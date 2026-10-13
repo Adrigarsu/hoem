@@ -3,6 +3,30 @@ description: Something does not work as expected.
 title: "[Bug]: "
 labels: ["type:bug"]
 body:
+  - type: input
+    id: requirements
+    attributes:
+      label: Related requirement IDs
+      description: IDs from docs/srs.md, if you know them.
+      placeholder: FR-SHOP-003
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Households
+        - Dashboard
+        - Meals
+        - Shopping
+        - Expenses
+        - Planner
+        - Integrations
+        - Demo
+        - Onboarding
+        - Platform
+        - Design system
+
   - type: textarea
     id: steps
     attributes:

@@ -1,0 +1,41 @@
+name: Documentation
+description: Add or update documentation (SRS, architecture, ADRs, README, AGENTS.md).
+title: "[Docs]: "
+labels: ["type:docs"]
+body:
+  - type: input
+    id: documents
+    attributes:
+      label: Documents affected
+      placeholder: docs/srs.md, docs/architecture.md
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is missing, wrong or out of date, and why it matters.
+    validations:
+      required: true
+
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: Checklist that tells us the change is finished.
+      placeholder: |
+        - [ ] …
+    validations:
+      required: true
+
+  - type: input
+    id: requirements
+    attributes:
+      label: Related requirement IDs
+      placeholder: NFR-MNT-002
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes

@@ -1,5 +1,5 @@
 name: Technical task
-description: Technical work with no direct user-facing change (chore, refactor, docs).
+description: Technical work with no direct user-facing change (chore, refactor, CI, tests).
 title: "[Task]: "
 labels: ["type:chore"]
 body:
@@ -7,10 +7,10 @@ body:
     id: kind
     attributes:
       label: Kind of work
+      description: For documentation, use the Documentation form instead.
       options:
         - Chore
         - Refactor
-        - Docs
         - CI
         - Test
     validations:
