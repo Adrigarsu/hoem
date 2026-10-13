@@ -19,7 +19,7 @@ built to meet WCAG 2.2 AA in light and dark themes.
 ## Tech stack
 
 Next.js 16 (App Router) · React 19 with React Compiler · TypeScript (strict) · Tailwind CSS 4 ·
-Supabase (Postgres, Auth, Realtime, Storage) · Drizzle ORM · Zod · TanStack Query · next-intl ·
+Supabase (Postgres, Auth, Realtime, Storage, Edge Functions) · Drizzle ORM · Zod · TanStack Query · next-intl ·
 Vitest + Testing Library · Playwright + axe-core · pnpm
 
 ## Getting started
