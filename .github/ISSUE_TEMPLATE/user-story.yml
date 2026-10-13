@@ -1,0 +1,73 @@
+name: User story
+description: A feature described from the user's point of view.
+title: "[Story]: "
+labels: ["type:feature"]
+body:
+  - type: input
+    id: requirements
+    attributes:
+      label: Requirement IDs
+      description: IDs from docs/srs.md.
+      placeholder: US-SHOP-02, FR-SHOP-003
+    validations:
+      required: true
+
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      value: |
+        As a …
+        I want …
+        so that …
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: One Gherkin scenario per behaviour.
+      render: gherkin
+      placeholder: |
+        Scenario: A flatmate adds an item to the shared list
+          Given I am a member of a shared flat
+          When I add "milk" to the shared shopping list
+          Then my flatmates see "milk" without reloading
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (MoSCoW)
+      options:
+        - Must
+        - Should
+        - Could
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Households
+        - Dashboard
+        - Meals
+        - Shopping
+        - Expenses
+        - Planner
+        - Demo
+        - Onboarding
+        - Platform
+        - Design system
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Designs, open questions, dependencies.
