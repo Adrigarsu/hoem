@@ -1,0 +1,46 @@
+name: Technical task
+description: Technical work with no direct user-facing change (chore, refactor, CI, tests).
+title: "[Task]: "
+labels: ["type:chore"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of work
+      description: For documentation, use the Documentation form instead.
+      options:
+        - Chore
+        - Refactor
+        - CI
+        - Test
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be done and why.
+    validations:
+      required: true
+
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: Checklist that tells us the task is finished.
+      placeholder: |
+        - [ ] …
+    validations:
+      required: true
+
+  - type: input
+    id: requirements
+    attributes:
+      label: Related requirement IDs
+      placeholder: NFR-MNT-002
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes

@@ -13,7 +13,7 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test",
