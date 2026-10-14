@@ -5,7 +5,7 @@ family, a shared flat or a single person. It brings meal planning, shopping list
 reminders into one place, keeps private records private between household members, and is
 built to meet WCAG 2.2 AA in light and dark themes.
 
-**Live demo:** coming soon
+**Live:** https://hoemapp.com
 
 ## Features
 
@@ -62,3 +62,14 @@ Open http://localhost:3000.
   `feat(shopping): live updates (FR-SHOP-003)`. commitlint checks them on commit.
 - Run **`pnpm check`** before pushing. CI runs the same checks plus `pnpm build` on every pull
   request.
+
+## Deployment
+
+- **Vercel** builds the app through its GitHub integration. Functions run in `fra1` (Frankfurt,
+  set in `vercel.json`), the same EU region as Supabase.
+- **Production:** every merge into `main` deploys to https://hoemapp.com.
+- **Previews:** every pull request gets its own `*.vercel.app` URL, protected by Vercel
+  Authentication.
+- **Domain:** `hoemapp.com` is registered at Cloudflare, which hosts its DNS. The apex `A` record
+  and the `www` `CNAME` point to Vercel as "DNS only" (proxy off), so TLS certificates and
+  caching stay with Vercel. `www.hoemapp.com` redirects permanently (308) to `hoemapp.com`.
