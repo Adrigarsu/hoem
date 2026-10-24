@@ -57,120 +57,24 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 ## 3. Architecture decisions
 
-Fourteen decisions shape the system. Each is summarised here and lives as its own file in `docs/adr/` (for example `docs/adr/0004-two-layer-authorization.md`), so it can be reviewed in a pull request and superseded later without rewriting history.
+Fourteen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
 
-| ADR | Decision                                                                              | Status   |
-| --- | ------------------------------------------------------------------------------------- | -------- |
-| 001 | One Next.js application in one GitHub repository (modular monolith)                   | Accepted |
-| 002 | Supabase as the backend platform, hosted in the EU                                    | Accepted |
-| 003 | Drizzle ORM for queries and schema; plain SQL migrations for policies                 | Accepted |
-| 004 | Authorization in two layers: application services and PostgreSQL RLS                  | Accepted |
-| 005 | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                | Accepted |
-| 006 | Visibility of private records is decided when they are written                        | Accepted |
-| 007 | Money stored as integer cents, one currency per household                             | Accepted |
-| 008 | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push  | Accepted |
-| 009 | Deletes are immediate after a 5-second undo window; no soft delete                    | Accepted |
-| 010 | Test pyramid: test-first for domain and services, end-to-end per story                | Accepted |
-| 011 | Demo mode with anonymous sessions and per-visitor copies                              | Accepted |
-| 012 | Internationalisation with next-intl; locale from the profile, not the URL             | Accepted |
-| 013 | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
-| 014 | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
-
-### ADR-001 One Next.js application in one repository
-
-**Context.** One part-time developer builds a web app with a design system, a REST API and background jobs. Splitting these into separate packages (a Turborepo monorepo) adds build configuration, versioning and tooling before any feature exists.
-
-**Decision.** A single Next.js project in one GitHub repository, organised as a modular monolith: code grouped by feature, layers inside each feature, and lint rules that forbid imports across feature boundaries except through each feature's public `index.ts`.
-
-**Consequences.** One build, one deploy, one test run. The design system lives in `src/design-system/` and could be extracted into a package later because nothing outside it reaches into its internals. Rejected: a monorepo (too much setup for the MVP) and a separate backend service (two deploys, duplicated types).
-
-### ADR-002 Supabase as the backend platform
-
-**Context.** The MVP needs PostgreSQL, authentication (email, Google, anonymous), real-time updates for the shopping list, file storage for photos and a scheduler for reminders, within free tiers.
-
-**Decision.** Supabase, in the EU region (Frankfurt), for Postgres, Auth, Realtime, Storage, Edge Functions and pg\_cron. The web app is hosted on Vercel, in the same region. ADR-013 keeps the production project in Ireland instead.
-
-**Consequences.** One managed platform covers every infrastructure need, and EU hosting keeps personal data in the EU (GDPR). Supabase is open source and can be self-hosted, which limits lock-in. Rejected: assembling Auth.js, Neon, Pusher and S3 separately (more integrations, more secrets, more failure points).
-
-### ADR-003 Drizzle ORM and SQL migrations
-
-**Context.** The schema must be typed in TypeScript, versioned, and include row-level security policies, triggers and SQL functions that ORMs do not model well.
-
-**Decision.** Drizzle ORM defines tables in TypeScript (`src/db/schema/`) and generates migrations. Policies, functions and triggers are written as hand-reviewed SQL migrations in the same folder, applied in order by the Supabase CLI. ADR-014 sets the folder (`supabase/migrations/`) and how migrations reach each environment.
-
-**Consequences.** Queries are type-safe and close to SQL, so they are easy to reason about. Every policy is visible in code review. Rejected: Prisma (heavier client, weaker fit for RLS and custom SQL).
-
-### ADR-004 Authorization in two layers
-
-**Context.** A privacy leak is the worst failure this product can have (quality goal 1). A single check in application code can be forgotten in one endpoint.
-
-**Decision.** Every request is checked twice. Application services verify membership and role and return a clear error. PostgreSQL row-level security enforces the same rules on every row, using the user's own JWT, so the database refuses what the code forgot. The service-role key is used only by background jobs, never in request handling.
-
-**Consequences.** Defence in depth: a bug in one layer is caught by the other. RLS also protects Realtime subscriptions from the browser. Policies must be tested directly with integration tests that sign in as different users (section 7.5).
-
-### ADR-005 Server Actions and a REST API with OpenAPI
-
-**Context.** The web app benefits from Server Actions (no hand-written fetch code, progressive enhancement). A future native app, the AI assistant and external integrations need a stable, documented HTTP API.
-
-**Decision.** Both entry points call the same application services. Server Actions serve the web UI. A REST API under `/api/v1` exposes the same use cases, is described with OpenAPI 3.1 generated from the shared Zod schemas, and is browsable at `/api/docs`.
-
-**Consequences.** Business rules live once, in the services; the two entry points stay thin. Versioning in the path lets the API evolve without breaking clients. Rejected: Server Actions only (no public API) and tRPC (TypeScript clients only).
-
-### ADR-006 Visibility decided at write time
-
-**Context.** Who can see a private expense depends on the household type and the author's family role (FR-HH-002). FR-HH-007 requires that changing the household type never exposes existing private data.
-
-**Decision.** Each private expense stores `visible_to_parents`, set by a database trigger when the row is inserted, from the household rules in force at that moment. Policies read that column, never the current household type.
-
-**Consequences.** Past records keep the visibility they were created with, which satisfies FR-HH-007 by construction. Changing the rules affects only new records, as the setup screen warns.
-
-### ADR-007 Money as integer cents
-
-**Context.** Floating-point numbers cannot represent most decimal amounts exactly (0.1 + 0.2 ≠ 0.3), which breaks splits and balances.
-
-**Decision.** Amounts are `bigint` cents in the database and `number` cents in TypeScript; formatting to "€43.20" happens only in the interface with `Intl.NumberFormat`. One currency per household (ISO 4217 code). Splits that do not divide evenly give the leftover cent to the payer.
-
-**Consequences.** Totals and balances are exact. Multi-currency households are out of scope.
-
-### ADR-008 Reminders with iCalendar rules and Web Push
-
-**Context.** Notes can repeat (daily, chosen weekdays, monthly, yearly) and must notify chosen members even when the app is closed (FR-NOTE-003, FR-NOTIF-002).
-
-**Decision.** A reminder stores its start, time zone and an RFC 5545 recurrence rule (`FREQ=MONTHLY;BYMONTHDAY=1`), plus a precomputed `next_fire_at`. pg\_cron calls an Edge Function every minute; it sends due reminders with the Web Push protocol (RFC 8030, VAPID keys per RFC 8292), writes them to the in-app notification centre, and computes the next occurrence with the `rrule` library.
-
-**Consequences.** A standard format any calendar understands; times stay correct across daylight-saving changes because rules are evaluated in the user's time zone. Delivery is at most about one minute late. On iOS, push requires the app to be installed to the home screen (FR-NOTIF-004).
-
-### ADR-009 Delete with a 5-second undo, no soft delete
-
-**Context.** NFR-UX-002 requires confirmation or undo for destructive actions. A recycle bin (soft delete) would add a `deleted_at` filter to every query and every policy.
-
-**Decision.** The interface hides the item at once and shows a toast with Undo for 5 seconds; only then does it call the delete. If the page is closed during those 5 seconds, the pending delete is sent on `pagehide`. Deleting a whole household or account still asks for typed confirmation.
-
-**Consequences.** Simple data model and policies. Once the 5 seconds pass, data is gone for good, which also simplifies the GDPR right to erasure.
-
-### ADR-010 Testing strategy
-
-**Context.** Business rules (splits, merging ingredients, privacy) must be right; interfaces change often during the MVP.
-
-**Decision.** A test pyramid. Domain functions and services are written test-first with Vitest (TDD). RLS policies get integration tests against a local Supabase. Each user story gets at least one Playwright end-to-end test once its interface is done, with axe-core accessibility checks on every page visited.
-
-**Consequences.** Fast, stable tests where bugs are most expensive; fewer brittle UI tests. Coverage target 80 % for domain and services (NFR-MNT-003).
-
-### ADR-011 Demo mode with anonymous sessions
-
-**Context.** Reviewers must try the app without registering, without seeing each other's changes (FR-DEMO-001 to 008).
-
-**Decision.** "Try the demo" signs the visitor in with a Supabase anonymous session; a SQL function copies the template households into new households owned by that session. A scheduled job deletes anonymous users and their data after 24 hours. Outgoing actions (invitations, emails, push) check `is_anonymous` in the JWT and refuse.
-
-**Consequences.** The demo runs on exactly the same code and policies as real accounts, so it also demonstrates them.
-
-### ADR-012 Internationalisation
-
-**Context.** English first, Spanish in phase 2 (NFR-I18N-001). The app is behind a sign-in, so localised URLs bring no search benefit.
-
-**Decision.** next-intl with message files per locale (`messages/en.json`). The locale comes from the profile, then the `Accept-Language` header; it is not part of the URL. Dates, numbers and money are formatted with the `Intl` API.
-
-**Consequences.** Clean URLs, one place for every string, and a lint rule can forbid literal text in components.
+| ADR                                               | Decision                                                                              | Status   |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------- | -------- |
+| [001](adr/0001-modular-monolith.md)               | One Next.js application in one GitHub repository (modular monolith)                   | Accepted |
+| [002](adr/0002-supabase-backend.md)               | Supabase as the backend platform, hosted in the EU                                    | Accepted |
+| [003](adr/0003-drizzle-and-sql-migrations.md)     | Drizzle ORM for queries and schema; plain SQL migrations for policies                 | Accepted |
+| [004](adr/0004-two-layer-authorization.md)        | Authorization in two layers: application services and PostgreSQL RLS                  | Accepted |
+| [005](adr/0005-server-actions-and-rest-api.md)    | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                | Accepted |
+| [006](adr/0006-visibility-at-write-time.md)       | Visibility of private records is decided when they are written                        | Accepted |
+| [007](adr/0007-money-as-integer-cents.md)         | Money stored as integer cents, one currency per household                             | Accepted |
+| [008](adr/0008-reminders-icalendar-web-push.md)   | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push  | Accepted |
+| [009](adr/0009-delete-with-undo.md)               | Deletes are immediate after a 5-second undo window; no soft delete                    | Accepted |
+| [010](adr/0010-testing-strategy.md)               | Test pyramid: test-first for domain and services, end-to-end per story                | Accepted |
+| [011](adr/0011-demo-with-anonymous-sessions.md)   | Demo mode with anonymous sessions and per-visitor copies                              | Accepted |
+| [012](adr/0012-internationalisation.md)           | Internationalisation with next-intl; locale from the profile, not the URL             | Accepted |
+| [013](adr/0013-production-supabase-in-ireland.md) | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
+| [014](adr/0014-migration-pipeline.md)             | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
 
 ## 4. Code organisation and conventions
 

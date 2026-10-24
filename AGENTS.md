@@ -13,7 +13,9 @@ Sources of truth. Read the relevant parts before designing anything non-trivial:
 
 - `docs/srs.md`: requirements with IDs (`FR-EXP-007`, `NFR-A11Y-001`…)
 - `docs/architecture.md`: architecture, data model, row-level security, decisions (ADRs)
-- `docs/adr/`: new architecture decisions, one file each
+- `docs/adr/`: architecture decisions, one file each (index in `docs/adr/README.md`)
+- `docs/design-system/`: design tokens (`tokens.json`), approved colour pairs, typography,
+  spacing and component rules (`README.md`), and the reference component CSS
 
 If the code and these documents disagree, stop and ask. Never silently pick one.
 
