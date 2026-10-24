@@ -249,7 +249,7 @@ Unexpected errors are logged with a request ID and shown to the user as a generi
 
 ### 4.5 Other conventions
 
-- **Configuration** follows the Twelve-Factor App: every secret and URL comes from environment variables, validated at start-up with Zod in `src/lib/env.ts`; the app refuses to start if one is missing.
+- **Configuration** follows the Twelve-Factor App: every secret and URL comes from environment variables, validated at start-up with Zod in `src/lib/env.ts` (public values, also used in the browser) and `src/lib/server-env.ts` (secrets, guarded by `server-only` so a Client Component cannot import them); the app refuses to start if one is missing.
 - **Dates:** timestamps are `timestamptz` in UTC; calendar days (a meal, an expense) are `date`; the user's time zone is applied only when displaying.
 - **Strings:** no literal user-facing text in components; ESLint (`i18next/no-literal-string`) enforces it.
 - **Formatting and style:** Prettier and ESLint run on every commit through Husky and lint-staged; TypeScript runs in `strict` mode.
