@@ -61,7 +61,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - IDs are UUID v7.
 - Services throw typed `AppError` subclasses with stable codes; the API answers with RFC 9457
   Problem Details. Stack traces never reach the client.
-- Configuration comes from environment variables validated with Zod in `src/lib/env.ts`.
+- Configuration comes from environment variables validated with Zod: public `NEXT_PUBLIC_*`
+  values in `src/lib/env.ts`, secrets in `src/lib/server-env.ts` (guarded by `server-only`).
   Never commit secrets and never read `.env` files.
 - Deleting hides the item at once with a 5-second undo, then deletes for real. No soft delete.
 - **Migrations are backward compatible (expand/contract, ADR-014):** a migration that adds a

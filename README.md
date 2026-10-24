@@ -96,6 +96,11 @@ Open http://localhost:3000. Stop Supabase with `pnpm db:stop`.
   (ADR-013).
   Vercel holds `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` per
   environment. The service-role key is never set in Vercel; only background jobs use it.
+- **E-mail:** Resend (eu-west-1) sends from `no-reply@hoemapp.com`. It is the SMTP server of
+  Supabase Auth on staging and production, and `RESEND_API_KEY` (Sensitive in Vercel) is for the
+  app's own e-mails. Each environment has its own key, limited to sending from `hoemapp.com`.
+  DMARC reports go to Cloudflare DMARC Management. Locally, Auth e-mails land in Mailpit at
+  http://127.0.0.1:54324.
 - **Keep-alive:** free Supabase projects pause after a week without activity, so the
   `keep-alive.yml` workflow calls `ping()` on both projects every three days. GitHub disables
   scheduled workflows after 60 days without commits; its failure e-mail is the signal to
