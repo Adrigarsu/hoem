@@ -54,3 +54,40 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  # Pull requests never touch a shared database: every migration runs from scratch on a
+  # throw-away Postgres, and the database tests run against it (ADR-014).
+  database:
+    name: database
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Fail if the Drizzle schema has changes without a migration
+        run: |
+          pnpm db:generate
+          if [ -n "$(git status --porcelain supabase/migrations)" ]; then
+            echo "::error::src/db/schema changed without a migration. Run pnpm db:generate and commit it."
+            git status --porcelain supabase/migrations
+            exit 1
+          fi
+
+      - name: Start Postgres and apply every migration
+        run: pnpm exec supabase db start
+
+      - name: Run database tests
+        run: pnpm db:test

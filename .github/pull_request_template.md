@@ -21,6 +21,8 @@ Closes #
 <!-- Unit, component, end-to-end or manual steps. -->
 
 - [ ] `pnpm check` passes
+- [ ] Database changes: the migration is backward compatible and ships in its own pull request,
+      before any code that uses it (expand/contract, ADR-014), or N/A
 
 ## Accessibility checklist
 
