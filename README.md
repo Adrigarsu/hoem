@@ -45,18 +45,23 @@ Open http://localhost:3000. Stop Supabase with `pnpm db:stop`.
 
 ## Scripts
 
-| Script           | What it does                                         |
-| ---------------- | ---------------------------------------------------- |
-| `pnpm dev`       | Start the development server                         |
-| `pnpm build`     | Build for production                                 |
-| `pnpm start`     | Serve the production build                           |
-| `pnpm lint`      | Lint with ESLint (`pnpm lint:fix` to autofix)        |
-| `pnpm typecheck` | Type-check with TypeScript                           |
-| `pnpm format`    | Format with Prettier (`pnpm format:check` to verify) |
-| `pnpm test`      | Run unit tests with Vitest (`pnpm test:watch`)       |
-| `pnpm check`     | Lint, typecheck, format check and tests              |
-| `pnpm db:start`  | Start the local Supabase in Docker                   |
-| `pnpm db:stop`   | Stop the local Supabase                              |
+| Script             | What it does                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `pnpm dev`         | Start the development server                                                          |
+| `pnpm build`       | Build for production                                                                  |
+| `pnpm start`       | Serve the production build                                                            |
+| `pnpm lint`        | Lint with ESLint (`pnpm lint:fix` to autofix)                                         |
+| `pnpm typecheck`   | Type-check with TypeScript                                                            |
+| `pnpm format`      | Format with Prettier (`pnpm format:check` to verify)                                  |
+| `pnpm test`        | Run unit tests with Vitest (`pnpm test:watch`)                                        |
+| `pnpm check`       | Lint, typecheck, format check and tests                                               |
+| `pnpm db:start`    | Start the local Supabase in Docker                                                    |
+| `pnpm db:stop`     | Stop the local Supabase                                                               |
+| `pnpm db:generate` | Generate a migration from `src/db/schema/` (`--custom --name=…` for hand-written SQL) |
+| `pnpm db:migrate`  | Apply pending migrations to the local Supabase                                        |
+| `pnpm db:reset`    | Recreate the local database and apply every migration from scratch                    |
+| `pnpm db:test`     | Run the pgTAP database tests in `supabase/tests/`                                     |
+| `pnpm db:seed`     | Load local seed data (`src/db/seed/`)                                                 |
 
 ## Project docs
 
@@ -71,6 +76,9 @@ Open http://localhost:3000. Stop Supabase with `pnpm db:stop`.
   `type/REQ-ID-short-name` (for example `feat/FR-SHOP-003-realtime-list`) and open a pull request.
 - **Conventional Commits** with the requirement ID, for example
   `feat(shopping): live updates (FR-SHOP-003)`. commitlint checks them on commit.
+- **Migrations** live in `supabase/migrations/` and are always backward compatible
+  (expand/contract, ADR-014). CI applies them from scratch on a throw-away database; merges to
+  `main` apply them to staging, then production.
 - Run **`pnpm check`** before pushing. CI runs the same checks plus `pnpm build` on every pull
   request.
 

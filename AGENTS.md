@@ -64,6 +64,10 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - Configuration comes from environment variables validated with Zod in `src/lib/env.ts`.
   Never commit secrets and never read `.env` files.
 - Deleting hides the item at once with a 5-second undo, then deletes for real. No soft delete.
+- **Migrations are backward compatible (expand/contract, ADR-014):** a migration that adds a
+  column, table or function merges in its own pull request, before the code that uses it, because
+  Vercel deploys the app while `migrate.yml` is still running. Remove the old one in a later pull
+  request, once nothing reads it. Never rename or drop something the deployed code still uses.
 
 ## UI and accessibility (WCAG 2.2 AA, light and dark themes)
 

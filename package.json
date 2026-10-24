@@ -19,11 +19,17 @@
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test",
     "prepare": "husky",
     "db:start": "supabase start",
-    "db:stop": "supabase stop"
+    "db:stop": "supabase stop",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "supabase migration up --local",
+    "db:reset": "supabase db reset --local",
+    "db:test": "supabase test db",
+    "db:seed": "tsx src/db/seed/run.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
+    "drizzle-orm": "^0.45.4",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -42,6 +48,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.1.2",
     "babel-plugin-react-compiler": "1.0.0",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "eslint-config-prettier": "^10.1.8",
@@ -53,6 +60,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "supabase": "^2.120.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^5.0.4"

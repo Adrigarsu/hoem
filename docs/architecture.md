@@ -57,23 +57,24 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 ## 3. Architecture decisions
 
-Thirteen decisions shape the system. Each is summarised here and lives as its own file in `docs/adr/` (for example `docs/adr/0004-two-layer-authorization.md`), so it can be reviewed in a pull request and superseded later without rewriting history.
+Fourteen decisions shape the system. Each is summarised here and lives as its own file in `docs/adr/` (for example `docs/adr/0004-two-layer-authorization.md`), so it can be reviewed in a pull request and superseded later without rewriting history.
 
-| ADR | Decision                                                                             | Status   |
-| --- | ------------------------------------------------------------------------------------ | -------- |
-| 001 | One Next.js application in one GitHub repository (modular monolith)                  | Accepted |
-| 002 | Supabase as the backend platform, hosted in the EU                                   | Accepted |
-| 003 | Drizzle ORM for queries and schema; plain SQL migrations for policies                | Accepted |
-| 004 | Authorization in two layers: application services and PostgreSQL RLS                 | Accepted |
-| 005 | Server Actions for the web app; REST API v1 described with OpenAPI 3.1               | Accepted |
-| 006 | Visibility of private records is decided when they are written                       | Accepted |
-| 007 | Money stored as integer cents, one currency per household                            | Accepted |
-| 008 | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push | Accepted |
-| 009 | Deletes are immediate after a 5-second undo window; no soft delete                   | Accepted |
-| 010 | Test pyramid: test-first for domain and services, end-to-end per story               | Accepted |
-| 011 | Demo mode with anonymous sessions and per-visitor copies                             | Accepted |
-| 012 | Internationalisation with next-intl; locale from the profile, not the URL            | Accepted |
-| 013 | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt     | Proposed |
+| ADR | Decision                                                                              | Status   |
+| --- | ------------------------------------------------------------------------------------- | -------- |
+| 001 | One Next.js application in one GitHub repository (modular monolith)                   | Accepted |
+| 002 | Supabase as the backend platform, hosted in the EU                                    | Accepted |
+| 003 | Drizzle ORM for queries and schema; plain SQL migrations for policies                 | Accepted |
+| 004 | Authorization in two layers: application services and PostgreSQL RLS                  | Accepted |
+| 005 | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                | Accepted |
+| 006 | Visibility of private records is decided when they are written                        | Accepted |
+| 007 | Money stored as integer cents, one currency per household                             | Accepted |
+| 008 | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push  | Accepted |
+| 009 | Deletes are immediate after a 5-second undo window; no soft delete                    | Accepted |
+| 010 | Test pyramid: test-first for domain and services, end-to-end per story                | Accepted |
+| 011 | Demo mode with anonymous sessions and per-visitor copies                              | Accepted |
+| 012 | Internationalisation with next-intl; locale from the profile, not the URL             | Accepted |
+| 013 | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
+| 014 | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
 
 ### ADR-001 One Next.js application in one repository
 
@@ -95,7 +96,7 @@ Thirteen decisions shape the system. Each is summarised here and lives as its ow
 
 **Context.** The schema must be typed in TypeScript, versioned, and include row-level security policies, triggers and SQL functions that ORMs do not model well.
 
-**Decision.** Drizzle ORM defines tables in TypeScript (`src/db/schema/`) and generates migrations. Policies, functions and triggers are written as hand-reviewed SQL migrations in the same folder, applied in order by the Supabase CLI.
+**Decision.** Drizzle ORM defines tables in TypeScript (`src/db/schema/`) and generates migrations. Policies, functions and triggers are written as hand-reviewed SQL migrations in the same folder, applied in order by the Supabase CLI. ADR-014 sets the folder (`supabase/migrations/`) and how migrations reach each environment.
 
 **Consequences.** Queries are type-safe and close to SQL, so they are easy to reason about. Every policy is visible in code review. Rejected: Prisma (heavier client, weaker fit for RLS and custom SQL).
 
@@ -194,10 +195,12 @@ hoem/
 │   ├── design-system/           tokens, components, Storybook stories
 │   ├── db/
 │   │   ├── schema/              Drizzle table definitions
-│   │   ├── migrations/          generated + hand-written SQL (policies, triggers)
 │   │   └── seed/                demo template and local test data
 │   └── lib/                     Supabase clients, errors, env, i18n, logging
-├── supabase/functions/          Edge Functions: dispatch-reminders, cleanup-demo
+├── supabase/
+│   ├── migrations/              generated + hand-written SQL (policies, triggers), ADR-014
+│   ├── tests/                   pgTAP database and policy tests
+│   └── functions/               Edge Functions: dispatch-reminders, cleanup-demo
 ├── messages/                    en.json, es.json
 ├── tests/e2e/                   Playwright specs, one per user story
 └── docs/adr/                    Architecture Decision Records
@@ -489,11 +492,11 @@ Every pull request gets its own preview deployment and must pass the same checks
 
 ### 9.1 Environments
 
-| Environment                | Address                                       | Web app                    | Database                                           | Data                                       |
-| -------------------------- | --------------------------------------------- | -------------------------- | -------------------------------------------------- | ------------------------------------------ |
-| Local                      | `localhost:3000`                              | `pnpm dev`                 | Supabase CLI in Docker                             | Seed script: two households, demo template |
-| Preview (per pull request) | `*.vercel.app` preview URL                    | Vercel preview             | Supabase staging project, migrations applied by CI | Seed data, reset weekly                    |
-| Production                 | `https://hoemapp.com` (`www` redirects to it) | Vercel, `fra1` (Frankfurt) | Supabase production project, Ireland (ADR-013)     | Real users and the demo template           |
+| Environment                | Address                                       | Web app                    | Database                                         | Data                                       |
+| -------------------------- | --------------------------------------------- | -------------------------- | ------------------------------------------------ | ------------------------------------------ |
+| Local                      | `localhost:3000`                              | `pnpm dev`                 | Supabase CLI in Docker                           | Seed script: two households, demo template |
+| Preview (per pull request) | `*.vercel.app` preview URL                    | Vercel preview             | Supabase staging project, migrations from `main` | Seed data, reset weekly                    |
+| Production                 | `https://hoemapp.com` (`www` redirects to it) | Vercel, `fra1` (Frankfurt) | Supabase production project, Ireland (ADR-013)   | Real users and the demo template           |
 
 **Domain and e-mail.** The domain `hoemapp.com` is registered at Cloudflare, which also hosts its DNS. Vercel serves the app on it with an automatic TLS certificate. Resend sends from `no-reply@hoemapp.com` (region eu-west-1) on a verified domain. Its records are added through Resend's Cloudflare integration (MX and SPF on send, DKIM on resend.\_domainkey), plus a DMARC record on \_dmarc that we add ourselves, so invitations are not marked as spam. Every record for Vercel and Resend is "DNS only" (Cloudflare proxy off), so TLS and caching stay with Vercel and e-mail authentication is not altered. Supabase Auth uses the same Resend account as its SMTP server, so password-reset and confirmation e-mails come from the same address. The VAPID contact for Web Push is `mailto:hello@hoemapp.com`.
 
@@ -501,17 +504,17 @@ Every pull request gets its own preview deployment and must pass the same checks
 
 GitHub Actions runs these jobs on every pull request; all must pass before merging into `main`.
 
-| Order | Job                                         | Fails when                                                               |
-| ----- | ------------------------------------------- | ------------------------------------------------------------------------ |
-| 1     | Install, type-check, lint, format check     | Any TypeScript, ESLint or Prettier error, including layer and i18n rules |
-| 2     | Unit tests (Vitest) with coverage           | A test fails, or domain and services drop below 80 %                     |
-| 3     | Policy tests against Supabase in Docker     | Any row of the visibility matrix (7.2) is wrong                          |
-| 4     | Build and OpenAPI generation                | The build fails or a route has no schema                                 |
-| 5     | End-to-end tests (Playwright) with axe-core | A story test fails or an accessibility violation is found                |
-| 6     | Lighthouse CI on the preview URL            | Any score below 90 (NFR-PERF-002)                                        |
-| 7     | Secret scanning and dependency audit        | A secret is committed or a high-severity vulnerability is found          |
+| Order | Job                                         | Fails when                                                                                                            |
+| ----- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1     | Install, type-check, lint, format check     | Any TypeScript, ESLint or Prettier error, including layer and i18n rules                                              |
+| 2     | Unit tests (Vitest) with coverage           | A test fails, or domain and services drop below 80 %                                                                  |
+| 3     | Migrations and database tests in Docker     | A migration fails from scratch, a pgTAP or policy test fails (7.2), or the Drizzle schema changed without a migration |
+| 4     | Build and OpenAPI generation                | The build fails or a route has no schema                                                                              |
+| 5     | End-to-end tests (Playwright) with axe-core | A story test fails or an accessibility violation is found                                                             |
+| 6     | Lighthouse CI on the preview URL            | Any score below 90 (NFR-PERF-002)                                                                                     |
+| 7     | Secret scanning and dependency audit        | A secret is committed or a high-severity vulnerability is found                                                       |
 
-Merging into `main` deploys to production: migrations run first, then Vercel promotes the build. Releases are tagged with Semantic Versioning (`v1.0.0` at Gate B).
+Merging into `main` applies pending migrations to staging and then to production (production is skipped if staging fails), while Vercel deploys the build. Every migration is backward compatible and merges before the code that uses it (expand/contract, ADR-014), so either can finish first. Releases are tagged with Semantic Versioning (`v1.0.0` at Gate B).
 
 A scheduled workflow (`keep-alive.yml`, every three days and on demand) calls the `ping()` SQL function on the staging and production projects with the publishable key, so the free Supabase tier never pauses them; it fails loudly if either project does not answer.
 

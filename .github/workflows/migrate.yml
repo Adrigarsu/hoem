@@ -1,0 +1,72 @@
+name: Migrate
+
+# Only merges to main change a shared database: staging first, then production. Vercel deploys
+# the app at the same time, so a migration merges in its own pull request, before any code that
+# needs it (expand/contract, ADR-014).
+on:
+  push:
+    branches: [main]
+    paths: [supabase/migrations/**]
+  workflow_dispatch:
+
+# Never two runs at once, and never cancel one halfway through.
+concurrency:
+  group: migrate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  staging:
+    name: migrate staging
+    # A manual run can be started from any branch; only main may change a shared database. The
+    # environments also accept main only, but that setting lives outside the repository.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: supabase-staging
+    steps:
+      - &checkout
+        name: Checkout
+        uses: actions/checkout@v7
+
+      - &pnpm
+        name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - &node
+        name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - &install
+        name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - &push
+        name: Apply pending migrations
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL is not set for this environment"
+            exit 1
+          fi
+          pnpm exec supabase db push --db-url "$SUPABASE_DB_URL" --yes
+
+  production:
+    name: migrate production
+    # Skipped when staging fails, so a broken migration never reaches real users.
+    needs: staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: supabase-production
+    steps:
+      - *checkout
+      - *pnpm
+      - *node
+      - *install
+      - *push
