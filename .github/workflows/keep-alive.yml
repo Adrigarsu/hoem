@@ -1,0 +1,45 @@
+name: Keep alive
+
+# Free Supabase projects pause after a week without activity. A real database read every three
+# days keeps staging and production awake. GitHub disables scheduled workflows after 60 days
+# without commits; the failure e-mail is the signal to re-enable this one.
+on:
+  schedule:
+    - cron: "0 6 */3 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: ping ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      # One sleeping project must not hide the state of the other.
+      fail-fast: false
+      matrix:
+        environment: [supabase-staging, supabase-production]
+    # These environments must stay without protection rules: a job waiting for approval never
+    # fails, so the project would pause without any e-mail.
+    environment: ${{ matrix.environment }}
+    steps:
+      - name: Call ping() through the REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_PUBLISHABLE_KEY" ]; then
+            echo "::error::SUPABASE_URL or SUPABASE_PUBLISHABLE_KEY is not set for this environment"
+            exit 1
+          fi
+          body=$(curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
+            --max-time 30 --request POST "$SUPABASE_URL/rest/v1/rpc/ping" \
+            --header "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            --header "Content-Type: application/json" --data '{}')
+          if [ "$body" != "1" ]; then
+            echo "::error::Expected 1 from ping(), got: $body"
+            exit 1
+          fi
+          echo "ping() answered 1"

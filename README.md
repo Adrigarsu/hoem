@@ -24,15 +24,24 @@ Vitest + Testing Library · Playwright + axe-core · pnpm
 
 ## Getting started
 
-Requirements: Node.js 22 (see `.nvmrc`) and pnpm (version pinned in `package.json`; enable it
-with `corepack enable`).
+Requirements: Node.js 22 (see `.nvmrc`), pnpm (version pinned in `package.json`; enable it
+with `corepack enable`) and Docker Desktop for the local Supabase.
 
 ```bash
 pnpm install
+pnpm db:start
+```
+
+`pnpm db:start` runs Supabase locally in Docker, applies the migrations in
+`supabase/migrations/` and prints the local URLs and keys. Copy `.env.example` to `.env.local`
+and fill it in with the API URL and the publishable key it printed (`pnpm exec supabase status`
+shows them again). The app refuses to start while a variable is missing.
+
+```bash
 pnpm dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000. Stop Supabase with `pnpm db:stop`.
 
 ## Scripts
 
@@ -46,6 +55,8 @@ Open http://localhost:3000.
 | `pnpm format`    | Format with Prettier (`pnpm format:check` to verify) |
 | `pnpm test`      | Run unit tests with Vitest (`pnpm test:watch`)       |
 | `pnpm check`     | Lint, typecheck, format check and tests              |
+| `pnpm db:start`  | Start the local Supabase in Docker                   |
+| `pnpm db:stop`   | Stop the local Supabase                              |
 
 ## Project docs
 
@@ -73,3 +84,11 @@ Open http://localhost:3000.
 - **Domain:** `hoemapp.com` is registered at Cloudflare, which hosts its DNS. The apex `A` record
   and the `www` `CNAME` point to Vercel as "DNS only" (proxy off), so TLS certificates and
   caching stay with Vercel. `www.hoemapp.com` redirects permanently (308) to `hoemapp.com`.
+- **Supabase:** `hoem-staging` (used by previews) in Frankfurt and `hoem-production` in Ireland
+  (ADR-013).
+  Vercel holds `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` per
+  environment. The service-role key is never set in Vercel; only background jobs use it.
+- **Keep-alive:** free Supabase projects pause after a week without activity, so the
+  `keep-alive.yml` workflow calls `ping()` on both projects every three days. GitHub disables
+  scheduled workflows after 60 days without commits; its failure e-mail is the signal to
+  re-enable it.
