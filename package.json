@@ -17,12 +17,17 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
     "next": "16.4.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
@@ -46,6 +51,7 @@
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "supabase": "^2.120.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",

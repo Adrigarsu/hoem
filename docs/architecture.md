@@ -47,7 +47,7 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 | Container | Technology                                                        | Responsibility                                                   |
 | --------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
 | Web app   | Next.js (App Router), React, TypeScript, Tailwind, TanStack Query | Pages, Server Actions, REST API, PWA manifest and service worker |
-| Database  | PostgreSQL 16 on Supabase, Drizzle ORM                            | All data, RLS policies, triggers, helper functions               |
+| Database  | PostgreSQL 17 on Supabase, Drizzle ORM                            | All data, RLS policies, triggers, helper functions               |
 | Auth      | Supabase Auth                                                     | Sessions, email and Google sign-in, anonymous demo sessions      |
 | Realtime  | Supabase Realtime                                                 | Shopping list changes and presence                               |
 | Storage   | Supabase Storage                                                  | Recipe photos and avatars in private buckets                     |
@@ -57,7 +57,7 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 ## 3. Architecture decisions
 
-Twelve decisions shape the system. Each is summarised here and lives as its own file in `docs/adr/` (for example `docs/adr/0004-two-layer-authorization.md`), so it can be reviewed in a pull request and superseded later without rewriting history.
+Thirteen decisions shape the system. Each is summarised here and lives as its own file in `docs/adr/` (for example `docs/adr/0004-two-layer-authorization.md`), so it can be reviewed in a pull request and superseded later without rewriting history.
 
 | ADR | Decision                                                                             | Status   |
 | --- | ------------------------------------------------------------------------------------ | -------- |
@@ -73,6 +73,7 @@ Twelve decisions shape the system. Each is summarised here and lives as its own 
 | 010 | Test pyramid: test-first for domain and services, end-to-end per story               | Accepted |
 | 011 | Demo mode with anonymous sessions and per-visitor copies                             | Accepted |
 | 012 | Internationalisation with next-intl; locale from the profile, not the URL            | Accepted |
+| 013 | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt     | Proposed |
 
 ### ADR-001 One Next.js application in one repository
 
@@ -86,7 +87,7 @@ Twelve decisions shape the system. Each is summarised here and lives as its own 
 
 **Context.** The MVP needs PostgreSQL, authentication (email, Google, anonymous), real-time updates for the shopping list, file storage for photos and a scheduler for reminders, within free tiers.
 
-**Decision.** Supabase, in the EU region (Frankfurt), for Postgres, Auth, Realtime, Storage, Edge Functions and pg\_cron. The web app is hosted on Vercel, in the same region.
+**Decision.** Supabase, in the EU region (Frankfurt), for Postgres, Auth, Realtime, Storage, Edge Functions and pg\_cron. The web app is hosted on Vercel, in the same region. ADR-013 keeps the production project in Ireland instead.
 
 **Consequences.** One managed platform covers every infrastructure need, and EU hosting keeps personal data in the EU (GDPR). Supabase is open source and can be self-hosted, which limits lock-in. Rejected: assembling Auth.js, Neon, Pusher and S3 separately (more integrations, more secrets, more failure points).
 
@@ -492,7 +493,7 @@ Every pull request gets its own preview deployment and must pass the same checks
 | -------------------------- | --------------------------------------------- | -------------------------- | -------------------------------------------------- | ------------------------------------------ |
 | Local                      | `localhost:3000`                              | `pnpm dev`                 | Supabase CLI in Docker                             | Seed script: two households, demo template |
 | Preview (per pull request) | `*.vercel.app` preview URL                    | Vercel preview             | Supabase staging project, migrations applied by CI | Seed data, reset weekly                    |
-| Production                 | `https://hoemapp.com` (`www` redirects to it) | Vercel, `fra1` (Frankfurt) | Supabase production project, Frankfurt             | Real users and the demo template           |
+| Production                 | `https://hoemapp.com` (`www` redirects to it) | Vercel, `fra1` (Frankfurt) | Supabase production project, Ireland (ADR-013)     | Real users and the demo template           |
 
 **Domain and e-mail.** The domain `hoemapp.com` is registered at Cloudflare, which also hosts its DNS. Vercel serves the app on it with an automatic TLS certificate. Resend sends from `no-reply@hoemapp.com` (region eu-west-1) on a verified domain. Its records are added through Resend's Cloudflare integration (MX and SPF on send, DKIM on resend.\_domainkey), plus a DMARC record on \_dmarc that we add ourselves, so invitations are not marked as spam. Every record for Vercel and Resend is "DNS only" (Cloudflare proxy off), so TLS and caching stay with Vercel and e-mail authentication is not altered. Supabase Auth uses the same Resend account as its SMTP server, so password-reset and confirmation e-mails come from the same address. The VAPID contact for Web Push is `mailto:hello@hoemapp.com`.
 
@@ -511,6 +512,8 @@ GitHub Actions runs these jobs on every pull request; all must pass before mergi
 | 7     | Secret scanning and dependency audit        | A secret is committed or a high-severity vulnerability is found          |
 
 Merging into `main` deploys to production: migrations run first, then Vercel promotes the build. Releases are tagged with Semantic Versioning (`v1.0.0` at Gate B).
+
+A scheduled workflow (`keep-alive.yml`, every three days and on demand) calls the `ping()` SQL function on the staging and production projects with the publishable key, so the free Supabase tier never pauses them; it fails loudly if either project does not answer.
 
 ### 9.3 Observability
 
