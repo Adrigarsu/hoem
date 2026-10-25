@@ -17,8 +17,9 @@ async function messagesTo(email: string): Promise<MessageSummary[]> {
   return messages;
 }
 
-// Waits for the count-th e-mail to an address and returns its subject and verification link.
-export async function verificationEmail(email: string, count = 1) {
+// Waits for the count-th e-mail to an address and returns its subject and its link (verification
+// or password reset).
+export async function emailLink(email: string, count = 1) {
   let messages: MessageSummary[] = [];
   await expect
     .poll(async () => (messages = await messagesTo(email)).length, { timeout: 15_000 })
@@ -29,6 +30,6 @@ export async function verificationEmail(email: string, count = 1) {
   const response = await fetch(`${mailpit}/api/v1/message/${latest.ID}`);
   const { HTML } = (await response.json()) as { HTML: string };
   const href = /href="([^"]*token_hash=[^"]*)"/.exec(HTML)?.[1];
-  if (!href) throw new Error(`No verification link in the e-mail to ${email}`);
+  if (!href) throw new Error(`No link in the e-mail to ${email}`);
   return { subject: latest.Subject, link: href.replaceAll("&amp;", "&") };
 }

@@ -9,6 +9,11 @@ const variants = {
   danger: "bg-danger text-on-accent",
 };
 
+// For a link that looks like a button, such as "Ask for a new link".
+export function buttonClassName(variant: keyof typeof variants = "primary") {
+  return `inline-flex h-control-height items-center justify-center gap-2 rounded-md border border-transparent px-5 text-label transition-colors duration-fast aria-disabled:cursor-progress ${variants[variant]}`;
+}
+
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: keyof typeof variants;
   // While a form is submitting: announced as busy and ignores clicks, but stays focusable, so
@@ -42,7 +47,7 @@ export function Button({
       aria-busy={pending || undefined}
       aria-disabled={pending || undefined}
       onClick={handleClick}
-      className={`inline-flex h-control-height items-center justify-center gap-2 rounded-md border border-transparent px-5 text-label transition-colors duration-fast aria-disabled:cursor-progress ${variants[variant]} ${className}`}
+      className={`${buttonClassName(variant)} ${className}`}
       {...props}
     >
       {pending && pendingLabel ? pendingLabel : children}

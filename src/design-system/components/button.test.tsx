@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Button } from "./button";
+import { Button, buttonClassName } from "./button";
 
 describe("Button", () => {
   it("NFR-A11Y-003 is a native button that does not submit forms unless asked", () => {
@@ -31,5 +31,12 @@ describe("Button", () => {
   it("NFR-A11Y-003 keeps its own label when it is not pending", () => {
     render(<Button pendingLabel="Signing in…">Sign in</Button>);
     expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+  });
+
+  it("NFR-UX-004 lets a link share the button styles", () => {
+    render(<Button variant="primary">Save</Button>);
+    expect(screen.getByRole("button", { name: "Save" })).toHaveClass(
+      ...buttonClassName("primary").split(" "),
+    );
   });
 });

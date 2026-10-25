@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { fieldErrors, readPendingSignUp, signInSchema, signUpSchema } from "./schemas";
+import {
+  fieldErrors,
+  forgotPasswordSchema,
+  readPendingSignUp,
+  resetPasswordSchema,
+  signInSchema,
+  signUpSchema,
+} from "./schemas";
 
 const validSignUp = {
   displayName: "Ana",
@@ -133,4 +140,49 @@ describe("readPendingSignUp", () => {
       expect(readPendingSignUp(value)).toBeNull();
     },
   );
+});
+
+describe("forgotPasswordSchema", () => {
+  it("FR-ACC-008 normalises the e-mail the link is sent to", () => {
+    expect(forgotPasswordSchema.parse({ email: " Ana@Example.COM " })).toEqual({
+      email: "ana@example.com",
+    });
+  });
+
+  it("FR-ACC-008 rejects a malformed e-mail", () => {
+    expect(issues(forgotPasswordSchema.safeParse({ email: "ana@" }))).toEqual([
+      ["email", "invalidEmail"],
+    ]);
+  });
+});
+
+describe("resetPasswordSchema", () => {
+  const validReset = {
+    tokenHash: "token-hash",
+    password: "a new passphrase",
+    confirmPassword: "a new passphrase",
+  };
+
+  it("FR-ACC-008 accepts a new password typed twice and the link token", () => {
+    expect(resetPasswordSchema.safeParse(validReset).success).toBe(true);
+  });
+
+  it("FR-ACC-008 applies the password policy to the new password", () => {
+    const result = resetPasswordSchema.safeParse({
+      ...validReset,
+      password: "short",
+      confirmPassword: "short",
+    });
+    expect(issues(result)).toEqual([["password", "passwordTooShort"]]);
+  });
+
+  it("FR-ACC-008 asks for the same new password twice", () => {
+    const result = resetPasswordSchema.safeParse({ ...validReset, confirmPassword: "different" });
+    expect(issues(result)).toEqual([["confirmPassword", "passwordsDoNotMatch"]]);
+  });
+
+  it("FR-ACC-008 rejects a reset without the link token", () => {
+    const result = resetPasswordSchema.safeParse({ ...validReset, tokenHash: "" });
+    expect(issues(result)).toEqual([["tokenHash", "required"]]);
+  });
 });

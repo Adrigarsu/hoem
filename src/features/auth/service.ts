@@ -19,8 +19,11 @@ export type AuthGateway = {
     email: string;
     options: { emailRedirectTo: string };
   }): AuthResult;
-  verifyOtp(params: { token_hash: string; type: VerificationType }): AuthResult;
+  verifyOtp(params: { token_hash: string; type: VerificationType | "recovery" }): AuthResult;
   signOut(): AuthResult;
+  resetPasswordForEmail(email: string, options: { redirectTo: string }): AuthResult;
+  updatePassword(password: string): AuthResult;
+  signOutOthers(): AuthResult;
   profileLocale(): Promise<string | null>;
 };
 
@@ -70,4 +73,36 @@ export async function verifyEmail(auth: AuthGateway, tokenHash: string, type: Ve
 
 export async function signOut(auth: AuthGateway) {
   await run(auth.signOut());
+}
+
+// Supabase only e-mails existing accounts, so any failure while sending (an SMTP error, the
+// per-address rate limit) would reveal that the account exists. Only the per-visitor rate limit
+// is reported; everything else gets the same "if an account exists" answer (FR-ACC-008).
+export async function requestPasswordReset(auth: AuthGateway, email: string, resetUrl: string) {
+  const { error } = await auth.resetPasswordForEmail(email, { redirectTo: resetUrl });
+  if (error?.code === "over_request_rate_limit") throw new AuthFailedError("rateLimited");
+}
+
+// The recovery token is verified only now, when the form is sent, so mail scanners that open the
+// link cannot use it up. Verifying it signs the visitor in, which updatePassword needs.
+export async function resetPassword(auth: AuthGateway, tokenHash: string, password: string) {
+  const verified = await auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+  if (verified.error) {
+    // A truncated or tampered token is as unusable as an expired one: offer a new link.
+    const rateLimited = verified.error.code === "over_request_rate_limit";
+    throw new AuthFailedError(rateLimited ? "rateLimited" : "linkExpired");
+  }
+
+  const { error } = await auth.updatePassword(password);
+  // Keeping the current password is allowed (decided in #24); Supabase refuses it as a change.
+  if (error && error.code !== "same_password") {
+    // The token is used up; do not leave a session behind for a password that was never set.
+    await auth.signOut();
+    throw new AuthFailedError(authErrorKey(error.code));
+  }
+
+  // A reset often follows a stolen password, so the other sessions go. The new password is
+  // already saved: a failure here must not tell the user that the reset failed.
+  await auth.signOutOthers();
+  return { locale: await auth.profileLocale() };
 }

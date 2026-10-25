@@ -15,6 +15,8 @@ The HTML uses the token names from `docs/design-system/tokens.json` as CSS custo
 | 2   | Sign in                 | `sign-in`            | `/sign-in`                      | ✓ + 2 error states        | ✓ + error       | M0        |
 | 3   | Create account          | `sign-up`            | `/sign-up`                      | ✓                         | ✓ (derived)     | M0        |
 | 4   | Check your inbox        | `check-your-inbox`   | `/check-your-inbox`             | ✓ + resent state          | ✓               | M0 (new)  |
+| 4a  | Forgot password         | `forgot-password`    | `/forgot-password`              | ✓ + states (derived, #24) | ✓               | M1a       |
+| 4b  | Set a new password      | `reset-password`     | `/auth/reset-password`          | ✓ + states (derived, #24) | ✓               | M1a       |
 | 5   | Setup guide: welcome    | `setup-welcome`      | `/setup`                        | ✓                         | centred column  | M1b       |
 | 6   | Setup step 1: household | `setup-household`    | `/setup/household`              | ✓                         | centred column  | M1b       |
 | 7   | Setup step 2: meals     | `setup-meals`        | `/setup/meals`                  | ✓                         | centred column  | M1b       |
@@ -69,7 +71,7 @@ decision wins and the screen's spec says so.
 | Desktop split      | The brand panel appears from `bp-lg` (1024 px), not 960 px: 960 is not a breakpoint token. Between 768 and 1023 px the pages use the mobile layout.              |
 | Links in text      | Links inside sentences ("Create an account", "Use a different email") are underlined: brand blue next to `text-secondary` is not enough on its own (WCAG 1.4.1). |
 | Panel text         | The secondary text of the brand panel uses the `body` style (16/24); 18/28 is not a type token.                                                                  |
-| "Forgot password?" | Hidden until FR-ACC-008 (#24) builds the reset flow, like Google and the demo.                                                                                   |
+| "Forgot password?" | Shown since #24, which builds the reset flow (FR-ACC-008).                                                                                                       |
 | Submitting         | The button text changes ("Signing in…", "Creating account…", "Sending…"); the spinner waits for an animation token, as the theme has none.                       |
 | Resend wait        | After "Resend email" the button keeps focus and is `aria-disabled` for 60 s, not `disabled`, so keyboard users do not lose their place.                          |
 | "Resend the link"  | On sign-in it sends a new link and opens Check your inbox for that address.                                                                                      |

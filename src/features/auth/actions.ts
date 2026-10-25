@@ -12,7 +12,9 @@ import { pendingSignUp, rememberPendingSignUp } from "./pending-sign-up-cookie";
 import { authGateway } from "./repository";
 import {
   fieldErrors,
+  forgotPasswordSchema,
   resendSchema,
+  resetPasswordSchema,
   signInSchema,
   signUpSchema,
   type ValidationKey,
@@ -22,13 +24,14 @@ import * as auth from "./service";
 // Thin entry points: parse with the shared schema, call the service, map the result to form
 // state. Passwords are never echoed back to the form.
 export type AuthFormState = {
-  status: "idle" | "invalid" | "failed" | "resent";
+  status: "idle" | "invalid" | "failed" | "resent" | "sent";
   fieldErrors?: Record<string, ValidationKey>;
   error?: AuthErrorKey;
   values?: { displayName?: string; email?: string };
 };
 
 const confirmPath = "/auth/confirm";
+const resetPasswordPath = "/auth/reset-password";
 
 function text(formData: FormData, name: string): string {
   const value = formData.get(name);
@@ -117,6 +120,58 @@ export async function resendFromInboxAction(): Promise<AuthFormState> {
     return failure(error, undefined);
   }
   return { status: "resent" };
+}
+
+// FR-ACC-008: the answer is "sent" whether or not the account exists (see the service).
+export async function requestPasswordResetAction(
+  _: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const values = { email: text(formData, "email") };
+  const parsed = forgotPasswordSchema.safeParse(values);
+  if (!parsed.success) {
+    return { status: "invalid", fieldErrors: fieldErrors(parsed.error), values };
+  }
+
+  try {
+    await auth.requestPasswordReset(
+      await authGateway(),
+      parsed.data.email,
+      `${requestOrigin(await headers())}${resetPasswordPath}`,
+    );
+  } catch (error) {
+    return failure(error, { email: parsed.data.email });
+  }
+  return { status: "sent", values: { email: parsed.data.email } };
+}
+
+export async function resetPasswordAction(
+  _: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const parsed = resetPasswordSchema.safeParse({
+    tokenHash: text(formData, "tokenHash"),
+    password: text(formData, "password"),
+    confirmPassword: text(formData, "confirmPassword"),
+  });
+  if (!parsed.success) {
+    const errors = fieldErrors(parsed.error);
+    // Without the token from the e-mail there is nothing to verify: the link is broken.
+    if (errors.tokenHash) return { status: "failed", error: "linkExpired" };
+    return { status: "invalid", fieldErrors: errors };
+  }
+
+  try {
+    const { locale } = await auth.resetPassword(
+      await authGateway(),
+      parsed.data.tokenHash,
+      parsed.data.password,
+    );
+    await rememberLocale(locale);
+  } catch (error) {
+    return failure(error, undefined);
+  }
+  redirect("/");
 }
 
 export async function signOutAction() {

@@ -1,7 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { AuthFailedError } from "@/lib/errors";
 import type { AuthGateway } from "./service";
-import { resendVerification, signIn, signOut, signUp, verifyEmail } from "./service";
+import {
+  requestPasswordReset,
+  resendVerification,
+  resetPassword,
+  signIn,
+  signOut,
+  signUp,
+  verifyEmail,
+} from "./service";
 
 const signUpInput = {
   displayName: "Ana",
@@ -22,6 +30,9 @@ function gateway(overrides: Partial<AuthGateway> = {}): AuthGateway {
     resend: vi.fn(async () => ({ error: null })),
     verifyOtp: vi.fn(async () => ({ error: null })),
     signOut: vi.fn(async () => ({ error: null })),
+    resetPasswordForEmail: vi.fn(async () => ({ error: null })),
+    updatePassword: vi.fn(async () => ({ error: null })),
+    signOutOthers: vi.fn(async () => ({ error: null })),
     profileLocale: vi.fn(async () => "en"),
     ...overrides,
   };
@@ -129,5 +140,105 @@ describe("signOut", () => {
     const auth = gateway();
     await signOut(auth);
     expect(auth.signOut).toHaveBeenCalled();
+  });
+});
+
+const resetUrl = "https://hoemapp.com/auth/reset-password";
+
+describe("requestPasswordReset", () => {
+  it("FR-ACC-008 asks for a reset link that opens the reset page", async () => {
+    const auth = gateway();
+    await requestPasswordReset(auth, "ana@example.com", resetUrl);
+    expect(auth.resetPasswordForEmail).toHaveBeenCalledWith("ana@example.com", {
+      redirectTo: resetUrl,
+    });
+  });
+
+  // Supabase only e-mails existing accounts, so a sending failure would reveal one.
+  it.each(["over_email_send_rate_limit", "unexpected_failure"])(
+    "FR-ACC-008 gives the same answer when sending fails (%s), so it never reveals an account",
+    async (code) => {
+      const auth = gateway({ resetPasswordForEmail: refused(code) });
+      await expect(
+        requestPasswordReset(auth, "ana@example.com", resetUrl),
+      ).resolves.toBeUndefined();
+    },
+  );
+
+  it("FR-ACC-008 reports too many requests from the visitor", async () => {
+    const auth = gateway({ resetPasswordForEmail: refused("over_request_rate_limit") });
+    await expect(requestPasswordReset(auth, "ana@example.com", resetUrl)).rejects.toMatchObject({
+      reason: "rateLimited",
+    });
+  });
+});
+
+describe("resetPassword", () => {
+  it("FR-ACC-008 verifies the recovery link before setting the new password", async () => {
+    const auth = gateway();
+    await resetPassword(auth, "token-hash", "a new passphrase");
+    expect(auth.verifyOtp).toHaveBeenCalledWith({ token_hash: "token-hash", type: "recovery" });
+    expect(auth.updatePassword).toHaveBeenCalledWith("a new passphrase");
+    expect(vi.mocked(auth.verifyOtp).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(auth.updatePassword).mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it("FR-ACC-008 does not change the password when the link expired or was used", async () => {
+    const auth = gateway({ verifyOtp: refused("otp_expired") });
+    await expect(resetPassword(auth, "token-hash", "a new passphrase")).rejects.toMatchObject({
+      reason: "linkExpired",
+    });
+    expect(auth.updatePassword).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-008 accepts the same password as before", async () => {
+    const auth = gateway({ updatePassword: refused("same_password") });
+    await expect(resetPassword(auth, "token-hash", "the old one")).resolves.toMatchObject({
+      locale: "en",
+    });
+  });
+
+  it("FR-ACC-008 maps a password the provider rejects to a message key", async () => {
+    const auth = gateway({ updatePassword: refused("weak_password") });
+    await expect(resetPassword(auth, "token-hash", "a new passphrase")).rejects.toMatchObject({
+      reason: "weakPassword",
+    });
+  });
+
+  it("FR-ACC-008 signs out again when the provider rejects the new password", async () => {
+    const auth = gateway({ updatePassword: refused("weak_password") });
+    await expect(resetPassword(auth, "token-hash", "a new passphrase")).rejects.toThrow();
+    expect(auth.signOut).toHaveBeenCalled();
+  });
+
+  it.each(["validation_failed", "unexpected_failure"])(
+    "FR-ACC-008 treats a link the provider cannot verify (%s) as no longer valid",
+    async (code) => {
+      const auth = gateway({ verifyOtp: refused(code) });
+      await expect(resetPassword(auth, "token-hash", "a new passphrase")).rejects.toMatchObject({
+        reason: "linkExpired",
+      });
+    },
+  );
+
+  it("FR-ACC-008 reports a rate limit while verifying the link", async () => {
+    const auth = gateway({ verifyOtp: refused("over_request_rate_limit") });
+    await expect(resetPassword(auth, "token-hash", "a new passphrase")).rejects.toMatchObject({
+      reason: "rateLimited",
+    });
+  });
+
+  it("FR-ACC-008 still succeeds when signing out the other sessions fails", async () => {
+    const auth = gateway({ signOutOthers: refused("unexpected_failure") });
+    await expect(resetPassword(auth, "token-hash", "a new passphrase")).resolves.toMatchObject({
+      locale: "en",
+    });
+  });
+
+  it("FR-ACC-008 signs out the other sessions after the change", async () => {
+    const auth = gateway();
+    await resetPassword(auth, "token-hash", "a new passphrase");
+    expect(auth.signOutOthers).toHaveBeenCalled();
   });
 });

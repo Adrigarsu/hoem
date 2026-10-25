@@ -1,5 +1,5 @@
 export { AuthShell } from "./components/auth-shell";
-export { Button } from "./components/button";
+export { Button, buttonClassName } from "./components/button";
 export { FormMessage } from "./components/form-message";
 export { IconTile } from "./components/icon-tile";
 export { Logo } from "./components/logo";
