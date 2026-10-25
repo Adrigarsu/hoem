@@ -57,7 +57,7 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 ## 3. Architecture decisions
 
-Fifteen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
+Sixteen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
 
 | ADR                                                   | Decision                                                                              | Status   |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------- | -------- |
@@ -76,6 +76,7 @@ Fifteen decisions shape the system. Each lives as its own file in `docs/adr/`, w
 | [013](adr/0013-production-supabase-in-ireland.md)     | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
 | [014](adr/0014-migration-pipeline.md)                 | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
 | [015](adr/0015-locale-through-an-internal-rewrite.md) | Locale chosen in the proxy and rewritten to a hidden `[locale]` segment               | Proposed |
+| [016](adr/0016-session-only-in-httponly-cookies.md)   | Session only in HttpOnly cookies; no Supabase browser client                          | Proposed |
 
 ## 4. Code organisation and conventions
 
@@ -142,14 +143,15 @@ Shared contracts sit beside them: `schemas.ts` (Zod, used by forms, actions and 
 
 Services throw typed `AppError` subclasses, never strings. Each carries a stable code that maps to an HTTP status, a message key in the translation files and, in the API, a Problem Details body (section 5.3).
 
-| Error                   | Code                | HTTP                                                                |
-| ----------------------- | ------------------- | ------------------------------------------------------------------- |
-| `ValidationError`       | `validation_failed` | 422                                                                 |
-| `NotAuthenticatedError` | `not_authenticated` | 401                                                                 |
-| `ForbiddenError`        | `forbidden`         | 403                                                                 |
-| `NotFoundError`         | `not_found`         | 404 (also for rows RLS hides, so their existence is never revealed) |
-| `ConflictError`         | `conflict`          | 409                                                                 |
-| `DemoRestrictedError`   | `demo_restricted`   | 403                                                                 |
+| Error                   | Code                | HTTP                                                                                                   |
+| ----------------------- | ------------------- | ------------------------------------------------------------------------------------------------------ |
+| `ValidationError`       | `validation_failed` | 422                                                                                                    |
+| `NotAuthenticatedError` | `not_authenticated` | 401                                                                                                    |
+| `ForbiddenError`        | `forbidden`         | 403                                                                                                    |
+| `NotFoundError`         | `not_found`         | 404 (also for rows RLS hides, so their existence is never revealed)                                    |
+| `ConflictError`         | `conflict`          | 409                                                                                                    |
+| `DemoRestrictedError`   | `demo_restricted`   | 403                                                                                                    |
+| `AuthFailedError`       | `auth_failed`       | 401 (sign-up, sign-in or verification refused; the reason never says whether an e-mail has an account) |
 
 Unexpected errors are logged with a request ID and shown to the user as a generic message with that ID; stack traces never reach the client.
 
@@ -177,7 +179,7 @@ The web app talks to the server through Server Actions; everything else uses the
 
 ### 5.2 Authentication
 
-Requests send the Supabase access token as `Authorization: Bearer <jwt>`. The route handler creates a Supabase client with that token, so every query runs as the user and RLS applies (ADR-004). The web app uses the same token through HTTP-only cookies managed by `@supabase/ssr`.
+Requests send the Supabase access token as `Authorization: Bearer <jwt>`. The route handler creates a Supabase client with that token, so every query runs as the user and RLS applies (ADR-004). The web app uses the same token through HTTP-only cookies managed by `@supabase/ssr` (ADR-016): `src/proxy.ts` refreshes the session on every page request, sends signed-out visitors to `/sign-in?next=…` (only `/sign-in`, `/sign-up` and `/auth/*` are public) and applies the no-cache headers that `@supabase/ssr` asks for, so a CDN never stores a response that sets auth cookies. Sign-up sends a verification e-mail whose link goes to `/auth/confirm`, which verifies the one-time token and starts the session; passwords go only to Supabase Auth (NFR-SEC-003), with at least 10 characters and at most 72 bytes.
 
 ### 5.3 Errors
 

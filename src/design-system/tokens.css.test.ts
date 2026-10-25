@@ -27,7 +27,22 @@ function atRule(name: string, params = ""): Container | undefined {
   );
 }
 
+function ruleWithSelector(parent: Container | undefined, selector: string): Container | undefined {
+  return parent?.nodes?.find(
+    (node): node is postcss.Rule => node.type === "rule" && node.selector === selector,
+  );
+}
+
 const root = declarations(rootRule(css));
+// Dark values twice: for the system preference (unless the user chose light) and for a user
+// who chose dark (#22).
+const systemDark = declarations(
+  ruleWithSelector(
+    atRule("media", "(prefers-color-scheme: dark)"),
+    ':root:not([data-theme="light"])',
+  ),
+);
+const chosenDark = declarations(ruleWithSelector(css, ':root[data-theme="dark"]'));
 const theme = declarations(atRule("theme", "static"));
 const themeInline = declarations(atRule("theme", "inline"));
 const reducedMotionBlock = atRule("media", "(prefers-reduced-motion: reduce)");
@@ -48,12 +63,20 @@ describe("tokens.css", () => {
   it.each(tokens.color.tokens)(
     "NFR-UX-004 defines --$name with its light and dark values",
     ({ name, value }) => {
-      expect(withoutSpaces(root.get(`--${name}`))).toBe(
-        withoutSpaces(`light-dark(${cssValue(value.light)}, ${cssValue(value.dark)})`),
-      );
+      expect(withoutSpaces(root.get(`--${name}`))).toBe(withoutSpaces(cssValue(value.light)));
+      expect(withoutSpaces(systemDark.get(`--${name}`))).toBe(withoutSpaces(cssValue(value.dark)));
+      expect(withoutSpaces(chosenDark.get(`--${name}`))).toBe(withoutSpaces(cssValue(value.dark)));
       expect(themeInline.get(`--color-${name}`)).toBe(`var(--${name})`);
     },
   );
+
+  it("NFR-A11Y-001 sets the color-scheme of native controls for each theme", () => {
+    expect([
+      root.get("color-scheme"),
+      systemDark.get("color-scheme"),
+      chosenDark.get("color-scheme"),
+    ]).toEqual(["light", "dark", "dark"]);
+  });
 
   it.each([...tokens.spacing.tokens, ...tokens.size.tokens])(
     "NFR-UX-004 defines --$name and maps it to a Tailwind size",

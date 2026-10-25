@@ -54,14 +54,15 @@ jobs:
         run: pnpm test:coverage
 
   # NFR-UX-001, NFR-A11Y-001: the production build in Chromium, Chrome and Safari (WebKit) at three
-  # widths, with axe-core in both themes. Firefox and Edge are not wired up yet.
+  # widths, with axe-core in both themes. Firefox and Edge are not wired up yet. A throw-away local
+  # Supabase (database, Auth, REST and the Mailpit mail catcher) serves the auth stories.
   e2e:
     name: e2e
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    # The Supabase URL and key come from the local stack, set in a step below. Placeholder, not a
+    # secret: nothing in the E2E tests sends real e-mail.
     env:
-      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci
       RESEND_API_KEY: re_ci_placeholder
     steps:
       - name: Checkout
@@ -100,6 +101,17 @@ jobs:
       - name: Install browser system libraries
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps chromium webkit
+
+      - name: Start a local Supabase
+        run: pnpm exec supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+
+      # next build inlines NEXT_PUBLIC_* values, so they must be set before the build.
+      - name: Point the app at the local Supabase
+        run: |
+          eval "$(pnpm exec supabase status -o env)"
+          echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+          echo "MAILPIT_URL=$MAILPIT_URL" >> "$GITHUB_ENV"
 
       - name: Build
         run: pnpm build

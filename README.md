@@ -37,7 +37,11 @@ pnpm db:start
 and fill it in with the API URL and the publishable key it printed (`pnpm exec supabase status`
 shows them again). The app refuses to start while a variable is missing.
 
-The end-to-end tests need the Playwright browsers once (Chrome itself must be installed):
+Sign-up e-mails from the local Supabase never leave your machine: open Mailpit at
+http://127.0.0.1:54324 to read them and click the verification link.
+
+The end-to-end tests run against the local Supabase (`pnpm db:start`), and need the Playwright
+browsers once (Chrome itself must be installed):
 
 ```bash
 pnpm exec playwright install chromium webkit

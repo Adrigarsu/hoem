@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light only" />
+    <title>Verify your e-mail for HØEM</title>
+  </head>
+  <!--
+    Supabase Auth sign-up confirmation (FR-ACC-001). Colours are the light-theme tokens (bg, surface,
+    text, text-secondary, brand, on-brand); e-mail clients do not support CSS variables. The link
+    goes to /auth/confirm on the site that asked for it (emailRedirectTo, checked against the
+    redirect allow-list), which verifies the token and signs the user in.
+  -->
+  <body style="margin: 0; padding: 0; background-color: #f9f6f2">
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f9f6f2"
+    >
+      <tr>
+        <td align="center" style="padding: 32px 16px">
+          <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              max-width: 520px;
+              background-color: #ffffff;
+              border: 1px solid #e1ddd8;
+              border-radius: 14px;
+            "
+          >
+            <tr>
+              <td
+                style="
+                  padding: 32px 24px;
+                  font-family:
+                    &quot;Plus Jakarta Sans&quot;,
+                    system-ui,
+                    -apple-system,
+                    &quot;Segoe UI&quot;,
+                    sans-serif;
+                  color: #1d1a16;
+                "
+              >
+                <p style="margin: 0 0 24px; font-size: 24px; line-height: 32px; font-weight: 700">
+                  H<span style="color: #1f4bff">Ø</span>EM
+                </p>
+                <h1 style="margin: 0 0 16px; font-size: 20px; line-height: 28px; font-weight: 600">
+                  Verify your e-mail address
+                </h1>
+                <p style="margin: 0 0 24px; font-size: 16px; line-height: 24px">
+                  You created a HØEM account with {{ .Email }}. Verify that this address is yours to
+                  finish signing up and open your household.
+                </p>
+                <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 0 24px">
+                  <tr>
+                    <td style="border-radius: 10px; background-color: #1f4bff">
+                      <a
+                        href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=email"
+                        style="
+                          display: inline-block;
+                          padding: 12px 20px;
+                          font-size: 16px;
+                          line-height: 20px;
+                          font-weight: 600;
+                          color: #ffffff;
+                          text-decoration: none;
+                          border-radius: 10px;
+                        "
+                        >Verify my e-mail</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #58554f">
+                  If the button does not work, copy this address into your browser:
+                </p>
+                <p
+                  style="
+                    margin: 0 0 24px;
+                    font-size: 14px;
+                    line-height: 20px;
+                    word-break: break-all;
+                  "
+                >
+                  <a
+                    href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=email"
+                    style="color: #1f4bff"
+                    >{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=email</a
+                  >
+                </p>
+                <p style="margin: 0; font-size: 14px; line-height: 20px; color: #58554f">
+                  The link works once and expires in one hour. If you did not create this account,
+                  ignore this e-mail and nothing will happen.
+                </p>
+              </td>
+            </tr>
+          </table>
+          <p
+            style="
+              margin: 16px 0 0;
+              font-family:
+                system-ui,
+                -apple-system,
+                &quot;Segoe UI&quot;,
+                sans-serif;
+              font-size: 12px;
+              line-height: 16px;
+              color: #58554f;
+            "
+          >
+            HØEM · hoemapp.com · This is an automatic message; replies are not read.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
