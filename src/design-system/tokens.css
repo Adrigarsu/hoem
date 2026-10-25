@@ -4,45 +4,47 @@
  * text-text-secondary, p-6, rounded-md...), never raw values.
  */
 
-/* light-dark() picks the value for the active color-scheme: the system preference by default,
-   or the theme the user chose, set as data-theme on <html> (#22). */
+/* Light values by default. Dark values follow the system preference unless the user chose light,
+   or apply when the user chose dark; the choice is data-theme on <html> (#22). Media queries and
+   attribute selectors, not light-dark(): WebKit does not update inherited text colours built with
+   light-dark() when the theme changes on an open page. */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
-  --bg: light-dark(#f9f6f2, #201e1b);
-  --surface: light-dark(#ffffff, #292724);
-  --surface-subtle: light-dark(#f3f0ea, #33312e);
-  --border: light-dark(#e1ddd8, #474541);
-  --border-control: light-dark(#898680, #8e8c88);
-  --text: light-dark(#1d1a16, #f6f3ef);
-  --text-secondary: light-dark(#58554f, #c6c4c0);
-  --text-muted: light-dark(#6c6863, #adaaa7);
-  --brand: light-dark(#1f4bff, #8fb1ff);
-  --brand-hover: light-dark(#143cc9, #b4d1ff);
-  --brand-tint: light-dark(#eaf2ff, #2e3a55);
-  --brand-ink: light-dark(#283f77, #d8e8ff);
-  --on-brand: light-dark(#ffffff, #171613);
-  --on-accent: light-dark(#ffffff, #171613);
-  --meals: light-dark(#a34d00, #f7a062);
-  --meals-tint: light-dark(#ffeee2, #4f3320);
-  --meals-ink: light-dark(#693000, #ffe0c9);
-  --shopping: light-dark(#007a75, #21d1ca);
-  --shopping-tint: light-dark(#e0f8f5, #144340);
-  --shopping-ink: light-dark(#00524e, #c3f3ef);
-  --expenses: light-dark(#8b4a9a, #dc9beb);
-  --expenses-tint: light-dark(#faedfd, #46324b);
-  --expenses-ink: light-dark(#592e63, #f7defd);
-  --success: light-dark(#267d30, #80cd82);
-  --success-tint: light-dark(#e8f7e8, #29412a);
-  --success-ink: light-dark(#17501d, #d4f1d4);
-  --warning: light-dark(#8d6000, #ddb049);
-  --warning-tint: light-dark(#faf1df, #46381a);
-  --warning-ink: light-dark(#5a3c00, #f7e6c3);
-  --danger: light-dark(#ab413e, #ff958d);
-  --danger-tint: light-dark(#ffece9, #52302d);
-  --danger-ink: light-dark(#6e2826, #ffdcd7);
-  --focus-ring: light-dark(var(--brand), var(--brand));
-  --scrim: light-dark(rgba(29, 26, 22, 0.45), rgba(0, 0, 0, 0.55));
+  --bg: #f9f6f2;
+  --surface: #ffffff;
+  --surface-subtle: #f3f0ea;
+  --border: #e1ddd8;
+  --border-control: #898680;
+  --text: #1d1a16;
+  --text-secondary: #58554f;
+  --text-muted: #6c6863;
+  --brand: #1f4bff;
+  --brand-hover: #143cc9;
+  --brand-tint: #eaf2ff;
+  --brand-ink: #283f77;
+  --on-brand: #ffffff;
+  --on-accent: #ffffff;
+  --meals: #a34d00;
+  --meals-tint: #ffeee2;
+  --meals-ink: #693000;
+  --shopping: #007a75;
+  --shopping-tint: #e0f8f5;
+  --shopping-ink: #00524e;
+  --expenses: #8b4a9a;
+  --expenses-tint: #faedfd;
+  --expenses-ink: #592e63;
+  --success: #267d30;
+  --success-tint: #e8f7e8;
+  --success-ink: #17501d;
+  --warning: #8d6000;
+  --warning-tint: #faf1df;
+  --warning-ink: #5a3c00;
+  --danger: #ab413e;
+  --danger-tint: #ffece9;
+  --danger-ink: #6e2826;
+  --focus-ring: var(--brand);
+  --scrim: rgba(29, 26, 22, 0.45);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -68,12 +70,84 @@
   --duration-slow: 300ms;
 }
 
-:root[data-theme="light"] {
-  color-scheme: light;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg: #201e1b;
+    --surface: #292724;
+    --surface-subtle: #33312e;
+    --border: #474541;
+    --border-control: #8e8c88;
+    --text: #f6f3ef;
+    --text-secondary: #c6c4c0;
+    --text-muted: #adaaa7;
+    --brand: #8fb1ff;
+    --brand-hover: #b4d1ff;
+    --brand-tint: #2e3a55;
+    --brand-ink: #d8e8ff;
+    --on-brand: #171613;
+    --on-accent: #171613;
+    --meals: #f7a062;
+    --meals-tint: #4f3320;
+    --meals-ink: #ffe0c9;
+    --shopping: #21d1ca;
+    --shopping-tint: #144340;
+    --shopping-ink: #c3f3ef;
+    --expenses: #dc9beb;
+    --expenses-tint: #46324b;
+    --expenses-ink: #f7defd;
+    --success: #80cd82;
+    --success-tint: #29412a;
+    --success-ink: #d4f1d4;
+    --warning: #ddb049;
+    --warning-tint: #46381a;
+    --warning-ink: #f7e6c3;
+    --danger: #ff958d;
+    --danger-tint: #52302d;
+    --danger-ink: #ffdcd7;
+    --focus-ring: var(--brand);
+    --scrim: rgba(0, 0, 0, 0.55);
+  }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
+
+  --bg: #201e1b;
+  --surface: #292724;
+  --surface-subtle: #33312e;
+  --border: #474541;
+  --border-control: #8e8c88;
+  --text: #f6f3ef;
+  --text-secondary: #c6c4c0;
+  --text-muted: #adaaa7;
+  --brand: #8fb1ff;
+  --brand-hover: #b4d1ff;
+  --brand-tint: #2e3a55;
+  --brand-ink: #d8e8ff;
+  --on-brand: #171613;
+  --on-accent: #171613;
+  --meals: #f7a062;
+  --meals-tint: #4f3320;
+  --meals-ink: #ffe0c9;
+  --shopping: #21d1ca;
+  --shopping-tint: #144340;
+  --shopping-ink: #c3f3ef;
+  --expenses: #dc9beb;
+  --expenses-tint: #46324b;
+  --expenses-ink: #f7defd;
+  --success: #80cd82;
+  --success-tint: #29412a;
+  --success-ink: #d4f1d4;
+  --warning: #ddb049;
+  --warning-tint: #46381a;
+  --warning-ink: #f7e6c3;
+  --danger: #ff958d;
+  --danger-tint: #52302d;
+  --danger-ink: #ffdcd7;
+  --focus-ring: var(--brand);
+  --scrim: rgba(0, 0, 0, 0.55);
 }
 
 /* NFR-A11Y-006: every transition becomes an instant change. 0.01ms rather than 0s, so

@@ -9,7 +9,7 @@ const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22a", "wcag22
 export async function expectNoA11yViolations(page: Page) {
   const chosenTheme = await page.evaluate(() => document.documentElement.dataset.theme ?? null);
   for (const theme of ["light", "dark"] as const) {
-    // The system preference drives light-dark(); data-theme (the user's choice, #22) overrides it,
+    // The system preference picks the theme; data-theme (the user's choice, #22) overrides it,
     // so both are set. Reduced motion makes colour transitions instant, so axe never reads a
     // colour halfway through the switch.
     await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
