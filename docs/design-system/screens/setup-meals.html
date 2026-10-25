@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setup guide: step 2, meals · HØEM screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+/* Design tokens, generated from docs/design-system/tokens.json. Same names as the tokens. */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg: #f9f6f2;
+  --surface: #ffffff;
+  --surface-subtle: #f3f0ea;
+  --border: #e1ddd8;
+  --border-control: #898680;
+  --text: #1d1a16;
+  --text-secondary: #58554f;
+  --text-muted: #6c6863;
+  --brand: #1f4bff;
+  --brand-hover: #143cc9;
+  --brand-tint: #eaf2ff;
+  --brand-ink: #283f77;
+  --on-brand: #ffffff;
+  --on-accent: #ffffff;
+  --meals: #a34d00;
+  --meals-tint: #ffeee2;
+  --meals-ink: #693000;
+  --shopping: #007a75;
+  --shopping-tint: #e0f8f5;
+  --shopping-ink: #00524e;
+  --expenses: #8b4a9a;
+  --expenses-tint: #faedfd;
+  --expenses-ink: #592e63;
+  --success: #267d30;
+  --success-tint: #e8f7e8;
+  --success-ink: #17501d;
+  --warning: #8d6000;
+  --warning-tint: #faf1df;
+  --warning-ink: #5a3c00;
+  --danger: #ab413e;
+  --danger-tint: #ffece9;
+  --danger-ink: #6e2826;
+  --focus-ring: var(--brand);
+  --scrim: rgba(29,26,22,0.45);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #201e1b;
+  --surface: #292724;
+  --surface-subtle: #33312e;
+  --border: #474541;
+  --border-control: #8e8c88;
+  --text: #f6f3ef;
+  --text-secondary: #c6c4c0;
+  --text-muted: #adaaa7;
+  --brand: #8fb1ff;
+  --brand-hover: #b4d1ff;
+  --brand-tint: #2e3a55;
+  --brand-ink: #d8e8ff;
+  --on-brand: #171613;
+  --on-accent: #171613;
+  --meals: #f7a062;
+  --meals-tint: #4f3320;
+  --meals-ink: #ffe0c9;
+  --shopping: #21d1ca;
+  --shopping-tint: #144340;
+  --shopping-ink: #c3f3ef;
+  --expenses: #dc9beb;
+  --expenses-tint: #46324b;
+  --expenses-ink: #f7defd;
+  --success: #80cd82;
+  --success-tint: #29412a;
+  --success-ink: #d4f1d4;
+  --warning: #ddb049;
+  --warning-tint: #46381a;
+  --warning-ink: #f7e6c3;
+  --danger: #ff958d;
+  --danger-tint: #52302d;
+  --danger-ink: #ffdcd7;
+  --focus-ring: var(--brand);
+  --scrim: rgba(0,0,0,0.55);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --stroke-hairline: 1px;
+  --stroke-focus: 2px;
+  --control-height: 44px;
+  --control-height-sm: 36px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --sidebar-width: 264px;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-logo: "Montserrat", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+/* Reference-sheet layout (not part of the screen) */
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-subtle); color: var(--text); font-family: var(--font-sans); }
+.doc { padding: 32px 32px 64px; display: flex; flex-direction: column; gap: 40px; }
+.doc > header { max-width: 760px; display: flex; flex-direction: column; gap: 8px; }
+.doc h1 { margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.015em; }
+.doc .lede { margin: 0; font-size: 16px; line-height: 24px; color: var(--text-secondary); }
+.doc .meta { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.doc code { font-size: 13px; padding: 1px 6px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); }
+.group { display: flex; flex-direction: column; gap: 16px; }
+.group > h2 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+.group > p { margin: 0; max-width: 760px; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.stack { display: flex; flex-direction: column; gap: 32px; overflow-x: auto; }
+.frame { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.frame figcaption { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+.device { position: relative; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font-sans);
+  border: 1px solid var(--border-control); }
+.device--mobile { width: 360px; height: 800px; border-radius: 24px; }
+.device--desktop { width: 1440px; min-height: 900px; border-radius: 14px; }
+.device a { color: var(--brand); }
+.device a:hover { color: var(--brand-hover); }
+.device :focus-visible { outline: var(--stroke-focus) solid var(--focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .device * { animation: none !important; transition: none !important; } }
+
+</style>
+</head>
+<body>
+<div class="doc">
+<header>
+<h1>Setup guide: step 2, meals</h1>
+<p class="lede">Meal slots in use and usual servings (FR-ONB-003).</p>
+<p class="meta">Spec: <code>setup-meals.md</code> · Tokens: <code>docs/design-system/tokens.json</code> · Each frame shows the light and dark theme with the same markup; only <code>data-theme</code> changes.</p>
+</header>
+<section class="group" data-group="0">
+<h2>Default</h2>
+
+<div class="row">
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Light</figcaption>
+<div class="device device--mobile" data-theme="light">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+  <main style="display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-8) var(--space-6) 120px">
+    <div style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <p style="margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--text-secondary)">Step 2 of 4</p>
+      <div role="img" aria-label="Step 2 of 4" style="height: 6px; border-radius: var(--radius-full); background: var(--border); overflow: hidden"><div style="width: 50%; height: 100%; border-radius: var(--radius-full); background: var(--brand)"></div></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Which meals do you plan?</h1>
+      <p style="margin: 0; font-size: 16px; line-height: 24px; color: var(--text-secondary)">Only these will appear in your weekly plan.</p>
+    </div>
+    <fieldset style="margin: 0; padding: 0; border: 0">
+      <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Meals to plan</legend>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Breakfast</span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Morning snack</span><input type="checkbox" role="switch" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Lunch</span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Afternoon snack</span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Dinner</span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+      </ul>
+    </fieldset>
+    <div style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <label for="servings-27" style="font-size: 14px; line-height: 20px; font-weight: 600">Usual number of servings</label>
+      <div style="display: flex; align-items: center; gap: var(--space-3)">
+        <button type="button" aria-label="Fewer servings" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+        <input id="servings-27" type="number" inputmode="numeric" value="2" aria-describedby="servings-help-27" style="width: 64px; height: var(--control-height); box-sizing: border-box; text-align: center; border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 16px/24px 'Plus Jakarta Sans', sans-serif">
+        <button type="button" aria-label="More servings" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+      </div>
+      <span id="servings-help-27" style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Recipes scale their ingredients to this by default.</span>
+    </div>
+  </main>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); padding: var(--space-4) var(--space-6) var(--space-8); background: var(--bg); border-top: 1px solid var(--border)">
+    <a href="setup-household.html" style="display: flex; align-items: center; justify-content: center; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">Back</a>
+    <a href="setup-money.html" style="display: flex; align-items: center; justify-content: center; height: var(--control-height); border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">Continue</a>
+  </div>
+</div>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Dark</figcaption>
+<div class="device device--mobile" data-theme="dark">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+  <main style="display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-8) var(--space-6) 120px">
+    <div style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <p style="margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--text-secondary)">Step 2 of 4</p>
+      <div role="img" aria-label="Step 2 of 4" style="height: 6px; border-radius: var(--radius-full); background: var(--border); overflow: hidden"><div style="width: 50%; height: 100%; border-radius: var(--radius-full); background: var(--brand)"></div></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Which meals do you plan?</h1>
+      <p style="margin: 0; font-size: 16px; line-height: 24px; color: var(--text-secondary)">Only these will appear in your weekly plan.</p>
+    </div>
+    <fieldset style="margin: 0; padding: 0; border: 0">
+      <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Meals to plan</legend>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Breakfast</span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Morning snack</span><input type="checkbox" role="switch" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Lunch</span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Afternoon snack</span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 60px; padding: 0 var(--space-4); cursor: pointer"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Dinner</span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--brand)"></label></li>
+      </ul>
+    </fieldset>
+    <div style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <label for="servings-28" style="font-size: 14px; line-height: 20px; font-weight: 600">Usual number of servings</label>
+      <div style="display: flex; align-items: center; gap: var(--space-3)">
+        <button type="button" aria-label="Fewer servings" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+        <input id="servings-28" type="number" inputmode="numeric" value="2" aria-describedby="servings-help-28" style="width: 64px; height: var(--control-height); box-sizing: border-box; text-align: center; border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 16px/24px 'Plus Jakarta Sans', sans-serif">
+        <button type="button" aria-label="More servings" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+      </div>
+      <span id="servings-help-28" style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Recipes scale their ingredients to this by default.</span>
+    </div>
+  </main>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); padding: var(--space-4) var(--space-6) var(--space-8); background: var(--bg); border-top: 1px solid var(--border)">
+    <a href="setup-household.html" style="display: flex; align-items: center; justify-content: center; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">Back</a>
+    <a href="setup-money.html" style="display: flex; align-items: center; justify-content: center; height: var(--control-height); border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">Continue</a>
+  </div>
+</div>
+</div>
+</figure>
+</div>
+</section>
+</div>
+</body>
+</html>

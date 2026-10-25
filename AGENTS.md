@@ -16,6 +16,9 @@ Sources of truth. Read the relevant parts before designing anything non-trivial:
 - `docs/adr/`: architecture decisions, one file each (index in `docs/adr/README.md`)
 - `docs/design-system/`: design tokens (`tokens.json`), approved colour pairs, typography,
   spacing and component rules (`README.md`), and the reference component CSS
+- `docs/design-system/screens/`: the reference design of every screen (`<screen>.html` to open in a
+  browser, `<screen>.md` with layout, components, texts and states) and the decisions taken on them
+  (`README.md`)
 
 If the code and these documents disagree, stop and ask. Never silently pick one.
 
@@ -79,6 +82,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 
 ## UI and accessibility (WCAG 2.2 AA, light and dark themes)
 
+- **Every page follows its screen** in `docs/design-system/screens/`: layout, order, texts and states,
+  in both themes and at 360, 768 and 1440 px. A page without a screen is not designed on the fly:
+  ask first. A screen that breaks an accessibility rule is asked about, not copied.
 - Use design-system tokens (CSS variables) and components from `src/design-system/`.
   No hard-coded colours, fonts or spacing.
 - Prefer native elements (`button`, `a`, `dialog`, `label`); follow the WAI-ARIA Authoring

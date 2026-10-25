@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edit recipe · HØEM screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+/* Design tokens, generated from docs/design-system/tokens.json. Same names as the tokens. */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg: #f9f6f2;
+  --surface: #ffffff;
+  --surface-subtle: #f3f0ea;
+  --border: #e1ddd8;
+  --border-control: #898680;
+  --text: #1d1a16;
+  --text-secondary: #58554f;
+  --text-muted: #6c6863;
+  --brand: #1f4bff;
+  --brand-hover: #143cc9;
+  --brand-tint: #eaf2ff;
+  --brand-ink: #283f77;
+  --on-brand: #ffffff;
+  --on-accent: #ffffff;
+  --meals: #a34d00;
+  --meals-tint: #ffeee2;
+  --meals-ink: #693000;
+  --shopping: #007a75;
+  --shopping-tint: #e0f8f5;
+  --shopping-ink: #00524e;
+  --expenses: #8b4a9a;
+  --expenses-tint: #faedfd;
+  --expenses-ink: #592e63;
+  --success: #267d30;
+  --success-tint: #e8f7e8;
+  --success-ink: #17501d;
+  --warning: #8d6000;
+  --warning-tint: #faf1df;
+  --warning-ink: #5a3c00;
+  --danger: #ab413e;
+  --danger-tint: #ffece9;
+  --danger-ink: #6e2826;
+  --focus-ring: var(--brand);
+  --scrim: rgba(29,26,22,0.45);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #201e1b;
+  --surface: #292724;
+  --surface-subtle: #33312e;
+  --border: #474541;
+  --border-control: #8e8c88;
+  --text: #f6f3ef;
+  --text-secondary: #c6c4c0;
+  --text-muted: #adaaa7;
+  --brand: #8fb1ff;
+  --brand-hover: #b4d1ff;
+  --brand-tint: #2e3a55;
+  --brand-ink: #d8e8ff;
+  --on-brand: #171613;
+  --on-accent: #171613;
+  --meals: #f7a062;
+  --meals-tint: #4f3320;
+  --meals-ink: #ffe0c9;
+  --shopping: #21d1ca;
+  --shopping-tint: #144340;
+  --shopping-ink: #c3f3ef;
+  --expenses: #dc9beb;
+  --expenses-tint: #46324b;
+  --expenses-ink: #f7defd;
+  --success: #80cd82;
+  --success-tint: #29412a;
+  --success-ink: #d4f1d4;
+  --warning: #ddb049;
+  --warning-tint: #46381a;
+  --warning-ink: #f7e6c3;
+  --danger: #ff958d;
+  --danger-tint: #52302d;
+  --danger-ink: #ffdcd7;
+  --focus-ring: var(--brand);
+  --scrim: rgba(0,0,0,0.55);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --stroke-hairline: 1px;
+  --stroke-focus: 2px;
+  --control-height: 44px;
+  --control-height-sm: 36px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --sidebar-width: 264px;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-logo: "Montserrat", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+/* Reference-sheet layout (not part of the screen) */
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-subtle); color: var(--text); font-family: var(--font-sans); }
+.doc { padding: 32px 32px 64px; display: flex; flex-direction: column; gap: 40px; }
+.doc > header { max-width: 760px; display: flex; flex-direction: column; gap: 8px; }
+.doc h1 { margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.015em; }
+.doc .lede { margin: 0; font-size: 16px; line-height: 24px; color: var(--text-secondary); }
+.doc .meta { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.doc code { font-size: 13px; padding: 1px 6px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); }
+.group { display: flex; flex-direction: column; gap: 16px; }
+.group > h2 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+.group > p { margin: 0; max-width: 760px; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.stack { display: flex; flex-direction: column; gap: 32px; overflow-x: auto; }
+.frame { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.frame figcaption { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+.device { position: relative; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font-sans);
+  border: 1px solid var(--border-control); }
+.device--mobile { width: 360px; height: 800px; border-radius: 24px; }
+.device--desktop { width: 1440px; min-height: 900px; border-radius: 14px; }
+.device a { color: var(--brand); }
+.device a:hover { color: var(--brand-hover); }
+.device :focus-visible { outline: var(--stroke-focus) solid var(--focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .device * { animation: none !important; transition: none !important; } }
+
+</style>
+</head>
+<body>
+<div class="doc">
+<header>
+<h1>Edit recipe</h1>
+<p class="lede">Create or edit a recipe (FR-MEAL-001, FR-MEAL-002).</p>
+<p class="meta">Spec: <code>recipe-edit.md</code> · Tokens: <code>docs/design-system/tokens.json</code> · Each frame shows the light and dark theme with the same markup; only <code>data-theme</code> changes.</p>
+</header>
+<section class="group" data-group="0">
+<h2>Default</h2>
+
+<div class="row">
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Light</figcaption>
+<div class="device device--mobile" data-theme="light">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border)">
+    <a href="recipe.html" style="display: flex; align-items: center; height: var(--control-height); padding: 0 var(--space-2); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">Cancel</a>
+    <h1 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600">Edit recipe</h1>
+    <a href="recipe.html" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 0; background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; cursor: pointer; padding: 0 18px">Save</a>
+  </header>
+  <form aria-label="Edit recipe" style="display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4) var(--space-5) var(--space-8)">
+    <button type="button" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: 88px; border-radius: var(--radius-lg); border: 1.5px dashed var(--border-control); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>Change photo</button>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="rc-name-57" style="font-size: 14px; line-height: 20px; font-weight: 600">Name</label><input id="rc-name-57" value="Lentil stew with rice" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif"></div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3)">
+      <div style="display: flex; flex-direction: column; gap: 6px"><label for="rc-time-57" style="font-size: 14px; line-height: 20px; font-weight: 600">Time (min)</label><input id="rc-time-57" value="35" inputmode="numeric" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif"></div>
+      <div style="display: flex; flex-direction: column; gap: 6px"><label for="rc-serv-57" style="font-size: 14px; line-height: 20px; font-weight: 600">Servings</label><input id="rc-serv-57" value="4" inputmode="numeric" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif"></div>
+    </div>
+    <fieldset style="margin: 0; padding: 0; border: 0"><legend style="padding: 0; margin-bottom: var(--space-2); font-size: 14px; line-height: 20px; font-weight: 600">Tags</legend>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--space-2)"><label style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); border: 1px solid var(--meals-tint); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><input type="checkbox" checked="" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Vegetarian</label><label style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); border: 1px solid var(--meals-tint); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><input type="checkbox" checked="" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Batch cooking</label><label style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--surface); color: var(--text); border: 1px solid var(--border-control); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><input type="checkbox" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Quick</label><label style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--surface); color: var(--text); border: 1px solid var(--border-control); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><input type="checkbox" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Kids</label></div></fieldset>
+    <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: var(--space-2)"><legend style="padding: 0; margin-bottom: var(--space-2); font-size: 14px; line-height: 20px; font-weight: 600">Ingredients</legend>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2)"><li style="display: flex; align-items: flex-end; gap: var(--space-2)"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1)"><label for="i1n-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Ingredient 1</label><input id="i1n-57" value="Brown lentils" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-3); width: 100%"></div><div style="width: 64px; display: flex; flex-direction: column"><label for="i1q-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Quantity of Brown lentils</label><input id="i1q-57" value="300" inputmode="decimal" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 10px; width: 100%; text-align: right"></div><div style="width: 72px; display: flex; flex-direction: column"><label for="i1u-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Unit of Brown lentils</label><select id="i1u-57" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-2); width: 100%"><option>g</option></select></div><button type="button" aria-label="Remove Brown lentils" title="Remove" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent; color: var(--text-secondary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></li><li style="display: flex; align-items: flex-end; gap: var(--space-2)"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1)"><label for="i2n-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Ingredient 2</label><input id="i2n-57" value="Rice" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-3); width: 100%"></div><div style="width: 64px; display: flex; flex-direction: column"><label for="i2q-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Quantity of Rice</label><input id="i2q-57" value="200" inputmode="decimal" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 10px; width: 100%; text-align: right"></div><div style="width: 72px; display: flex; flex-direction: column"><label for="i2u-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Unit of Rice</label><select id="i2u-57" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-2); width: 100%"><option>g</option></select></div><button type="button" aria-label="Remove Rice" title="Remove" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent; color: var(--text-secondary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></li><li style="display: flex; align-items: flex-end; gap: var(--space-2)"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1)"><label for="i3n-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Ingredient 3</label><input id="i3n-57" value="Carrots" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-3); width: 100%"></div><div style="width: 64px; display: flex; flex-direction: column"><label for="i3q-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Quantity of Carrots</label><input id="i3q-57" value="2" inputmode="decimal" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 10px; width: 100%; text-align: right"></div><div style="width: 72px; display: flex; flex-direction: column"><label for="i3u-57" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Unit of Carrots</label><select id="i3u-57" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-2); width: 100%"><option>units</option></select></div><button type="button" aria-label="Remove Carrots" title="Remove" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent; color: var(--text-secondary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></li></ul>
+      <button type="button" style="display: flex; align-items: center; gap: var(--space-2); align-self: flex-start; height: var(--control-height); padding: 0 var(--space-2); border: 0; background: transparent; color: var(--brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Add ingredient</button>
+    </fieldset>
+  </form>
+</div>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Dark</figcaption>
+<div class="device device--mobile" data-theme="dark">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border)">
+    <a href="recipe.html" style="display: flex; align-items: center; height: var(--control-height); padding: 0 var(--space-2); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">Cancel</a>
+    <h1 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600">Edit recipe</h1>
+    <a href="recipe.html" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 0; background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; cursor: pointer; padding: 0 18px">Save</a>
+  </header>
+  <form aria-label="Edit recipe" style="display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4) var(--space-5) var(--space-8)">
+    <button type="button" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: 88px; border-radius: var(--radius-lg); border: 1.5px dashed var(--border-control); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>Change photo</button>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="rc-name-58" style="font-size: 14px; line-height: 20px; font-weight: 600">Name</label><input id="rc-name-58" value="Lentil stew with rice" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif"></div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3)">
+      <div style="display: flex; flex-direction: column; gap: 6px"><label for="rc-time-58" style="font-size: 14px; line-height: 20px; font-weight: 600">Time (min)</label><input id="rc-time-58" value="35" inputmode="numeric" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif"></div>
+      <div style="display: flex; flex-direction: column; gap: 6px"><label for="rc-serv-58" style="font-size: 14px; line-height: 20px; font-weight: 600">Servings</label><input id="rc-serv-58" value="4" inputmode="numeric" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif"></div>
+    </div>
+    <fieldset style="margin: 0; padding: 0; border: 0"><legend style="padding: 0; margin-bottom: var(--space-2); font-size: 14px; line-height: 20px; font-weight: 600">Tags</legend>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--space-2)"><label style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); border: 1px solid var(--meals-tint); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><input type="checkbox" checked="" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Vegetarian</label><label style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); border: 1px solid var(--meals-tint); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><input type="checkbox" checked="" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Batch cooking</label><label style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--surface); color: var(--text); border: 1px solid var(--border-control); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><input type="checkbox" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Quick</label><label style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--surface); color: var(--text); border: 1px solid var(--border-control); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><input type="checkbox" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Kids</label></div></fieldset>
+    <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: var(--space-2)"><legend style="padding: 0; margin-bottom: var(--space-2); font-size: 14px; line-height: 20px; font-weight: 600">Ingredients</legend>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2)"><li style="display: flex; align-items: flex-end; gap: var(--space-2)"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1)"><label for="i1n-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Ingredient 1</label><input id="i1n-58" value="Brown lentils" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-3); width: 100%"></div><div style="width: 64px; display: flex; flex-direction: column"><label for="i1q-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Quantity of Brown lentils</label><input id="i1q-58" value="300" inputmode="decimal" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 10px; width: 100%; text-align: right"></div><div style="width: 72px; display: flex; flex-direction: column"><label for="i1u-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Unit of Brown lentils</label><select id="i1u-58" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-2); width: 100%"><option>g</option></select></div><button type="button" aria-label="Remove Brown lentils" title="Remove" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent; color: var(--text-secondary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></li><li style="display: flex; align-items: flex-end; gap: var(--space-2)"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1)"><label for="i2n-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Ingredient 2</label><input id="i2n-58" value="Rice" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-3); width: 100%"></div><div style="width: 64px; display: flex; flex-direction: column"><label for="i2q-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Quantity of Rice</label><input id="i2q-58" value="200" inputmode="decimal" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 10px; width: 100%; text-align: right"></div><div style="width: 72px; display: flex; flex-direction: column"><label for="i2u-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Unit of Rice</label><select id="i2u-58" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-2); width: 100%"><option>g</option></select></div><button type="button" aria-label="Remove Rice" title="Remove" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent; color: var(--text-secondary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></li><li style="display: flex; align-items: flex-end; gap: var(--space-2)"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1)"><label for="i3n-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Ingredient 3</label><input id="i3n-58" value="Carrots" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-3); width: 100%"></div><div style="width: 64px; display: flex; flex-direction: column"><label for="i3q-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Quantity of Carrots</label><input id="i3q-58" value="2" inputmode="decimal" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 10px; width: 100%; text-align: right"></div><div style="width: 72px; display: flex; flex-direction: column"><label for="i3u-58" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">Unit of Carrots</label><select id="i3u-58" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-2); width: 100%"><option>units</option></select></div><button type="button" aria-label="Remove Carrots" title="Remove" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent; color: var(--text-secondary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></li></ul>
+      <button type="button" style="display: flex; align-items: center; gap: var(--space-2); align-self: flex-start; height: var(--control-height); padding: 0 var(--space-2); border: 0; background: transparent; color: var(--brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Add ingredient</button>
+    </fieldset>
+  </form>
+</div>
+</div>
+</figure>
+</div>
+</section>
+</div>
+</body>
+</html>

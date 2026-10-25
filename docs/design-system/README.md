@@ -90,6 +90,12 @@ Mobile first. Below `bp-md` (768px): bottom tab bar with Shopping, Expenses, Hom
 
 Friendly, short, active: "Add to shopping list", "Saved", "Your private expenses". No exclamation marks, no "please", no "successfully". Errors say what happened and what to do: "That email is already in this household. Try another."
 
+## Screens
+
+`screens/` holds the reference design of every MVP screen, with a spec per screen and the decisions
+taken on them. Every page in the app follows its screen (AGENTS.md). `pnpm screens:capture` saves
+screenshots of them, for comparing a pull request against the design.
+
 ## In the app
 
 `src/design-system/tokens.css` turns these tokens into CSS variables and Tailwind utilities, and a unit test fails when it drifts from `tokens.json`. Tailwind's own palette, spacing scale and shadows are removed, so only token utilities exist: `bg-surface`, `text-text-secondary`, `border-border-control`, `p-6` (24px), `rounded-lg`, `text-body`, `duration-fast`. Another test checks every pair in "Colour roles" against WCAG 2.2 in both themes, and the linters reject hard-coded colours and arbitrary values such as `bg-[#fff]`.

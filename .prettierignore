@@ -6,3 +6,5 @@ supabase/.temp
 supabase/migrations/meta
 /test-results
 /playwright-report
+/screenshots
+docs/design-system/screens/*.html

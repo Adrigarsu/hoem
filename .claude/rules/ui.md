@@ -6,6 +6,9 @@ paths:
 
 # UI components
 
+- Start from the screen in `docs/design-system/screens/<screen>.md` and `.html`, and the decisions in
+  its `README.md`. Match its layout, texts and states; if the page has no screen, or the screen
+  disagrees with the SRS or an accessibility rule, ask before building.
 - Build from the design system in `src/design-system/` before writing new markup.
   If a component is missing, propose adding it there rather than styling one-off markup.
 - Colours, type, radii and spacing come from design tokens (CSS variables, 8-point grid).

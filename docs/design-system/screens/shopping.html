@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopping · HØEM screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+/* Design tokens, generated from docs/design-system/tokens.json. Same names as the tokens. */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg: #f9f6f2;
+  --surface: #ffffff;
+  --surface-subtle: #f3f0ea;
+  --border: #e1ddd8;
+  --border-control: #898680;
+  --text: #1d1a16;
+  --text-secondary: #58554f;
+  --text-muted: #6c6863;
+  --brand: #1f4bff;
+  --brand-hover: #143cc9;
+  --brand-tint: #eaf2ff;
+  --brand-ink: #283f77;
+  --on-brand: #ffffff;
+  --on-accent: #ffffff;
+  --meals: #a34d00;
+  --meals-tint: #ffeee2;
+  --meals-ink: #693000;
+  --shopping: #007a75;
+  --shopping-tint: #e0f8f5;
+  --shopping-ink: #00524e;
+  --expenses: #8b4a9a;
+  --expenses-tint: #faedfd;
+  --expenses-ink: #592e63;
+  --success: #267d30;
+  --success-tint: #e8f7e8;
+  --success-ink: #17501d;
+  --warning: #8d6000;
+  --warning-tint: #faf1df;
+  --warning-ink: #5a3c00;
+  --danger: #ab413e;
+  --danger-tint: #ffece9;
+  --danger-ink: #6e2826;
+  --focus-ring: var(--brand);
+  --scrim: rgba(29,26,22,0.45);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #201e1b;
+  --surface: #292724;
+  --surface-subtle: #33312e;
+  --border: #474541;
+  --border-control: #8e8c88;
+  --text: #f6f3ef;
+  --text-secondary: #c6c4c0;
+  --text-muted: #adaaa7;
+  --brand: #8fb1ff;
+  --brand-hover: #b4d1ff;
+  --brand-tint: #2e3a55;
+  --brand-ink: #d8e8ff;
+  --on-brand: #171613;
+  --on-accent: #171613;
+  --meals: #f7a062;
+  --meals-tint: #4f3320;
+  --meals-ink: #ffe0c9;
+  --shopping: #21d1ca;
+  --shopping-tint: #144340;
+  --shopping-ink: #c3f3ef;
+  --expenses: #dc9beb;
+  --expenses-tint: #46324b;
+  --expenses-ink: #f7defd;
+  --success: #80cd82;
+  --success-tint: #29412a;
+  --success-ink: #d4f1d4;
+  --warning: #ddb049;
+  --warning-tint: #46381a;
+  --warning-ink: #f7e6c3;
+  --danger: #ff958d;
+  --danger-tint: #52302d;
+  --danger-ink: #ffdcd7;
+  --focus-ring: var(--brand);
+  --scrim: rgba(0,0,0,0.55);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --stroke-hairline: 1px;
+  --stroke-focus: 2px;
+  --control-height: 44px;
+  --control-height-sm: 36px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --sidebar-width: 264px;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-logo: "Montserrat", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+/* Reference-sheet layout (not part of the screen) */
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-subtle); color: var(--text); font-family: var(--font-sans); }
+.doc { padding: 32px 32px 64px; display: flex; flex-direction: column; gap: 40px; }
+.doc > header { max-width: 760px; display: flex; flex-direction: column; gap: 8px; }
+.doc h1 { margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.015em; }
+.doc .lede { margin: 0; font-size: 16px; line-height: 24px; color: var(--text-secondary); }
+.doc .meta { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.doc code { font-size: 13px; padding: 1px 6px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); }
+.group { display: flex; flex-direction: column; gap: 16px; }
+.group > h2 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+.group > p { margin: 0; max-width: 760px; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.stack { display: flex; flex-direction: column; gap: 32px; overflow-x: auto; }
+.frame { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.frame figcaption { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+.device { position: relative; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font-sans);
+  border: 1px solid var(--border-control); }
+.device--mobile { width: 360px; height: 800px; border-radius: 24px; }
+.device--desktop { width: 1440px; min-height: 900px; border-radius: 14px; }
+.device a { color: var(--brand); }
+.device a:hover { color: var(--brand-hover); }
+.device :focus-visible { outline: var(--stroke-focus) solid var(--focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .device * { animation: none !important; transition: none !important; } }
+
+</style>
+</head>
+<body>
+<div class="doc">
+<header>
+<h1>Shopping</h1>
+<p class="lede">Shared and private lists with live updates (FR-SHOP-001 to 004).</p>
+<p class="meta">Spec: <code>shopping.md</code> · Tokens: <code>docs/design-system/tokens.json</code> · Each frame shows the light and dark theme with the same markup; only <code>data-theme</code> changes.</p>
+</header>
+<section class="group" data-group="0">
+<h2>Default</h2>
+
+<div class="row">
+<figure class="frame">
+<figcaption>Mobile · 360 × 821 · full length · Light</figcaption>
+<div class="device device--mobile" data-theme="light" style="height: 821px">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+  <a href="profile.html" aria-label="Profile and settings" title="Profile and settings" style="position: absolute; top: 28px; right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-full); text-decoration: none"><span aria-hidden="true" style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--border-control)">L</span></a>
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-6) 72px var(--space-3) var(--space-6)">
+    <div>
+      <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Shopping</h1>
+      <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">5 of 6 items left</p>
+    </div>
+    <ul aria-label="Also on this list now" style="display: flex; list-style: none; margin: 0; padding: 0">
+      <li><span role="img" aria-label="Marcos" style="display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--shopping-tint); color: var(--shopping-ink); font: 600 12px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg)">M</span></li>
+      <li style="margin-left: -8px"><span role="img" aria-label="Lucía (you)" style="display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 12px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg)">L</span></li>
+    </ul>
+  </header>
+
+  <nav aria-label="Lists" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-1); margin: 0 var(--space-4); padding: var(--space-1); border-radius: 12px; background: var(--surface-subtle); border: 1px solid var(--border)">
+    <a href="#" aria-current="page" style="display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border-radius: 9px; background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; box-shadow: inset 0 0 0 1px var(--border)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Shared list</a>
+    <a href="#" style="display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border-radius: 9px; color: var(--text-secondary); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>My private list</a>
+  </nav>
+
+  <main style="display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4) var(--space-4) 112px">
+    <form aria-label="Add an item" style="display: flex; gap: var(--space-2)">
+      <label for="new-item-59" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">New item</label>
+      <input id="new-item-59" placeholder="Add an item, e.g. 2 l milk" style="flex: 1; min-width: 0; height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif">
+      <button type="submit" aria-label="Add item" title="Add item" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 0; background: var(--brand); color: var(--on-brand); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+    </form>
+
+    <section aria-labelledby="g-produce-59" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="g-produce-59" style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Produce</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Tomatoes</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">1 kg</span></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; color: var(--text-muted); text-decoration: line-through">Rice</span><span style="font-size: 14px; line-height: 20px; color: var(--text-muted)">500 g</span></label></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="g-dairy-59" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="g-dairy-59" style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Dairy</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 60px; padding: 0 var(--space-4); cursor: pointer; background: var(--shopping-tint)"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Milk</span><span style="font-size: 12px; line-height: 16px; color: var(--shopping-ink)">Added by Marcos · just now</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">2 l</span></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Greek yogurt</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">4</span></label></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="g-home-59" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="g-home-59" style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Home and cleaning</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Toilet paper</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">12 rolls</span></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Dish soap</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">1</span></label></li>
+      </ul>
+    </section>
+
+    <a href="expenses.html" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Finish shopping</a>
+  </main>
+
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: var(--space-2) 0 var(--space-6); background: var(--surface); border-top: 1px solid var(--border)">
+  <a href="shopping.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--brand); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>Shopping</a>
+  <a href="expenses.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg></span>Expenses</a>
+  <a href="home.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>Home</a>
+  <a href="planner.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg></span>Planner</a>
+  <a href="meals.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>Meals</a>
+</nav>
+</div>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Mobile · 360 × 821 · full length · Dark</figcaption>
+<div class="device device--mobile" data-theme="dark" style="height: 821px">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+  <a href="profile.html" aria-label="Profile and settings" title="Profile and settings" style="position: absolute; top: 28px; right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-full); text-decoration: none"><span aria-hidden="true" style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--border-control)">L</span></a>
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-6) 72px var(--space-3) var(--space-6)">
+    <div>
+      <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Shopping</h1>
+      <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">5 of 6 items left</p>
+    </div>
+    <ul aria-label="Also on this list now" style="display: flex; list-style: none; margin: 0; padding: 0">
+      <li><span role="img" aria-label="Marcos" style="display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--shopping-tint); color: var(--shopping-ink); font: 600 12px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg)">M</span></li>
+      <li style="margin-left: -8px"><span role="img" aria-label="Lucía (you)" style="display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 12px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg)">L</span></li>
+    </ul>
+  </header>
+
+  <nav aria-label="Lists" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-1); margin: 0 var(--space-4); padding: var(--space-1); border-radius: 12px; background: var(--surface-subtle); border: 1px solid var(--border)">
+    <a href="#" aria-current="page" style="display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border-radius: 9px; background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; box-shadow: inset 0 0 0 1px var(--border)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Shared list</a>
+    <a href="#" style="display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border-radius: 9px; color: var(--text-secondary); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>My private list</a>
+  </nav>
+
+  <main style="display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4) var(--space-4) 112px">
+    <form aria-label="Add an item" style="display: flex; gap: var(--space-2)">
+      <label for="new-item-60" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">New item</label>
+      <input id="new-item-60" placeholder="Add an item, e.g. 2 l milk" style="flex: 1; min-width: 0; height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif">
+      <button type="submit" aria-label="Add item" title="Add item" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 0; background: var(--brand); color: var(--on-brand); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+    </form>
+
+    <section aria-labelledby="g-produce-60" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="g-produce-60" style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Produce</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Tomatoes</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">1 kg</span></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; color: var(--text-muted); text-decoration: line-through">Rice</span><span style="font-size: 14px; line-height: 20px; color: var(--text-muted)">500 g</span></label></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="g-dairy-60" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="g-dairy-60" style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Dairy</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 60px; padding: 0 var(--space-4); cursor: pointer; background: var(--shopping-tint)"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Milk</span><span style="font-size: 12px; line-height: 16px; color: var(--shopping-ink)">Added by Marcos · just now</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">2 l</span></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Greek yogurt</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">4</span></label></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="g-home-60" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="g-home-60" style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Home and cleaning</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Toilet paper</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">12 rolls</span></label></li>
+        <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Dish soap</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">1</span></label></li>
+      </ul>
+    </section>
+
+    <a href="expenses.html" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Finish shopping</a>
+  </main>
+
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: var(--space-2) 0 var(--space-6); background: var(--surface); border-top: 1px solid var(--border)">
+  <a href="shopping.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--brand); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>Shopping</a>
+  <a href="expenses.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg></span>Expenses</a>
+  <a href="home.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>Home</a>
+  <a href="planner.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg></span>Planner</a>
+  <a href="meals.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>Meals</a>
+</nav>
+</div>
+</div>
+</figure>
+</div>
+</section>
+<section class="group" data-group="1">
+<h2>Default</h2>
+
+<div class="stack">
+<figure class="frame">
+<figcaption>Desktop · 1440 × 900 · Light</figcaption>
+<div class="device device--desktop" data-theme="light">
+<div style="display: flex; flex-wrap: wrap; min-height: 900px; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+  <aside style="flex: 1 1 264px; box-sizing: border-box; display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-6) var(--space-4); background: var(--surface); border-right: 1px solid var(--border)">
+    <div style="padding: 0 var(--space-3); font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; letter-spacing: 1px">H<span style="color: var(--brand)">Ø</span>EM</div>
+    <button type="button" aria-haspopup="menu" aria-expanded="false" style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 var(--space-3) 0 var(--space-2); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-align: left; cursor: pointer">
+      <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-ink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font: 600 14px/20px 'Plus Jakarta Sans', sans-serif">Calle Mayor flat</span><span style="font: 400 12px/16px 'Plus Jakarta Sans', sans-serif; color: var(--text-secondary)">Shared flat · 2 members</span></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">, switch household</span>
+    </button>
+    <nav aria-label="Main" style="display: flex; flex-direction: column; gap: var(--space-1)">
+      <a href="home.html" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); color: var(--text); font: 500 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--brand)"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>Home</a>
+<a href="planner.html" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); color: var(--text); font: 500 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--brand)"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>Planner</a>
+<a href="meals.html" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); color: var(--text); font: 500 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--meals)"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>Meals</a>
+<a href="shopping.html" aria-current="page" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); background: var(--brand-tint); color: var(--brand-ink); font: 600 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>Shopping</a>
+<a href="expenses.html" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); color: var(--text); font: 500 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--expenses)"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>Expenses</a>
+    </nav>
+    <a href="profile.html" style="margin-top: auto; display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: 6px var(--space-3) 6px var(--space-2); border-radius: var(--radius-md); border: 1px solid var(--border); color: var(--text); text-decoration: none">
+      <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif">L</span>
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font: 600 14px/20px 'Plus Jakarta Sans', sans-serif">Lucía</span><span style="font: 400 12px/16px 'Plus Jakarta Sans', sans-serif; color: var(--text-secondary)">Profile and settings</span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+    </a>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: var(--space-8) var(--space-10) var(--space-12)">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6)">
+      <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4)">
+        <div>
+          <h1 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.015em">Shopping</h1>
+          <p style="margin: 0; display: flex; align-items: center; gap: var(--space-2); font-size: 16px; line-height: 24px; color: var(--text-secondary)">5 of 6 items left · <span style="display: inline-flex; align-items: center; gap: 6px; color: var(--shopping-ink)"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: var(--radius-full); background: var(--shopping)"></span>Marcos is on this list</span></p>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3)">
+          <nav aria-label="Lists" style="display: flex; gap: var(--space-1); padding: var(--space-1); border-radius: 12px; background: var(--surface-subtle); border: 1px solid var(--border)">
+            <a href="#" aria-current="page" style="display: flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 9px; background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; box-shadow: inset 0 0 0 1px var(--border)">Shared list</a>
+            <a href="#" style="display: flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 9px; color: var(--text-secondary); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">My private list</a>
+          </nav>
+          <a href="expenses.html" style="display: flex; align-items: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-5); border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Finish shopping</a>
+        </div>
+      </header>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-6)">
+        <div style="flex: 2 1 480px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-5)">
+          <form aria-label="Add an item" style="display: flex; gap: var(--space-2)">
+            <label for="dk-item-61" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">New item</label>
+            <input id="dk-item-61" placeholder="Add an item, e.g. 2 l milk" style="flex: 1; min-width: 0; height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif">
+            <button type="submit" style="display: flex; align-items: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Add</button>
+          </form>
+          
+            <section style="display: flex; flex-direction: column; gap: var(--space-2)">
+              <h2 style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Produce</h2>
+              <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+                
+                  <li style="display: block">
+                    
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Tomatoes</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">1 kg</span></label>
+                    
+                    
+                  </li>
+                
+                  <li style="display: block">
+                    <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                    
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; color: var(--text-muted); text-decoration: line-through">Rice</span><span style="font-size: 14px; line-height: 20px; color: var(--text-muted)">500 g</span></label>
+                    
+                  </li>
+                
+              </ul>
+            </section>
+          
+            <section style="display: flex; flex-direction: column; gap: var(--space-2)">
+              <h2 style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Dairy</h2>
+              <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+                
+                  <li style="display: block">
+                    
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Milk</span><span style="font-size: 12px; line-height: 16px; color: var(--shopping-ink)">Added by Marcos · just now</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">2 l</span></label>
+                    
+                    
+                  </li>
+                
+                  <li style="display: block">
+                    <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Greek yogurt</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">4</span></label>
+                    
+                    
+                  </li>
+                
+              </ul>
+            </section>
+          
+            <section style="display: flex; flex-direction: column; gap: var(--space-2)">
+              <h2 style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Home and cleaning</h2>
+              <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+                
+                  <li style="display: block">
+                    
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Toilet paper</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">12 rolls</span></label>
+                    
+                    
+                  </li>
+                
+                  <li style="display: block">
+                    <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Dish soap</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">1</span></label>
+                    
+                    
+                  </li>
+                
+              </ul>
+            </section>
+          
+        </div>
+
+        <aside aria-labelledby="dk-from-meals-61" style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-6); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border)">
+          <div>
+            <h2 id="dk-from-meals-61" style="margin: 0; font-size: 20px; line-height: 28px; font-weight: 600">From this week's meals</h2>
+            <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">Add a recipe's ingredients; you'll choose which ones you need.</p>
+          </div>
+          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+            
+              <li style="display: block">
+                
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0">
+                <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--meals-tint); color: var(--meals-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Paella</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Saturday lunch</span></span>
+                <button type="button" aria-label="Add ingredients of Paella to the shopping list" title="Add ingredients to shopping list" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--shopping); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                </div>
+              </li>
+            
+              <li style="display: block">
+                <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0">
+                <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--meals-tint); color: var(--meals-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Grilled salmon</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Thursday dinner</span></span>
+                <button type="button" aria-label="Add ingredients of Grilled salmon to the shopping list" title="Add ingredients to shopping list" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--shopping); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                </div>
+              </li>
+            
+              <li style="display: block">
+                <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0">
+                <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--meals-tint); color: var(--meals-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Chicken wraps</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Friday lunch</span></span>
+                <button type="button" aria-label="Add ingredients of Chicken wraps to the shopping list" title="Add ingredients to shopping list" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--shopping); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                </div>
+              </li>
+            
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Desktop · 1440 × 900 · Dark</figcaption>
+<div class="device device--desktop" data-theme="dark">
+<div style="display: flex; flex-wrap: wrap; min-height: 900px; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+  <aside style="flex: 1 1 264px; box-sizing: border-box; display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-6) var(--space-4); background: var(--surface); border-right: 1px solid var(--border)">
+    <div style="padding: 0 var(--space-3); font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; letter-spacing: 1px">H<span style="color: var(--brand)">Ø</span>EM</div>
+    <button type="button" aria-haspopup="menu" aria-expanded="false" style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 var(--space-3) 0 var(--space-2); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-align: left; cursor: pointer">
+      <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-ink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font: 600 14px/20px 'Plus Jakarta Sans', sans-serif">Calle Mayor flat</span><span style="font: 400 12px/16px 'Plus Jakarta Sans', sans-serif; color: var(--text-secondary)">Shared flat · 2 members</span></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">, switch household</span>
+    </button>
+    <nav aria-label="Main" style="display: flex; flex-direction: column; gap: var(--space-1)">
+      <a href="home.html" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); color: var(--text); font: 500 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--brand)"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>Home</a>
+<a href="planner.html" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); color: var(--text); font: 500 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--brand)"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>Planner</a>
+<a href="meals.html" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); color: var(--text); font: 500 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--meals)"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>Meals</a>
+<a href="shopping.html" aria-current="page" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); background: var(--brand-tint); color: var(--brand-ink); font: 600 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>Shopping</a>
+<a href="expenses.html" style="display: flex; align-items: center; gap: var(--space-3); height: var(--control-height); padding: 0 var(--space-3); border-radius: var(--radius-md); color: var(--text); font: 500 15px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--expenses)"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>Expenses</a>
+    </nav>
+    <a href="profile.html" style="margin-top: auto; display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: 6px var(--space-3) 6px var(--space-2); border-radius: var(--radius-md); border: 1px solid var(--border); color: var(--text); text-decoration: none">
+      <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif">L</span>
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font: 600 14px/20px 'Plus Jakarta Sans', sans-serif">Lucía</span><span style="font: 400 12px/16px 'Plus Jakarta Sans', sans-serif; color: var(--text-secondary)">Profile and settings</span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+    </a>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: var(--space-8) var(--space-10) var(--space-12)">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6)">
+      <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4)">
+        <div>
+          <h1 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.015em">Shopping</h1>
+          <p style="margin: 0; display: flex; align-items: center; gap: var(--space-2); font-size: 16px; line-height: 24px; color: var(--text-secondary)">5 of 6 items left · <span style="display: inline-flex; align-items: center; gap: 6px; color: var(--shopping-ink)"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: var(--radius-full); background: var(--shopping)"></span>Marcos is on this list</span></p>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3)">
+          <nav aria-label="Lists" style="display: flex; gap: var(--space-1); padding: var(--space-1); border-radius: 12px; background: var(--surface-subtle); border: 1px solid var(--border)">
+            <a href="#" aria-current="page" style="display: flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 9px; background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; box-shadow: inset 0 0 0 1px var(--border)">Shared list</a>
+            <a href="#" style="display: flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 9px; color: var(--text-secondary); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">My private list</a>
+          </nav>
+          <a href="expenses.html" style="display: flex; align-items: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-5); border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Finish shopping</a>
+        </div>
+      </header>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-6)">
+        <div style="flex: 2 1 480px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-5)">
+          <form aria-label="Add an item" style="display: flex; gap: var(--space-2)">
+            <label for="dk-item-62" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">New item</label>
+            <input id="dk-item-62" placeholder="Add an item, e.g. 2 l milk" style="flex: 1; min-width: 0; height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif">
+            <button type="submit" style="display: flex; align-items: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Add</button>
+          </form>
+          
+            <section style="display: flex; flex-direction: column; gap: var(--space-2)">
+              <h2 style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Produce</h2>
+              <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+                
+                  <li style="display: block">
+                    
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Tomatoes</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">1 kg</span></label>
+                    
+                    
+                  </li>
+                
+                  <li style="display: block">
+                    <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                    
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" checked="" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; color: var(--text-muted); text-decoration: line-through">Rice</span><span style="font-size: 14px; line-height: 20px; color: var(--text-muted)">500 g</span></label>
+                    
+                  </li>
+                
+              </ul>
+            </section>
+          
+            <section style="display: flex; flex-direction: column; gap: var(--space-2)">
+              <h2 style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Dairy</h2>
+              <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+                
+                  <li style="display: block">
+                    
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Milk</span><span style="font-size: 12px; line-height: 16px; color: var(--shopping-ink)">Added by Marcos · just now</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">2 l</span></label>
+                    
+                    
+                  </li>
+                
+                  <li style="display: block">
+                    <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Greek yogurt</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">4</span></label>
+                    
+                    
+                  </li>
+                
+              </ul>
+            </section>
+          
+            <section style="display: flex; flex-direction: column; gap: var(--space-2)">
+              <h2 style="margin: 0 var(--space-2); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Home and cleaning</h2>
+              <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+                
+                  <li style="display: block">
+                    
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Toilet paper</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">12 rolls</span></label>
+                    
+                    
+                  </li>
+                
+                  <li style="display: block">
+                    <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                    
+                      <label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4); cursor: pointer"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Dish soap</span></span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">1</span></label>
+                    
+                    
+                  </li>
+                
+              </ul>
+            </section>
+          
+        </div>
+
+        <aside aria-labelledby="dk-from-meals-62" style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-6); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border)">
+          <div>
+            <h2 id="dk-from-meals-62" style="margin: 0; font-size: 20px; line-height: 28px; font-weight: 600">From this week's meals</h2>
+            <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">Add a recipe's ingredients; you'll choose which ones you need.</p>
+          </div>
+          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+            
+              <li style="display: block">
+                
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0">
+                <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--meals-tint); color: var(--meals-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Paella</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Saturday lunch</span></span>
+                <button type="button" aria-label="Add ingredients of Paella to the shopping list" title="Add ingredients to shopping list" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--shopping); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                </div>
+              </li>
+            
+              <li style="display: block">
+                <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0">
+                <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--meals-tint); color: var(--meals-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Grilled salmon</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Thursday dinner</span></span>
+                <button type="button" aria-label="Add ingredients of Grilled salmon to the shopping list" title="Add ingredients to shopping list" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--shopping); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                </div>
+              </li>
+            
+              <li style="display: block">
+                <div aria-hidden="true" style="height: 1px; background: var(--border)"></div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0">
+                <span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--meals-tint); color: var(--meals-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Chicken wraps</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Friday lunch</span></span>
+                <button type="button" aria-label="Add ingredients of Chicken wraps to the shopping list" title="Add ingredients to shopping list" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--shopping); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                </div>
+              </li>
+            
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+</figure>
+</div>
+</section>
+<section class="group" data-group="2">
+<h2>Empty</h2>
+
+<div class="row">
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Light</figcaption>
+<div class="device device--mobile" data-theme="light">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+  <a href="profile.html" aria-label="Profile and settings" title="Profile and settings" style="position: absolute; top: 28px; right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-full); text-decoration: none"><span aria-hidden="true" style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--border-control)">L</span></a>
+  <header style="padding: var(--space-6) 72px var(--space-3) var(--space-6)">
+    <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Shopping</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">Nothing to buy yet</p>
+  </header>
+  <nav aria-label="Lists" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-1); margin: 0 var(--space-4); padding: var(--space-1); border-radius: 12px; background: var(--surface-subtle); border: 1px solid var(--border)">
+    <a href="#" aria-current="page" style="display: flex; align-items: center; justify-content: center; height: 40px; border-radius: 9px; background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; box-shadow: inset 0 0 0 1px var(--border)">Shared list</a>
+    <a href="#" style="display: flex; align-items: center; justify-content: center; height: 40px; border-radius: 9px; color: var(--text-secondary); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">My private list</a>
+  </nav>
+  <main style="display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4) var(--space-4) 112px">
+    <form aria-label="Add an item" style="display: flex; gap: var(--space-2)">
+      <label for="first-item-63" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">New item</label>
+      <input id="first-item-63" placeholder="Add an item, e.g. 2 l milk" style="flex: 1; min-width: 0; height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif">
+      <button type="submit" aria-label="Add item" title="Add item" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 0; background: var(--brand); color: var(--on-brand); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+    </form>
+    <section style="display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-12) var(--space-6); text-align: center">
+      <span aria-hidden="true" style="display: grid; place-items: center; width: 72px; height: 72px; border-radius: var(--radius-full); background: var(--shopping-tint); color: var(--shopping-ink)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>
+      <h2 style="margin: var(--space-2) 0 0; font-size: 20px; line-height: 28px; font-weight: 600">Your list is empty</h2>
+      <p style="margin: 0; max-width: 280px; font-size: 16px; line-height: 24px; color: var(--text-secondary)">Add things as you think of them, or bring in the ingredients from this week's meals.</p>
+      <a href="meals.html" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); margin-top: var(--space-2); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--meals)"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>Add from this week's meals</a>
+    </section>
+  </main>
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: var(--space-2) 0 var(--space-6); background: var(--surface); border-top: 1px solid var(--border)">
+  <a href="shopping.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--brand); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>Shopping</a>
+  <a href="expenses.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg></span>Expenses</a>
+  <a href="home.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>Home</a>
+  <a href="planner.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg></span>Planner</a>
+  <a href="meals.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>Meals</a>
+</nav>
+</div>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Dark</figcaption>
+<div class="device device--mobile" data-theme="dark">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+  <a href="profile.html" aria-label="Profile and settings" title="Profile and settings" style="position: absolute; top: 28px; right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-full); text-decoration: none"><span aria-hidden="true" style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--border-control)">L</span></a>
+  <header style="padding: var(--space-6) 72px var(--space-3) var(--space-6)">
+    <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Shopping</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">Nothing to buy yet</p>
+  </header>
+  <nav aria-label="Lists" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-1); margin: 0 var(--space-4); padding: var(--space-1); border-radius: 12px; background: var(--surface-subtle); border: 1px solid var(--border)">
+    <a href="#" aria-current="page" style="display: flex; align-items: center; justify-content: center; height: 40px; border-radius: 9px; background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; box-shadow: inset 0 0 0 1px var(--border)">Shared list</a>
+    <a href="#" style="display: flex; align-items: center; justify-content: center; height: 40px; border-radius: 9px; color: var(--text-secondary); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none">My private list</a>
+  </nav>
+  <main style="display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4) var(--space-4) 112px">
+    <form aria-label="Add an item" style="display: flex; gap: var(--space-2)">
+      <label for="first-item-64" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); margin: -1px">New item</label>
+      <input id="first-item-64" placeholder="Add an item, e.g. 2 l milk" style="flex: 1; min-width: 0; height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif">
+      <button type="submit" aria-label="Add item" title="Add item" style="display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 0; background: var(--brand); color: var(--on-brand); cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+    </form>
+    <section style="display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-12) var(--space-6); text-align: center">
+      <span aria-hidden="true" style="display: grid; place-items: center; width: 72px; height: 72px; border-radius: var(--radius-full); background: var(--shopping-tint); color: var(--shopping-ink)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>
+      <h2 style="margin: var(--space-2) 0 0; font-size: 20px; line-height: 28px; font-weight: 600">Your list is empty</h2>
+      <p style="margin: 0; max-width: 280px; font-size: 16px; line-height: 24px; color: var(--text-secondary)">Add things as you think of them, or bring in the ingredients from this week's meals.</p>
+      <a href="meals.html" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); margin-top: var(--space-2); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--meals)"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>Add from this week's meals</a>
+    </section>
+  </main>
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: var(--space-2) 0 var(--space-6); background: var(--surface); border-top: 1px solid var(--border)">
+  <a href="shopping.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--brand); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>Shopping</a>
+  <a href="expenses.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg></span>Expenses</a>
+  <a href="home.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>Home</a>
+  <a href="planner.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg></span>Planner</a>
+  <a href="meals.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>Meals</a>
+</nav>
+</div>
+</div>
+</figure>
+</div>
+</section>
+<section class="group" data-group="3">
+<h2>Offline and error</h2>
+
+<div class="row">
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Light</figcaption>
+<div class="device device--mobile" data-theme="light">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+
+  <div role="status" style="display: flex; align-items: center; gap: 10px; padding: 10px var(--space-4); background: var(--warning-tint); color: var(--warning-ink); font-size: 14px; line-height: 20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01"></path><path d="M8.5 16.43a5 5 0 0 1 7 0"></path><path d="M2 8.82a15 15 0 0 1 4.17-2.65"></path><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"></path><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"></path><path d="M5 13a10 10 0 0 1 5.24-2.76"></path><path d="m2 2 20 20"></path></svg><span style="flex: 1">You're offline. Reconnect to see the latest list.</span></div>
+  <a href="profile.html" aria-label="Profile and settings" title="Profile and settings" style="position: absolute; top: 68px; right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-full); text-decoration: none"><span aria-hidden="true" style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--border-control)">L</span></a>
+  <header style="padding: var(--space-4) 72px var(--space-3) var(--space-6)">
+    <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Shopping</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">Last updated 10 min ago</p>
+  </header>
+  <main style="display: flex; flex-direction: column; gap: var(--space-4); padding: 0 var(--space-4) 104px">
+    <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+      <li><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4)"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Tomatoes</span><span style="font-size: 14px; color: var(--text-secondary)">1 kg</span></label></li>
+      <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4)"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Milk</span><span style="font-size: 14px; color: var(--text-secondary)">2 l</span></label></li>
+      <li style="border-top: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-3); min-height: 60px; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-4); background: var(--danger-tint)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--danger)"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Bread</span><span style="font-size: 14px; line-height: 20px; color: var(--danger-ink)">Not saved yet</span></span><button type="button" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; cursor: pointer; height: 40px; padding: 0 var(--space-3)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>Retry</button></li>
+    </ul>
+    <div role="alert" style="display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4); border-radius: var(--radius-md); background: var(--text); color: var(--bg); font: 500 14px/20px 'Plus Jakarta Sans', sans-serif"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--danger-tint)"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span style="flex: 1">Couldn't save "Bread". We'll try again when you're back online.</span></div>
+  </main>
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: var(--space-2) 0 var(--space-6); background: var(--surface); border-top: 1px solid var(--border)">
+  <a href="shopping.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--brand); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>Shopping</a>
+  <a href="expenses.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg></span>Expenses</a>
+  <a href="home.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>Home</a>
+  <a href="planner.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg></span>Planner</a>
+  <a href="meals.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>Meals</a>
+</nav>
+</div>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Dark</figcaption>
+<div class="device device--mobile" data-theme="dark">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+
+  <div role="status" style="display: flex; align-items: center; gap: 10px; padding: 10px var(--space-4); background: var(--warning-tint); color: var(--warning-ink); font-size: 14px; line-height: 20px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01"></path><path d="M8.5 16.43a5 5 0 0 1 7 0"></path><path d="M2 8.82a15 15 0 0 1 4.17-2.65"></path><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"></path><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"></path><path d="M5 13a10 10 0 0 1 5.24-2.76"></path><path d="m2 2 20 20"></path></svg><span style="flex: 1">You're offline. Reconnect to see the latest list.</span></div>
+  <a href="profile.html" aria-label="Profile and settings" title="Profile and settings" style="position: absolute; top: 68px; right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-full); text-decoration: none"><span aria-hidden="true" style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--border-control)">L</span></a>
+  <header style="padding: var(--space-4) 72px var(--space-3) var(--space-6)">
+    <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Shopping</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">Last updated 10 min ago</p>
+  </header>
+  <main style="display: flex; flex-direction: column; gap: var(--space-4); padding: 0 var(--space-4) 104px">
+    <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+      <li><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4)"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Tomatoes</span><span style="font-size: 14px; color: var(--text-secondary)">1 kg</span></label></li>
+      <li style="border-top: 1px solid var(--border)"><label style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: 0 var(--space-4)"><input type="checkbox" style="width: 22px; height: 22px; margin: 0; accent-color: var(--shopping)"><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 600">Milk</span><span style="font-size: 14px; color: var(--text-secondary)">2 l</span></label></li>
+      <li style="border-top: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-3); min-height: 60px; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-4); background: var(--danger-tint)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--danger)"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Bread</span><span style="font-size: 14px; line-height: 20px; color: var(--danger-ink)">Not saved yet</span></span><button type="button" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; cursor: pointer; height: 40px; padding: 0 var(--space-3)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>Retry</button></li>
+    </ul>
+    <div role="alert" style="display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4); border-radius: var(--radius-md); background: var(--text); color: var(--bg); font: 500 14px/20px 'Plus Jakarta Sans', sans-serif"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--danger-tint)"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span style="flex: 1">Couldn't save "Bread". We'll try again when you're back online.</span></div>
+  </main>
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: var(--space-2) 0 var(--space-6); background: var(--surface); border-top: 1px solid var(--border)">
+  <a href="shopping.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--brand); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>Shopping</a>
+  <a href="expenses.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg></span>Expenses</a>
+  <a href="home.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>Home</a>
+  <a href="planner.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg></span>Planner</a>
+  <a href="meals.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>Meals</a>
+</nav>
+</div>
+</div>
+</figure>
+</div>
+</section>
+</div>
+</body>
+</html>

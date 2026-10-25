@@ -31,6 +31,7 @@ Closes #
 - [ ] Every interaction works with the keyboard only
 - [ ] Focus is visible and follows a logical order
 - [ ] Contrast meets WCAG 2.2 AA in the light and dark themes
+- [ ] UI matches its screen in `docs/design-system/screens/` (light and dark, 360/768/1440 px), or N/A
 - [ ] Controls have accessible names for screen readers
 
 ## Screenshots
