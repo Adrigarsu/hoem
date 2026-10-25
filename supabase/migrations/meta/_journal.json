@@ -8,6 +8,20 @@
       "when": 1792876698016,
       "tag": "20261024211818_common-functions",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792949037820,
+      "tag": "20261025172357_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792949049315,
+      "tag": "20261025172409_profiles-sign-up-trigger",
+      "breakpoints": true
     }
   ]
 }
