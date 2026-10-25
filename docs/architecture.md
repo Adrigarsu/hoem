@@ -99,7 +99,7 @@ hoem/
 │   │   ├── expenses/
 │   │   ├── planner/             notes and reminders
 │   │   └── notifications/
-│   ├── design-system/           tokens, components, Storybook stories
+│   ├── design-system/           tokens and components
 │   ├── db/
 │   │   ├── schema/              Drizzle table definitions
 │   │   └── seed/                demo template and local test data
@@ -110,7 +110,8 @@ hoem/
 │   └── functions/               Edge Functions: dispatch-reminders, cleanup-demo
 ├── messages/                    en.json, es.json
 ├── tests/e2e/                   Playwright specs, one per user story
-└── docs/adr/                    Architecture Decision Records
+├── docs/adr/                    Architecture Decision Records
+└── docs/design-system/          tokens, component rules and the screen designs (screens/)
 ```
 
 ### 4.2 Layers inside a feature

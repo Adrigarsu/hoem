@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Launch screen · HØEM screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+/* Design tokens, generated from docs/design-system/tokens.json. Same names as the tokens. */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg: #f9f6f2;
+  --surface: #ffffff;
+  --surface-subtle: #f3f0ea;
+  --border: #e1ddd8;
+  --border-control: #898680;
+  --text: #1d1a16;
+  --text-secondary: #58554f;
+  --text-muted: #6c6863;
+  --brand: #1f4bff;
+  --brand-hover: #143cc9;
+  --brand-tint: #eaf2ff;
+  --brand-ink: #283f77;
+  --on-brand: #ffffff;
+  --on-accent: #ffffff;
+  --meals: #a34d00;
+  --meals-tint: #ffeee2;
+  --meals-ink: #693000;
+  --shopping: #007a75;
+  --shopping-tint: #e0f8f5;
+  --shopping-ink: #00524e;
+  --expenses: #8b4a9a;
+  --expenses-tint: #faedfd;
+  --expenses-ink: #592e63;
+  --success: #267d30;
+  --success-tint: #e8f7e8;
+  --success-ink: #17501d;
+  --warning: #8d6000;
+  --warning-tint: #faf1df;
+  --warning-ink: #5a3c00;
+  --danger: #ab413e;
+  --danger-tint: #ffece9;
+  --danger-ink: #6e2826;
+  --focus-ring: var(--brand);
+  --scrim: rgba(29,26,22,0.45);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #201e1b;
+  --surface: #292724;
+  --surface-subtle: #33312e;
+  --border: #474541;
+  --border-control: #8e8c88;
+  --text: #f6f3ef;
+  --text-secondary: #c6c4c0;
+  --text-muted: #adaaa7;
+  --brand: #8fb1ff;
+  --brand-hover: #b4d1ff;
+  --brand-tint: #2e3a55;
+  --brand-ink: #d8e8ff;
+  --on-brand: #171613;
+  --on-accent: #171613;
+  --meals: #f7a062;
+  --meals-tint: #4f3320;
+  --meals-ink: #ffe0c9;
+  --shopping: #21d1ca;
+  --shopping-tint: #144340;
+  --shopping-ink: #c3f3ef;
+  --expenses: #dc9beb;
+  --expenses-tint: #46324b;
+  --expenses-ink: #f7defd;
+  --success: #80cd82;
+  --success-tint: #29412a;
+  --success-ink: #d4f1d4;
+  --warning: #ddb049;
+  --warning-tint: #46381a;
+  --warning-ink: #f7e6c3;
+  --danger: #ff958d;
+  --danger-tint: #52302d;
+  --danger-ink: #ffdcd7;
+  --focus-ring: var(--brand);
+  --scrim: rgba(0,0,0,0.55);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --stroke-hairline: 1px;
+  --stroke-focus: 2px;
+  --control-height: 44px;
+  --control-height-sm: 36px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --sidebar-width: 264px;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-logo: "Montserrat", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+/* Reference-sheet layout (not part of the screen) */
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-subtle); color: var(--text); font-family: var(--font-sans); }
+.doc { padding: 32px 32px 64px; display: flex; flex-direction: column; gap: 40px; }
+.doc > header { max-width: 760px; display: flex; flex-direction: column; gap: 8px; }
+.doc h1 { margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.015em; }
+.doc .lede { margin: 0; font-size: 16px; line-height: 24px; color: var(--text-secondary); }
+.doc .meta { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.doc code { font-size: 13px; padding: 1px 6px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); }
+.group { display: flex; flex-direction: column; gap: 16px; }
+.group > h2 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+.group > p { margin: 0; max-width: 760px; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.stack { display: flex; flex-direction: column; gap: 32px; overflow-x: auto; }
+.frame { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.frame figcaption { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+.device { position: relative; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font-sans);
+  border: 1px solid var(--border-control); }
+.device--mobile { width: 360px; height: 800px; border-radius: 24px; }
+.device--desktop { width: 1440px; min-height: 900px; border-radius: 14px; }
+.device a { color: var(--brand); }
+.device a:hover { color: var(--brand-hover); }
+.device :focus-visible { outline: var(--stroke-focus) solid var(--focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .device * { animation: none !important; transition: none !important; } }
+
+</style>
+</head>
+<body>
+<div class="doc">
+<header>
+<h1>Launch screen</h1>
+<p class="lede">Shown while the session is checked (FR-NAV-004). The same centred layout is used at every width.</p>
+<p class="meta">Spec: <code>splash.md</code> · Tokens: <code>docs/design-system/tokens.json</code> · Each frame shows the light and dark theme with the same markup; only <code>data-theme</code> changes.</p>
+</header>
+<section class="group" data-group="0">
+<h2>Default</h2>
+
+<div class="row">
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Light</figcaption>
+<div class="device device--mobile" data-theme="light">
+<main aria-busy="true" style="width: 100%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-6); background: var(--brand); color: var(--on-brand); font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+  <div role="img" aria-label="HØEM" style="font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 56px; line-height: 1; letter-spacing: 2px">H<span style="color: var(--brand-tint)">Ø</span>EM</div>
+  <div role="status" style="display: flex; flex-direction: column; align-items: center; gap: var(--space-3)">
+    <div aria-hidden="true" style="width: 120px; height: 4px; border-radius: var(--radius-full); background: color-mix(in srgb, var(--on-brand) 25%, transparent); overflow: hidden"><div style="width: 45%; height: 100%; border-radius: var(--radius-full); background: var(--surface)"></div></div>
+    <span style="font-size: 14px; line-height: 20px; color: var(--brand-tint)">Opening your home…</span>
+  </div>
+</main>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Dark</figcaption>
+<div class="device device--mobile" data-theme="dark">
+<main aria-busy="true" style="width: 100%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-6); background: var(--brand); color: var(--on-brand); font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+  <div role="img" aria-label="HØEM" style="font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 56px; line-height: 1; letter-spacing: 2px">H<span style="color: var(--brand-tint)">Ø</span>EM</div>
+  <div role="status" style="display: flex; flex-direction: column; align-items: center; gap: var(--space-3)">
+    <div aria-hidden="true" style="width: 120px; height: 4px; border-radius: var(--radius-full); background: color-mix(in srgb, var(--on-brand) 25%, transparent); overflow: hidden"><div style="width: 45%; height: 100%; border-radius: var(--radius-full); background: var(--surface)"></div></div>
+    <span style="font-size: 14px; line-height: 20px; color: var(--brand-tint)">Opening your home…</span>
+  </div>
+</main>
+</div>
+</figure>
+</div>
+</section>
+</div>
+</body>
+</html>

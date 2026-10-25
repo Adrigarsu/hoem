@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Household settings · HØEM screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+/* Design tokens, generated from docs/design-system/tokens.json. Same names as the tokens. */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg: #f9f6f2;
+  --surface: #ffffff;
+  --surface-subtle: #f3f0ea;
+  --border: #e1ddd8;
+  --border-control: #898680;
+  --text: #1d1a16;
+  --text-secondary: #58554f;
+  --text-muted: #6c6863;
+  --brand: #1f4bff;
+  --brand-hover: #143cc9;
+  --brand-tint: #eaf2ff;
+  --brand-ink: #283f77;
+  --on-brand: #ffffff;
+  --on-accent: #ffffff;
+  --meals: #a34d00;
+  --meals-tint: #ffeee2;
+  --meals-ink: #693000;
+  --shopping: #007a75;
+  --shopping-tint: #e0f8f5;
+  --shopping-ink: #00524e;
+  --expenses: #8b4a9a;
+  --expenses-tint: #faedfd;
+  --expenses-ink: #592e63;
+  --success: #267d30;
+  --success-tint: #e8f7e8;
+  --success-ink: #17501d;
+  --warning: #8d6000;
+  --warning-tint: #faf1df;
+  --warning-ink: #5a3c00;
+  --danger: #ab413e;
+  --danger-tint: #ffece9;
+  --danger-ink: #6e2826;
+  --focus-ring: var(--brand);
+  --scrim: rgba(29,26,22,0.45);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #201e1b;
+  --surface: #292724;
+  --surface-subtle: #33312e;
+  --border: #474541;
+  --border-control: #8e8c88;
+  --text: #f6f3ef;
+  --text-secondary: #c6c4c0;
+  --text-muted: #adaaa7;
+  --brand: #8fb1ff;
+  --brand-hover: #b4d1ff;
+  --brand-tint: #2e3a55;
+  --brand-ink: #d8e8ff;
+  --on-brand: #171613;
+  --on-accent: #171613;
+  --meals: #f7a062;
+  --meals-tint: #4f3320;
+  --meals-ink: #ffe0c9;
+  --shopping: #21d1ca;
+  --shopping-tint: #144340;
+  --shopping-ink: #c3f3ef;
+  --expenses: #dc9beb;
+  --expenses-tint: #46324b;
+  --expenses-ink: #f7defd;
+  --success: #80cd82;
+  --success-tint: #29412a;
+  --success-ink: #d4f1d4;
+  --warning: #ddb049;
+  --warning-tint: #46381a;
+  --warning-ink: #f7e6c3;
+  --danger: #ff958d;
+  --danger-tint: #52302d;
+  --danger-ink: #ffdcd7;
+  --focus-ring: var(--brand);
+  --scrim: rgba(0,0,0,0.55);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --stroke-hairline: 1px;
+  --stroke-focus: 2px;
+  --control-height: 44px;
+  --control-height-sm: 36px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --sidebar-width: 264px;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-logo: "Montserrat", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+/* Reference-sheet layout (not part of the screen) */
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-subtle); color: var(--text); font-family: var(--font-sans); }
+.doc { padding: 32px 32px 64px; display: flex; flex-direction: column; gap: 40px; }
+.doc > header { max-width: 760px; display: flex; flex-direction: column; gap: 8px; }
+.doc h1 { margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.015em; }
+.doc .lede { margin: 0; font-size: 16px; line-height: 24px; color: var(--text-secondary); }
+.doc .meta { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.doc code { font-size: 13px; padding: 1px 6px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); }
+.group { display: flex; flex-direction: column; gap: 16px; }
+.group > h2 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+.group > p { margin: 0; max-width: 760px; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.stack { display: flex; flex-direction: column; gap: 32px; overflow-x: auto; }
+.frame { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.frame figcaption { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+.device { position: relative; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font-sans);
+  border: 1px solid var(--border-control); }
+.device--mobile { width: 360px; height: 800px; border-radius: 24px; }
+.device--desktop { width: 1440px; min-height: 900px; border-radius: 14px; }
+.device a { color: var(--brand); }
+.device a:hover { color: var(--brand-hover); }
+.device :focus-visible { outline: var(--stroke-focus) solid var(--focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .device * { animation: none !important; transition: none !important; } }
+
+</style>
+</head>
+<body>
+<div class="doc">
+<header>
+<h1>Household settings</h1>
+<p class="lede">Members, details and rules of the active household (FR-ACC-006, FR-ACC-009, FR-HH).</p>
+<p class="meta">Spec: <code>household-settings.md</code> · Tokens: <code>docs/design-system/tokens.json</code> · Each frame shows the light and dark theme with the same markup; only <code>data-theme</code> changes.</p>
+</header>
+<section class="group" data-group="0">
+<h2>Default (owner of a shared flat)</h2>
+
+<div class="row">
+<figure class="frame">
+<figcaption>Mobile · 360 × 1011 · full length · Light</figcaption>
+<div class="device device--mobile" data-theme="light" style="height: 1011px">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+
+  <header style="padding: var(--space-3) var(--space-4) 0"><a href="profile.html" style="display: inline-flex; align-items: center; gap: var(--space-1); height: var(--control-height); padding: 0 var(--space-3) 0 var(--space-1); margin-left: -4px; border-radius: var(--radius-md); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>Profile</a></header>
+  <main style="display: flex; flex-direction: column; gap: 18px; padding: var(--space-2) var(--space-4) 104px">
+    <div style="padding: 0 var(--space-2)"><h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Calle Mayor flat</h1><p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">Household settings · you're the owner</p></div>
+    <section aria-labelledby="hs-members-81" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 var(--space-2)"><h2 id="hs-members-81" style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Members</h2><a href="setup-people.html" style="display: flex; align-items: center; gap: 6px; height: var(--control-height); padding: 0 var(--space-2); font-size: 14px; font-weight: 600; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Invite</a></div>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border)"><li style="display: flex; align-items: center; gap: var(--space-3); min-height: 60px; padding: 6px var(--space-2) 6px var(--space-4)"><span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif">L</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Lucía (you)</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Owner</span></span><button type="button" aria-label="Options for Lucía" title="Member options" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></button></li><li style="border-top: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-3); min-height: 60px; padding: 6px var(--space-2) 6px var(--space-4)"><span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--shopping-tint); color: var(--shopping-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif">M</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Marcos</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Member</span></span><button type="button" aria-label="Options for Marcos" title="Member options" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></button></li></ul>
+    </section>
+    <section aria-labelledby="hs-details-81" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="hs-details-81" style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); padding: 0 var(--space-2)">Details</h2>
+      <div style="display: flex; flex-direction: column; gap: 14px; padding: var(--space-4); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border)">
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="hs-name-81" style="font-size: 14px; line-height: 20px; font-weight: 600">Name</label><input id="hs-name-81" value="Calle Mayor flat" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="hs-type-81" style="font-size: 14px; line-height: 20px; font-weight: 600">Type</label><div style="position: relative; display: flex"><select id="hs-type-81" style="appearance: none; width: 100%; height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-10) 0 var(--space-4)"><option selected="">Shared flat</option><option>Just me</option><option>Family</option><option>Something else</option></select><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary); position: absolute; right: 12px; top: 12px; pointer-events: none"><path d="m6 9 6 6 6-6"></path></svg></div><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Changing the type never reveals existing private data.</span></div>
+      </div>
+    </section>
+    <section aria-labelledby="hs-rules-81" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="hs-rules-81" style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); padding: 0 var(--space-2)">How the household works</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li style="display: block"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 56px; padding: 6px var(--space-4); cursor: pointer"><span style="display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Split shared expenses</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Equally between members</span></span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; flex: none; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border); display: block"><a href="setup-meals.html" style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: var(--space-1) var(--space-4); color: var(--text); text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 500">Meals to plan</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">4 of 5</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></a></li>
+        <li style="border-top: 1px solid var(--border); display: block"><a href="setup-money.html" style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: var(--space-1) var(--space-4); color: var(--text); text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 500">Monthly shared budget</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">€600</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></a></li>
+        <li style="border-top: 1px solid var(--border); display: block"><a href="setup-welcome.html" style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: var(--space-1) var(--space-4); color: var(--text); text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 500">Run the setup guide again</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></a></li>
+      </ul>
+    </section>
+    <button type="button" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; cursor: pointer; color: var(--danger)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--danger)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path></svg>Leave household</button>
+  </main>
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: var(--space-2) 0 var(--space-6); background: var(--surface); border-top: 1px solid var(--border)">
+  <a href="shopping.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>Shopping</a>
+  <a href="expenses.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg></span>Expenses</a>
+  <a href="home.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>Home</a>
+  <a href="planner.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg></span>Planner</a>
+  <a href="meals.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>Meals</a>
+</nav>
+</div>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Mobile · 360 × 1011 · full length · Dark</figcaption>
+<div class="device device--mobile" data-theme="dark" style="height: 1011px">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+
+  <header style="padding: var(--space-3) var(--space-4) 0"><a href="profile.html" style="display: inline-flex; align-items: center; gap: var(--space-1); height: var(--control-height); padding: 0 var(--space-3) 0 var(--space-1); margin-left: -4px; border-radius: var(--radius-md); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>Profile</a></header>
+  <main style="display: flex; flex-direction: column; gap: 18px; padding: var(--space-2) var(--space-4) 104px">
+    <div style="padding: 0 var(--space-2)"><h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Calle Mayor flat</h1><p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary)">Household settings · you're the owner</p></div>
+    <section aria-labelledby="hs-members-82" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 var(--space-2)"><h2 id="hs-members-82" style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary)">Members</h2><a href="setup-people.html" style="display: flex; align-items: center; gap: 6px; height: var(--control-height); padding: 0 var(--space-2); font-size: 14px; font-weight: 600; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Invite</a></div>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border)"><li style="display: flex; align-items: center; gap: var(--space-3); min-height: 60px; padding: 6px var(--space-2) 6px var(--space-4)"><span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif">L</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Lucía (you)</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Owner</span></span><button type="button" aria-label="Options for Lucía" title="Member options" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></button></li><li style="border-top: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-3); min-height: 60px; padding: 6px var(--space-2) 6px var(--space-4)"><span aria-hidden="true" style="display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--shopping-tint); color: var(--shopping-ink); font: 600 14px/1 'Plus Jakarta Sans', sans-serif">M</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Marcos</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Member</span></span><button type="button" aria-label="Options for Marcos" title="Member options" style="position: relative; display: grid; place-items: center; flex: none; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; border-color: transparent; background: transparent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></button></li></ul>
+    </section>
+    <section aria-labelledby="hs-details-82" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="hs-details-82" style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); padding: 0 var(--space-2)">Details</h2>
+      <div style="display: flex; flex-direction: column; gap: 14px; padding: var(--space-4); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border)">
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="hs-name-82" style="font-size: 14px; line-height: 20px; font-weight: 600">Name</label><input id="hs-name-82" value="Calle Mayor flat" style="height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="hs-type-82" style="font-size: 14px; line-height: 20px; font-weight: 600">Type</label><div style="position: relative; display: flex"><select id="hs-type-82" style="appearance: none; width: 100%; height: var(--control-height); box-sizing: border-box; padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 400 16px/24px 'Plus Jakarta Sans', sans-serif; padding: 0 var(--space-10) 0 var(--space-4)"><option selected="">Shared flat</option><option>Just me</option><option>Family</option><option>Something else</option></select><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary); position: absolute; right: 12px; top: 12px; pointer-events: none"><path d="m6 9 6 6 6-6"></path></svg></div><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Changing the type never reveals existing private data.</span></div>
+      </div>
+    </section>
+    <section aria-labelledby="hs-rules-82" style="display: flex; flex-direction: column; gap: var(--space-2)">
+      <h2 id="hs-rules-82" style="margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); padding: 0 var(--space-2)">How the household works</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden">
+        <li style="display: block"><label style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 56px; padding: 6px var(--space-4); cursor: pointer"><span style="display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Split shared expenses</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">Equally between members</span></span><input type="checkbox" role="switch" checked="" style="width: 22px; height: 22px; margin: 0; flex: none; accent-color: var(--brand)"></label></li>
+        <li style="border-top: 1px solid var(--border); display: block"><a href="setup-meals.html" style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: var(--space-1) var(--space-4); color: var(--text); text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 500">Meals to plan</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">4 of 5</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></a></li>
+        <li style="border-top: 1px solid var(--border); display: block"><a href="setup-money.html" style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: var(--space-1) var(--space-4); color: var(--text); text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 500">Monthly shared budget</span><span style="font-size: 14px; line-height: 20px; color: var(--text-secondary)">€600</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></a></li>
+        <li style="border-top: 1px solid var(--border); display: block"><a href="setup-welcome.html" style="display: flex; align-items: center; gap: var(--space-3); min-height: 52px; padding: var(--space-1) var(--space-4); color: var(--text); text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg><span style="flex: 1; font-size: 16px; line-height: 24px; font-weight: 500">Run the setup guide again</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--text-secondary)"><path d="m9 18 6-6-6-6"></path></svg></a></li>
+      </ul>
+    </section>
+    <button type="button" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none; cursor: pointer; color: var(--danger)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--danger)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path></svg>Leave household</button>
+  </main>
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: var(--space-2) 0 var(--space-6); background: var(--surface); border-top: 1px solid var(--border)">
+  <a href="shopping.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg></span>Shopping</a>
+  <a href="expenses.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg></span>Expenses</a>
+  <a href="home.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>Home</a>
+  <a href="planner.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg></span>Planner</a>
+  <a href="meals.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; color: var(--text-secondary); text-decoration: none; font: 600 12px/16px 'Plus Jakarta Sans', sans-serif"><span style="display: grid; place-items: center; width: 56px; height: 28px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></span>Meals</a>
+</nav>
+</div>
+</div>
+</figure>
+</div>
+</section>
+</div>
+</body>
+</html>

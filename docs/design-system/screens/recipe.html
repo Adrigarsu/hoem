@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recipe · HØEM screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+/* Design tokens, generated from docs/design-system/tokens.json. Same names as the tokens. */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg: #f9f6f2;
+  --surface: #ffffff;
+  --surface-subtle: #f3f0ea;
+  --border: #e1ddd8;
+  --border-control: #898680;
+  --text: #1d1a16;
+  --text-secondary: #58554f;
+  --text-muted: #6c6863;
+  --brand: #1f4bff;
+  --brand-hover: #143cc9;
+  --brand-tint: #eaf2ff;
+  --brand-ink: #283f77;
+  --on-brand: #ffffff;
+  --on-accent: #ffffff;
+  --meals: #a34d00;
+  --meals-tint: #ffeee2;
+  --meals-ink: #693000;
+  --shopping: #007a75;
+  --shopping-tint: #e0f8f5;
+  --shopping-ink: #00524e;
+  --expenses: #8b4a9a;
+  --expenses-tint: #faedfd;
+  --expenses-ink: #592e63;
+  --success: #267d30;
+  --success-tint: #e8f7e8;
+  --success-ink: #17501d;
+  --warning: #8d6000;
+  --warning-tint: #faf1df;
+  --warning-ink: #5a3c00;
+  --danger: #ab413e;
+  --danger-tint: #ffece9;
+  --danger-ink: #6e2826;
+  --focus-ring: var(--brand);
+  --scrim: rgba(29,26,22,0.45);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #201e1b;
+  --surface: #292724;
+  --surface-subtle: #33312e;
+  --border: #474541;
+  --border-control: #8e8c88;
+  --text: #f6f3ef;
+  --text-secondary: #c6c4c0;
+  --text-muted: #adaaa7;
+  --brand: #8fb1ff;
+  --brand-hover: #b4d1ff;
+  --brand-tint: #2e3a55;
+  --brand-ink: #d8e8ff;
+  --on-brand: #171613;
+  --on-accent: #171613;
+  --meals: #f7a062;
+  --meals-tint: #4f3320;
+  --meals-ink: #ffe0c9;
+  --shopping: #21d1ca;
+  --shopping-tint: #144340;
+  --shopping-ink: #c3f3ef;
+  --expenses: #dc9beb;
+  --expenses-tint: #46324b;
+  --expenses-ink: #f7defd;
+  --success: #80cd82;
+  --success-tint: #29412a;
+  --success-ink: #d4f1d4;
+  --warning: #ddb049;
+  --warning-tint: #46381a;
+  --warning-ink: #f7e6c3;
+  --danger: #ff958d;
+  --danger-tint: #52302d;
+  --danger-ink: #ffdcd7;
+  --focus-ring: var(--brand);
+  --scrim: rgba(0,0,0,0.55);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --stroke-hairline: 1px;
+  --stroke-focus: 2px;
+  --control-height: 44px;
+  --control-height-sm: 36px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --sidebar-width: 264px;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-logo: "Montserrat", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+/* Reference-sheet layout (not part of the screen) */
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-subtle); color: var(--text); font-family: var(--font-sans); }
+.doc { padding: 32px 32px 64px; display: flex; flex-direction: column; gap: 40px; }
+.doc > header { max-width: 760px; display: flex; flex-direction: column; gap: 8px; }
+.doc h1 { margin: 0; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.015em; }
+.doc .lede { margin: 0; font-size: 16px; line-height: 24px; color: var(--text-secondary); }
+.doc .meta { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.doc code { font-size: 13px; padding: 1px 6px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); }
+.group { display: flex; flex-direction: column; gap: 16px; }
+.group > h2 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+.group > p { margin: 0; max-width: 760px; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+.row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.stack { display: flex; flex-direction: column; gap: 32px; overflow-x: auto; }
+.frame { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.frame figcaption { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+.device { position: relative; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font-sans);
+  border: 1px solid var(--border-control); }
+.device--mobile { width: 360px; height: 800px; border-radius: 24px; }
+.device--desktop { width: 1440px; min-height: 900px; border-radius: 14px; }
+.device a { color: var(--brand); }
+.device a:hover { color: var(--brand-hover); }
+.device :focus-visible { outline: var(--stroke-focus) solid var(--focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .device * { animation: none !important; transition: none !important; } }
+
+</style>
+</head>
+<body>
+<div class="doc">
+<header>
+<h1>Recipe</h1>
+<p class="lede">Recipe detail with scalable servings (FR-MEAL-001, FR-INT-001).</p>
+<p class="meta">Spec: <code>recipe.md</code> · Tokens: <code>docs/design-system/tokens.json</code> · Each frame shows the light and dark theme with the same markup; only <code>data-theme</code> changes.</p>
+</header>
+<section class="group" data-group="0">
+<h2>Default</h2>
+
+<div class="row">
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Light</figcaption>
+<div class="device device--mobile" data-theme="light">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-4) var(--space-2)">
+    <a href="meals.html" style="display: inline-flex; align-items: center; gap: 6px; height: var(--control-height); padding: 0 var(--space-3) 0 var(--space-1); border-radius: var(--radius-md); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>Meals</a>
+    <a href="recipe-edit.html" aria-label="Edit recipe" title="Edit recipe" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); cursor: pointer; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.17 6.81a1 1 0 0 0-3.99-3.99L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z"></path></svg></a>
+  </header>
+  <main style="display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-2) var(--space-4) 112px">
+    <div aria-hidden="true" style="display: grid; place-items: center; height: 168px; border-radius: var(--radius-lg); background: var(--meals-tint); color: var(--meals-ink)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></div>
+    <div style="display: flex; flex-direction: column; gap: var(--space-2); padding: 0 var(--space-2)">
+      <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Lentil stew with rice</h1>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); font-size: 14px; line-height: 20px; color: var(--text-secondary)">
+        <span style="display: inline-flex; align-items: center; gap: var(--space-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>35 min</span>
+        <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font-size: 12px; line-height: 16px; font-weight: 600">Vegetarian</span>
+        <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-full); background: var(--surface-subtle); color: var(--text-secondary); box-shadow: inset 0 0 0 1px var(--border); font-size: 12px; line-height: 16px; font-weight: 600">Batch cooking</span>
+      </div>
+    </div>
+    <section aria-labelledby="ing-title-55" style="display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border)">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-3)">
+        <h2 id="ing-title-55" style="margin: 0; font-size: 16px; line-height: 24px; font-weight: 600">Ingredients</h2>
+        <div role="group" aria-label="Servings" style="display: flex; align-items: center; gap: var(--space-1)">
+          <button type="button" aria-label="Fewer servings" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 0; background: transparent; color: var(--text); cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+          <span aria-live="polite" style="min-width: 76px; text-align: center; font-size: 14px; line-height: 20px; font-weight: 600">4 servings</span>
+          <button type="button" aria-label="More servings" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 0; background: transparent; color: var(--text); cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+        </div>
+      </div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; font-size: 16px; line-height: 24px"><span>Brown lentils</span><span style="color: var(--text-secondary)">300 g</span></li>
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-top: 1px solid var(--border); font-size: 16px; line-height: 24px"><span>Rice</span><span style="color: var(--text-secondary)">200 g</span></li>
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-top: 1px solid var(--border); font-size: 16px; line-height: 24px"><span>Carrots</span><span style="color: var(--text-secondary)">2</span></li>
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-top: 1px solid var(--border); font-size: 16px; line-height: 24px"><span>Onion</span><span style="color: var(--text-secondary)">1</span></li>
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-top: 1px solid var(--border); font-size: 16px; line-height: 24px"><span>Sweet paprika</span><span style="color: var(--text-secondary)">1 tsp</span></li>
+      </ul>
+    </section>
+  </main>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: var(--space-4) var(--space-4) var(--space-8); background: var(--bg); border-top: 1px solid var(--border)">
+    <a href="shopping.html" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>Add ingredients to shopping list</a>
+  </div>
+</div>
+</div>
+</figure>
+<figure class="frame">
+<figcaption>Mobile · 360 × 800 · Dark</figcaption>
+<div class="device device--mobile" data-theme="dark">
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums">
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-4) var(--space-2)">
+    <a href="meals.html" style="display: inline-flex; align-items: center; gap: 6px; height: var(--control-height); padding: 0 var(--space-3) 0 var(--space-1); border-radius: var(--radius-md); color: var(--text); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>Meals</a>
+    <a href="recipe-edit.html" aria-label="Edit recipe" title="Edit recipe" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 1px solid var(--border-control); background: var(--surface); color: var(--text); cursor: pointer; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.17 6.81a1 1 0 0 0-3.99-3.99L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z"></path></svg></a>
+  </header>
+  <main style="display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-2) var(--space-4) 112px">
+    <div aria-hidden="true" style="display: grid; place-items: center; height: 168px; border-radius: var(--radius-lg); background: var(--meals-tint); color: var(--meals-ink)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></div>
+    <div style="display: flex; flex-direction: column; gap: var(--space-2); padding: 0 var(--space-2)">
+      <h1 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em">Lentil stew with rice</h1>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); font-size: 14px; line-height: 20px; color: var(--text-secondary)">
+        <span style="display: inline-flex; align-items: center; gap: var(--space-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>35 min</span>
+        <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-full); background: var(--meals-tint); color: var(--meals-ink); font-size: 12px; line-height: 16px; font-weight: 600">Vegetarian</span>
+        <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-full); background: var(--surface-subtle); color: var(--text-secondary); box-shadow: inset 0 0 0 1px var(--border); font-size: 12px; line-height: 16px; font-weight: 600">Batch cooking</span>
+      </div>
+    </div>
+    <section aria-labelledby="ing-title-56" style="display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border)">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-3)">
+        <h2 id="ing-title-56" style="margin: 0; font-size: 16px; line-height: 24px; font-weight: 600">Ingredients</h2>
+        <div role="group" aria-label="Servings" style="display: flex; align-items: center; gap: var(--space-1)">
+          <button type="button" aria-label="Fewer servings" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 0; background: transparent; color: var(--text); cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+          <span aria-live="polite" style="min-width: 76px; text-align: center; font-size: 14px; line-height: 20px; font-weight: 600">4 servings</span>
+          <button type="button" aria-label="More servings" style="display: grid; place-items: center; width: 44px; height: var(--control-height); border-radius: var(--radius-md); border: 0; background: transparent; color: var(--text); cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+        </div>
+      </div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; font-size: 16px; line-height: 24px"><span>Brown lentils</span><span style="color: var(--text-secondary)">300 g</span></li>
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-top: 1px solid var(--border); font-size: 16px; line-height: 24px"><span>Rice</span><span style="color: var(--text-secondary)">200 g</span></li>
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-top: 1px solid var(--border); font-size: 16px; line-height: 24px"><span>Carrots</span><span style="color: var(--text-secondary)">2</span></li>
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-top: 1px solid var(--border); font-size: 16px; line-height: 24px"><span>Onion</span><span style="color: var(--text-secondary)">1</span></li>
+        <li style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-top: 1px solid var(--border); font-size: 16px; line-height: 24px"><span>Sweet paprika</span><span style="color: var(--text-secondary)">1 tsp</span></li>
+      </ul>
+    </section>
+  </main>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: var(--space-4) var(--space-4) var(--space-8); background: var(--bg); border-top: 1px solid var(--border)">
+    <a href="shopping.html" style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-height); border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font: 600 14px/20px 'Plus Jakarta Sans', sans-serif; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>Add ingredients to shopping list</a>
+  </div>
+</div>
+</div>
+</figure>
+</div>
+</section>
+</div>
+</body>
+</html>

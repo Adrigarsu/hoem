@@ -27,7 +27,8 @@
     "db:seed": "tsx src/db/seed/run.ts",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "screens:capture": "tsx scripts/capture-screens.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
