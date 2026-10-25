@@ -1,6 +1,6 @@
 # ADR-012 Internationalisation
 
-Date: 2026-10-14 · Status: Accepted
+Date: 2026-10-14 · Status: Accepted · Amended by ADR-015 (how the locale reaches the page)
 
 ## Context
 

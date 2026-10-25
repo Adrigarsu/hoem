@@ -1,0 +1,13 @@
+{
+  "Metadata": {
+    "title": "HØEM",
+    "description": "Meals, shopping, expenses and plans for your household."
+  },
+  "Home": {
+    "title": "H<brand>Ø</brand>EM"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "This page does not exist or has moved."
+  }
+}
