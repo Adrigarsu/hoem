@@ -50,7 +50,7 @@ Open http://localhost:3000. Stop Supabase with `pnpm db:stop`.
 | `pnpm dev`         | Start the development server                                                          |
 | `pnpm build`       | Build for production                                                                  |
 | `pnpm start`       | Serve the production build                                                            |
-| `pnpm lint`        | Lint with ESLint (`pnpm lint:fix` to autofix)                                         |
+| `pnpm lint`        | Lint with ESLint and Stylelint (`pnpm lint:fix` to autofix)                           |
 | `pnpm typecheck`   | Type-check with TypeScript                                                            |
 | `pnpm format`      | Format with Prettier (`pnpm format:check` to verify)                                  |
 | `pnpm test`        | Run unit tests with Vitest (`pnpm test:watch`)                                        |

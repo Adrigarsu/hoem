@@ -1,0 +1,228 @@
+/*
+ * HØEM design tokens. Values come from docs/design-system/tokens.json; tokens.css.test.ts fails
+ * when the two disagree. Components use the Tailwind utilities generated below (bg-surface,
+ * text-text-secondary, p-6, rounded-md...), never raw values.
+ */
+
+/* light-dark() picks the value for the active color-scheme: the system preference by default,
+   or the theme the user chose, set as data-theme on <html> (#22). */
+:root {
+  color-scheme: light dark;
+
+  --bg: light-dark(#f9f6f2, #201e1b);
+  --surface: light-dark(#ffffff, #292724);
+  --surface-subtle: light-dark(#f3f0ea, #33312e);
+  --border: light-dark(#e1ddd8, #474541);
+  --border-control: light-dark(#898680, #8e8c88);
+  --text: light-dark(#1d1a16, #f6f3ef);
+  --text-secondary: light-dark(#58554f, #c6c4c0);
+  --text-muted: light-dark(#6c6863, #adaaa7);
+  --brand: light-dark(#1f4bff, #8fb1ff);
+  --brand-hover: light-dark(#143cc9, #b4d1ff);
+  --brand-tint: light-dark(#eaf2ff, #2e3a55);
+  --brand-ink: light-dark(#283f77, #d8e8ff);
+  --on-brand: light-dark(#ffffff, #171613);
+  --on-accent: light-dark(#ffffff, #171613);
+  --meals: light-dark(#a34d00, #f7a062);
+  --meals-tint: light-dark(#ffeee2, #4f3320);
+  --meals-ink: light-dark(#693000, #ffe0c9);
+  --shopping: light-dark(#007a75, #21d1ca);
+  --shopping-tint: light-dark(#e0f8f5, #144340);
+  --shopping-ink: light-dark(#00524e, #c3f3ef);
+  --expenses: light-dark(#8b4a9a, #dc9beb);
+  --expenses-tint: light-dark(#faedfd, #46324b);
+  --expenses-ink: light-dark(#592e63, #f7defd);
+  --success: light-dark(#267d30, #80cd82);
+  --success-tint: light-dark(#e8f7e8, #29412a);
+  --success-ink: light-dark(#17501d, #d4f1d4);
+  --warning: light-dark(#8d6000, #ddb049);
+  --warning-tint: light-dark(#faf1df, #46381a);
+  --warning-ink: light-dark(#5a3c00, #f7e6c3);
+  --danger: light-dark(#ab413e, #ff958d);
+  --danger-tint: light-dark(#ffece9, #52302d);
+  --danger-ink: light-dark(#6e2826, #ffdcd7);
+  --focus-ring: light-dark(var(--brand), var(--brand));
+  --scrim: light-dark(rgba(29, 26, 22, 0.45), rgba(0, 0, 0, 0.55));
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --control-height: 44px;
+  --control-height-sm: 36px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --sidebar-width: 264px;
+  --stroke-hairline: 1px;
+  --stroke-focus: 2px;
+
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* NFR-A11Y-006: every transition becomes an instant change. 0.01ms rather than 0s, so
+   transitionend still fires for code that waits for it. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-base: 0.01ms;
+    --duration-slow: 0.01ms;
+  }
+}
+
+/* Tailwind theme. Each namespace is reset first, so the default palette, spacing scale and
+   shadows do not exist and only design-system values can be used. */
+@theme static {
+  --color-*: initial;
+  --spacing: initial;
+  --spacing-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --ease-*: initial;
+  --animate-*: initial;
+  --breakpoint-*: initial;
+
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  --text-display: 40px;
+  --text-display--line-height: 48px;
+  --text-display--font-weight: 700;
+  --text-display--letter-spacing: -0.02em;
+  --text-heading: 32px;
+  --text-heading--line-height: 40px;
+  --text-heading--font-weight: 700;
+  --text-heading--letter-spacing: -0.015em;
+  --text-title: 24px;
+  --text-title--line-height: 32px;
+  --text-title--font-weight: 600;
+  --text-title--letter-spacing: -0.01em;
+  --text-subtitle: 20px;
+  --text-subtitle--line-height: 28px;
+  --text-subtitle--font-weight: 600;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body--font-weight: 400;
+  --text-body-strong: 16px;
+  --text-body-strong--line-height: 24px;
+  --text-body-strong--font-weight: 600;
+  --text-small: 14px;
+  --text-small--line-height: 20px;
+  --text-small--font-weight: 400;
+  --text-label: 14px;
+  --text-label--line-height: 20px;
+  --text-label--font-weight: 600;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 500;
+  --text-eyebrow: 12px;
+  --text-eyebrow--line-height: 16px;
+  --text-eyebrow--font-weight: 600;
+  --text-eyebrow--letter-spacing: 0.08em;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --default-transition-duration: var(--duration-fast);
+  --default-transition-timing-function: var(--ease-standard);
+}
+
+/* inline: utilities read the token variables directly, so they follow the theme. */
+@theme inline {
+  --font-sans: var(--font-plus-jakarta-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-border: var(--border);
+  --color-border-control: var(--border-control);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-tint: var(--brand-tint);
+  --color-brand-ink: var(--brand-ink);
+  --color-on-brand: var(--on-brand);
+  --color-on-accent: var(--on-accent);
+  --color-meals: var(--meals);
+  --color-meals-tint: var(--meals-tint);
+  --color-meals-ink: var(--meals-ink);
+  --color-shopping: var(--shopping);
+  --color-shopping-tint: var(--shopping-tint);
+  --color-shopping-ink: var(--shopping-ink);
+  --color-expenses: var(--expenses);
+  --color-expenses-tint: var(--expenses-tint);
+  --color-expenses-ink: var(--expenses-ink);
+  --color-success: var(--success);
+  --color-success-tint: var(--success-tint);
+  --color-success-ink: var(--success-ink);
+  --color-warning: var(--warning);
+  --color-warning-tint: var(--warning-tint);
+  --color-warning-ink: var(--warning-ink);
+  --color-danger: var(--danger);
+  --color-danger-tint: var(--danger-tint);
+  --color-danger-ink: var(--danger-ink);
+  --color-focus-ring: var(--focus-ring);
+  --color-scrim: var(--scrim);
+
+  --spacing-0: 0px;
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-8: var(--space-8);
+  --spacing-10: var(--space-10);
+  --spacing-12: var(--space-12);
+  --spacing-16: var(--space-16);
+  --spacing-control-height: var(--control-height);
+  --spacing-control-height-sm: var(--control-height-sm);
+  --spacing-icon-sm: var(--icon-sm);
+  --spacing-icon-md: var(--icon-md);
+  --spacing-icon-lg: var(--icon-lg);
+  --spacing-sidebar-width: var(--sidebar-width);
+}
+
+@utility duration-fast {
+  --tw-duration: var(--duration-fast);
+  transition-duration: var(--duration-fast);
+}
+
+@utility duration-base {
+  --tw-duration: var(--duration-base);
+  transition-duration: var(--duration-base);
+}
+
+@utility duration-slow {
+  --tw-duration: var(--duration-slow);
+  transition-duration: var(--duration-slow);
+}

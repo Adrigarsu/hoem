@@ -52,7 +52,7 @@ Status colours never appear alone: a "Pending" badge always carries its icon and
 
 ## Typography
 
-Plus Jakarta Sans, loaded from Google Fonts (weights 400, 500, 600, 700), with `font-variant-numeric: tabular-nums` on amounts, times and quantities so columns align. No monospace face is needed.
+Plus Jakarta Sans (weights 400, 500, 600, 700), self-hosted with `next/font` so visitors never contact Google (GDPR); the `@import` in `components-reference.css` is only for the reference previews. Amounts, times and quantities use `font-variant-numeric: tabular-nums` (the `tabular-nums` utility) so columns align. No monospace face is needed.
 
 The scale follows a 1.25 ratio rounded to the 4px grid: 12 · 14 · 16 · 20 · 24 · 32 · 40. Body text is never below 16px; 12px (`caption`, `eyebrow`) is the floor for anything on screen. Sentence case everywhere except `eyebrow` labels, which are uppercase with 0.08em tracking.
 
@@ -80,7 +80,7 @@ Intermediate corners: `radius-md` (10px) for controls, `radius-lg` (14px) for ca
 
 ## Motion
 
-Short and functional: 150ms for hovers and toggles, 200ms for menus, 300ms for sheets and modals, easing `cubic-bezier(0.2, 0, 0, 1)`. Everything collapses to an instant change under `prefers-reduced-motion: reduce` (NFR-A11Y-006).
+Short and functional: `duration-fast` (150ms) for hovers and toggles, `duration-base` (200ms) for menus, `duration-slow` (300ms) for sheets and modals, easing `ease-standard` (`cubic-bezier(0.2, 0, 0, 1)`). Everything collapses to an instant change under `prefers-reduced-motion: reduce` (NFR-A11Y-006).
 
 ## Layout
 
@@ -89,6 +89,10 @@ Mobile first. Below `bp-md` (768px): bottom tab bar with Shopping, Expenses, Hom
 ## Voice
 
 Friendly, short, active: "Add to shopping list", "Saved", "Your private expenses". No exclamation marks, no "please", no "successfully". Errors say what happened and what to do: "That email is already in this household. Try another."
+
+## In the app
+
+`src/design-system/tokens.css` turns these tokens into CSS variables and Tailwind utilities, and a unit test fails when it drifts from `tokens.json`. Tailwind's own palette, spacing scale and shadows are removed, so only token utilities exist: `bg-surface`, `text-text-secondary`, `border-border-control`, `p-6` (24px), `rounded-lg`, `text-body`, `duration-fast`. Another test checks every pair in "Colour roles" against WCAG 2.2 in both themes, and the linters reject hard-coded colours and arbitrary values such as `bg-[#fff]`.
 
 ## Accessibility audit
 
