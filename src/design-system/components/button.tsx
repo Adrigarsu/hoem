@@ -14,14 +14,18 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   // While a form is submitting: announced as busy and ignores clicks, but stays focusable, so
   // keyboard and screen reader users do not lose their place (a disabled button drops focus).
   pending?: boolean;
+  // Shown instead of the label while pending, such as "Signing in…".
+  pendingLabel?: string;
 };
 
 export function Button({
   variant = "primary",
   pending = false,
+  pendingLabel,
   type = "button",
   className = "",
   onClick,
+  children,
   ...props
 }: ButtonProps) {
   function handleClick(event: MouseEvent<HTMLButtonElement>) {
@@ -40,6 +44,8 @@ export function Button({
       onClick={handleClick}
       className={`inline-flex h-control-height items-center justify-center gap-2 rounded-md border border-transparent px-5 text-label transition-colors duration-fast aria-disabled:cursor-progress ${variants[variant]} ${className}`}
       {...props}
-    />
+    >
+      {pending && pendingLabel ? pendingLabel : children}
+    </button>
   );
 }

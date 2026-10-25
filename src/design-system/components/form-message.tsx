@@ -1,12 +1,13 @@
-import { CircleAlert, CircleCheck, type LucideIcon } from "lucide-react";
+import { CircleAlert, CircleCheck, TriangleAlert, type LucideIcon } from "lucide-react";
 import type { ReactNode, Ref } from "react";
 
 const tones: Record<
-  "danger" | "success",
+  "danger" | "warning" | "success",
   { icon: LucideIcon; role: "alert" | "status"; classes: string }
 > = {
   // Errors interrupt (role=alert); confirmations wait for a pause (role=status).
   danger: { icon: CircleAlert, role: "alert", classes: "bg-danger-tint text-danger-ink" },
+  warning: { icon: TriangleAlert, role: "alert", classes: "bg-warning-tint text-warning-ink" },
   success: { icon: CircleCheck, role: "status", classes: "bg-success-tint text-success-ink" },
 };
 

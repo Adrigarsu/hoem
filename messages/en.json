@@ -14,36 +14,54 @@
   "Auth": {
     "brand": "HØEM",
     "showPassword": "Show password",
+    "emailPlaceholder": "you@example.com",
+    "backToSignIn": "Back to sign in",
+    "panel": {
+      "title": "Your home, organised together.",
+      "text": "Plan the week's meals, share one shopping list and keep shared and private expenses apart, with the people you live with.",
+      "meals": "Meals",
+      "shopping": "Shopping",
+      "expenses": "Expenses"
+    },
     "signUp": {
       "title": "Create your account",
-      "intro": "Plan meals, shopping and expenses with the people you live with.",
+      "lede": "Next, we'll set up your household together.",
       "displayName": "Your name",
-      "displayNameHelp": "Shown to the people in your households.",
-      "email": "E-mail",
+      "email": "Email",
       "password": "Password",
-      "passwordHelp": "At least {min} characters. A few words you will remember work well.",
+      "passwordHelp": "At least {min} characters.",
       "confirmPassword": "Repeat the password",
       "submit": "Create account",
-      "haveAccount": "Already have an account?",
-      "signInLink": "Sign in"
+      "submitting": "Creating account…",
+      "confirmNote": "We'll send you an email to confirm it's really you.",
+      "failed": "We couldn't create your account. Try again in a moment."
     },
-    "checkEmail": {
+    "checkInbox": {
       "title": "Check your inbox",
-      "body": "We sent a link to {email}. Open it to verify your address and sign in. It can take a minute to arrive; check your spam folder too.",
-      "resend": "Send the link again",
-      "resent": "We sent a new link."
+      "sent": "We sent a link to <strong>{email}</strong>. Open it to confirm your email and set up your household.",
+      "note": "The link works for 1 hour. Can't find the email? Look in your spam or promotions folder.",
+      "resend": "Resend email",
+      "sending": "Sending…",
+      "resent": "We sent a new link. The previous one no longer works.",
+      "wait": "You can ask for another link in {seconds} s.",
+      "failed": "We couldn't send the email. Try again in a few minutes.",
+      "wrongAddress": "Wrong address? <link>Use a different email</link>"
     },
     "signIn": {
       "title": "Sign in",
-      "email": "E-mail",
+      "tagline": "Your home, organised together.",
+      "lede": "Meals, shopping and money, shared with the people you live with.",
+      "email": "Email",
       "password": "Password",
       "submit": "Sign in",
-      "noAccount": "New to HØEM?",
-      "signUpLink": "Create an account"
+      "submitting": "Signing in…",
+      "noAccount": "New to HØEM? <link>Create an account</link>",
+      "unverified": "Confirm your email first. We sent a link to {email}.",
+      "resend": "Resend the link"
     },
     "errors": {
-      "invalidCredentials": "E-mail or password is incorrect.",
-      "emailNotConfirmed": "Verify your e-mail first. Open the link we sent you, or ask for a new one.",
+      "invalidCredentials": "Email or password is incorrect.",
+      "emailNotConfirmed": "Confirm your email first. Open the link we sent you, or ask for a new one.",
       "linkExpired": "That link has expired or was already used. Sign in to get a new one.",
       "rateLimited": "Too many attempts. Wait a few minutes and try again.",
       "weakPassword": "Choose a longer password, one that is harder to guess.",
@@ -52,7 +70,7 @@
     "validation": {
       "required": "Fill in this field.",
       "tooLong": "Use 50 characters or fewer.",
-      "invalidEmail": "Enter an e-mail address like name@example.com.",
+      "invalidEmail": "Enter an email address like name@example.com.",
       "passwordTooShort": "Use at least {min} characters.",
       "passwordTooLong": "This password is too long. Use 72 characters or fewer.",
       "passwordsDoNotMatch": "The passwords do not match."

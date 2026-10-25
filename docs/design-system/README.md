@@ -20,7 +20,8 @@ The wordmark is **HØEM** set in a heavy geometric sans (Montserrat ExtraBold is
   - `hoem-o.svg`: the Ø in `brand`, for light backgrounds.
   - `hoem-o-inverse.svg`: the Ø in `brand-tint`, for `brand` backgrounds (5.3:1).
   - `hoem-app-icon.svg`: 1024 × 1024 `brand` square with the Ø in `brand-tint`, the source for the favicon and the PWA icons.
-- A vector master of the full HØEM wordmark is still pending.
+  - `hoem-wordmark.svg`, `hoem-wordmark-dark.svg`, `hoem-wordmark-on-brand.svg`: the full wordmark (vector master) for light, dark and `brand` backgrounds, for use outside the app.
+- In the app, use the `Logo` component (`src/design-system/components/logo.tsx`): the wordmark paths painted with `currentColor` from the tokens, so it follows the theme. `tone="on-brand"` gives the version for `brand` backgrounds. No Montserrat font is loaded.
 
 ## Colour
 
@@ -45,6 +46,8 @@ Every accent has three steps. Use them only like this:
 | `{accent}` (solid) | Icons and coloured text on `bg` or `surface`; solid buttons | `on-accent` (or `on-brand`) | ≥ 4.7:1  |
 | `{accent}-tint`    | Badges, selected cards, icon tiles                          | `{accent}-ink`              | ≥ 8:1    |
 | `{accent}-ink`     | Only on its own tint                                        | —                           | —        |
+
+Two more pairs, for the brand panel of the auth pages: `brand-tint` on `brand` (secondary text and the Ø of the inverse logo) and the module `-ink` colours on `surface` (module chips).
 
 Neutrals: `text` (16:1) for content, `text-secondary` (6.9:1) for metadata, `text-muted` (5.1:1) for placeholders and checked items. `border-control` (3.4:1) outlines every input and checkbox; `border` (1.25:1) is decorative and never the only edge of a control.
 
@@ -84,7 +87,7 @@ Short and functional: `duration-fast` (150ms) for hovers and toggles, `duration-
 
 ## Layout
 
-Mobile first. Below `bp-md` (768px): bottom tab bar with Shopping, Expenses, Home (centre), Planner and Meals, plus the avatar button at the top right for profile and settings. From `bp-md`: fixed sidebar of `sidebar-width`. From `bp-lg`: two-column dashboard. Content max-width 1200px from `bp-xl`.
+Mobile first. Below `bp-md` (768px): bottom tab bar with Shopping, Expenses, Home (centre), Planner and Meals, plus the avatar button at the top right for profile and settings. From `bp-md`: fixed sidebar of `sidebar-width`. From `bp-lg`: two-column dashboard. Content max-width 1200px from `bp-xl`. Single-column pages (sign-in, sign-up, check your inbox) are `column-narrow` (400px) wide on desktop.
 
 ## Voice
 

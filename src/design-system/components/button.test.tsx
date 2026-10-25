@@ -15,4 +15,21 @@ describe("Button", () => {
     expect(button).toHaveAttribute("aria-disabled", "true");
     expect(button).not.toBeDisabled();
   });
+
+  it("NFR-A11Y-003 says what is happening while pending", () => {
+    render(
+      <Button pending pendingLabel="Signing in…">
+        Sign in
+      </Button>,
+    );
+    expect(screen.getByRole("button", { name: "Signing in…" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+  });
+
+  it("NFR-A11Y-003 keeps its own label when it is not pending", () => {
+    render(<Button pendingLabel="Signing in…">Sign in</Button>);
+    expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+  });
 });

@@ -59,8 +59,22 @@ decision wins and the screen's spec says so.
 | Submitting        | The button shows a spinner and "Signing in…"/"Creating account…", stays focusable and is announced as busy (`aria-busy`, `aria-disabled`); it is never `disabled`, so focus is not lost. |
 | Google and demo   | "Continue with Google" and the demo card appear only when FR-ACC-002 (#25) and the demo (M6) exist.                                                                                      |
 | Age and terms     | The "14 or older" and terms checkboxes come with the sign-up redesign (#58), together with the terms and privacy pages they link to.                                                     |
-| Logo font         | Montserrat 800 for the wordmark only, self-hosted with `next/font` like Plus Jakarta Sans.                                                                                               |
+| Logo              | The `Logo` component draws the vector wordmark from `assets/logos/` with token colours, instead of setting it in Montserrat (#58). No logo font is loaded.                               |
 | Message keys      | Keys keep the app's namespaces (`Auth.signIn.title`), not the `signIn.title` pattern suggested above.                                                                                    |
+
+### Decisions taken building the auth screens (#58)
+
+| Topic              | Decision                                                                                                                                                         |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Desktop split      | The brand panel appears from `bp-lg` (1024 px), not 960 px: 960 is not a breakpoint token. Between 768 and 1023 px the pages use the mobile layout.              |
+| Links in text      | Links inside sentences ("Create an account", "Use a different email") are underlined: brand blue next to `text-secondary` is not enough on its own (WCAG 1.4.1). |
+| Panel text         | The secondary text of the brand panel uses the `body` style (16/24); 18/28 is not a type token.                                                                  |
+| "Forgot password?" | Hidden until FR-ACC-008 (#24) builds the reset flow, like Google and the demo.                                                                                   |
+| Submitting         | The button text changes ("Signing in…", "Creating account…", "Sending…"); the spinner waits for an animation token, as the theme has none.                       |
+| Resend wait        | After "Resend email" the button keeps focus and is `aria-disabled` for 60 s, not `disabled`, so keyboard users do not lose their place.                          |
+| "Resend the link"  | On sign-in it sends a new link and opens Check your inbox for that address.                                                                                      |
+| Expired link       | Still lands on sign-in with the "link expired" alert: the address is unknown once the cookie has expired, so the "This link has expired" page cannot resend.     |
+| Sign-up name help  | "Shown to the people in your households." is dropped, as in the screen.                                                                                          |
 
 ## Open questions
 

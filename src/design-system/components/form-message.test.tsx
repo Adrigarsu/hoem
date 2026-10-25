@@ -10,6 +10,13 @@ describe("FormMessage", () => {
     expect(alert.querySelector("svg")).not.toBeNull();
   });
 
+  it("NFR-A11Y-005 announces a warning with an icon and text, not colour alone", () => {
+    render(<FormMessage tone="warning">Confirm your email first.</FormMessage>);
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Confirm your email first.");
+    expect(alert.querySelector("svg")).not.toBeNull();
+  });
+
   it("NFR-A11Y-001 announces a success politely", () => {
     render(<FormMessage tone="success">Sent</FormMessage>);
     expect(screen.getByRole("status")).toHaveTextContent("Sent");

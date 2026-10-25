@@ -23,6 +23,10 @@ const browsers = {
   safari: { phone: safariPhone, desktop: safariDesktop },
 };
 
+// WebKit runs these tests about three times slower than Chromium (axe in both themes on every
+// page), so the longer sign-up flows reached the default 30 s even before #58.
+const timeouts: Partial<Record<keyof typeof browsers, number>> = { safari: 60_000 };
+
 export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: true,
@@ -34,11 +38,14 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  projects: Object.entries(browsers).flatMap(([browser, { phone, desktop: wide }]) => [
-    { name: `${browser}-360`, use: phone },
-    { name: `${browser}-768`, use: { ...wide, viewport: tablet } },
-    { name: `${browser}-1440`, use: { ...wide, viewport: desktop } },
-  ]),
+  projects: Object.entries(browsers).flatMap(([browser, { phone, desktop: wide }]) => {
+    const timeout = timeouts[browser as keyof typeof browsers];
+    return [
+      { name: `${browser}-360`, timeout, use: phone },
+      { name: `${browser}-768`, timeout, use: { ...wide, viewport: tablet } },
+      { name: `${browser}-1440`, timeout, use: { ...wide, viewport: desktop } },
+    ];
+  }),
   // Always a fresh production build: CI builds it in an earlier step, locally it is built here.
   // Never reused, so a server left running from an earlier run cannot serve an old build.
   webServer: {

@@ -40,6 +40,26 @@ export const signInSchema = z.object({
 
 export const resendSchema = z.object({ email });
 
+// What Check your inbox shows and "Use a different email" puts back in the sign-up form. It
+// travels in an HttpOnly cookie (screens README, "Decisions on the hand-off"), so it is parsed
+// like any other input.
+const pendingSignUpSchema = z.object({
+  email: z.email(),
+  displayName: z.string().max(50).default(""),
+});
+
+export type PendingSignUp = z.infer<typeof pendingSignUpSchema>;
+
+export function readPendingSignUp(value: string | undefined): PendingSignUp | null {
+  if (!value) return null;
+  try {
+    const parsed = pendingSignUpSchema.safeParse(JSON.parse(value));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 

@@ -1,4 +1,9 @@
+export { AuthShell } from "./components/auth-shell";
 export { Button } from "./components/button";
 export { FormMessage } from "./components/form-message";
+export { IconTile } from "./components/icon-tile";
+export { Logo } from "./components/logo";
+export { ModuleChip } from "./components/module-chip";
+export { Note } from "./components/note";
 export { PasswordField } from "./components/password-field";
 export { TextField } from "./components/text-field";
