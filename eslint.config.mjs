@@ -92,6 +92,11 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // Playwright fixtures receive a callback named `use`, which is not React's use() hook.
+    files: ["tests/e2e/**/*.ts"],
+    rules: { "react-hooks/rules-of-hooks": "off" },
+  },
   // Must stay last: turns off rules that would conflict with Prettier.
   prettier,
   globalIgnores([".next/**", "out/**", "build/**", "coverage/**", "next-env.d.ts"]),

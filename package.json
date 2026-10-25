@@ -16,7 +16,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test",
+    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test:coverage",
     "prepare": "husky",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
@@ -24,7 +24,10 @@
     "db:migrate": "supabase migration up --local",
     "db:reset": "supabase db reset --local",
     "db:test": "supabase test db",
-    "db:seed": "tsx src/db/seed/run.ts"
+    "db:seed": "tsx src/db/seed/run.ts",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -38,8 +41,10 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/turbopack": "^4",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
@@ -49,6 +54,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.1.2",
+    "@vitest/coverage-v8": "^5.0.5",
     "babel-plugin-react-compiler": "1.0.0",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
