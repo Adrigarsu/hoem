@@ -35,7 +35,8 @@ Not everything is installed yet. Add a dependency only when the task needs it, a
 - `pnpm test:coverage`: unit tests with the 80 % threshold on domain, services and pure utilities
 - `pnpm test:e2e`: Playwright on a production build (`tests/e2e/`), in Chromium, Chrome and Safari at
   360, 768 and 1440 px; open pages with the `visit` fixture so axe and the no-horizontal-scroll check
-  run on each one (`pnpm test:e2e:ui` to debug)
+  run on each one (`pnpm test:e2e:ui` to debug). Needs the local Supabase (`pnpm db:start`) and
+  `.env.local` pointing at it; e-mails land in Mailpit, http://127.0.0.1:54324
 - `pnpm lint:fix`, `pnpm format`: autofix
 
 Use pnpm only. Never edit `pnpm-lock.yaml` by hand.

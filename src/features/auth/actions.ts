@@ -1,0 +1,106 @@
+"use server";
+
+import { getLocale } from "next-intl/server";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { AuthFailedError } from "@/lib/errors";
+import { requestOrigin } from "@/lib/request-origin";
+import type { AuthErrorKey } from "./domain/auth-errors";
+import { safeNextPath } from "./domain/next-path";
+import { rememberLocale } from "./locale-cookie";
+import { authGateway } from "./repository";
+import {
+  fieldErrors,
+  resendSchema,
+  signInSchema,
+  signUpSchema,
+  type ValidationKey,
+} from "./schemas";
+import * as auth from "./service";
+
+// Thin entry points: parse with the shared schema, call the service, map the result to form
+// state. Passwords are never echoed back to the form.
+export type AuthFormState = {
+  status: "idle" | "invalid" | "failed" | "sent" | "resent";
+  fieldErrors?: Record<string, ValidationKey>;
+  error?: AuthErrorKey;
+  values?: { displayName?: string; email?: string };
+};
+
+const confirmPath = "/auth/confirm";
+
+function text(formData: FormData, name: string): string {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : "";
+}
+
+function failure(error: unknown, values: AuthFormState["values"]): AuthFormState {
+  if (error instanceof AuthFailedError) {
+    return { status: "failed", error: error.reason as AuthErrorKey, values };
+  }
+  throw error;
+}
+
+async function confirmUrl() {
+  return `${requestOrigin(await headers())}${confirmPath}`;
+}
+
+export async function signUpAction(_: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const values = { displayName: text(formData, "displayName"), email: text(formData, "email") };
+  const parsed = signUpSchema.safeParse({
+    ...values,
+    password: text(formData, "password"),
+    confirmPassword: text(formData, "confirmPassword"),
+  });
+  if (!parsed.success) {
+    return { status: "invalid", fieldErrors: fieldErrors(parsed.error), values };
+  }
+
+  try {
+    await auth.signUp(await authGateway(), parsed.data, {
+      locale: await getLocale(),
+      // From the browser (Intl); the database falls back to UTC for anything it does not know.
+      timeZone: text(formData, "timeZone").slice(0, 64),
+      confirmUrl: await confirmUrl(),
+    });
+  } catch (error) {
+    return failure(error, values);
+  }
+  return { status: "sent", values: { email: parsed.data.email } };
+}
+
+export async function signInAction(_: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const values = { email: text(formData, "email") };
+  const parsed = signInSchema.safeParse({ ...values, password: text(formData, "password") });
+  if (!parsed.success) {
+    return { status: "invalid", fieldErrors: fieldErrors(parsed.error), values };
+  }
+
+  try {
+    const { locale } = await auth.signIn(await authGateway(), parsed.data);
+    await rememberLocale(locale);
+  } catch (error) {
+    return failure(error, { email: parsed.data.email });
+  }
+  redirect(safeNextPath(text(formData, "next")));
+}
+
+export async function resendVerificationAction(
+  _: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const parsed = resendSchema.safeParse({ email: text(formData, "email") });
+  if (!parsed.success) return { status: "failed", error: "generic" };
+
+  try {
+    await auth.resendVerification(await authGateway(), parsed.data.email, await confirmUrl());
+  } catch (error) {
+    return failure(error, { email: parsed.data.email });
+  }
+  return { status: "resent", values: { email: parsed.data.email } };
+}
+
+export async function signOutAction() {
+  await auth.signOut(await authGateway());
+  redirect("/sign-in");
+}
