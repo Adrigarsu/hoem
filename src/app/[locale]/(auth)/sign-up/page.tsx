@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { SignUpForm } from "@/features/auth";
+import { Suspense } from "react";
+import { SignUp } from "@/features/auth";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
 
 export async function generateMetadata({
@@ -13,5 +14,10 @@ export async function generateMetadata({
 
 export default async function SignUpPage({ params }: PageProps<"/[locale]/sign-up">) {
   await setLocaleFromParams(params);
-  return <SignUpForm />;
+  // The form reads the pending sign-up cookie, which only exists per request (Cache Components).
+  return (
+    <Suspense>
+      <SignUp />
+    </Suspense>
+  );
 }

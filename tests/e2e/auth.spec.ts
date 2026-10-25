@@ -8,10 +8,11 @@ const password = "correct horse battery";
 async function signUp(page: Page, visit: (path: string) => Promise<void>, email: string) {
   await visit("/sign-up");
   await page.getByLabel("Your name").fill("Ana");
-  await page.getByLabel("E-mail").fill(email);
+  await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Repeat the password").fill(password);
   await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/\/check-your-inbox$/);
   await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
 }
 
@@ -21,7 +22,7 @@ function alert(page: Page, text: string) {
 }
 
 async function signIn(page: Page, email: string, withPassword = password) {
-  await page.getByLabel("E-mail").fill(email);
+  await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(withPassword);
   await page.getByRole("button", { name: "Sign in" }).click();
 }
@@ -30,7 +31,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
   test("FR-ACC-001 sign up sends a verification e-mail", async ({ page, visit }) => {
     const email = uniqueEmail("signup");
     await signUp(page, visit, email);
-    await expect(page.getByText(email)).toBeVisible();
+    await expect(page.getByText(email, { exact: true })).toBeVisible();
     await expectNoA11yViolations(page);
 
     const { subject, link } = await verificationEmail(email);
@@ -81,10 +82,14 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
     await visit("/sign-in");
     await signIn(page, email);
 
-    await expect(alert(page, "Verify your e-mail first")).toBeVisible();
+    await expect(
+      alert(page, `Confirm your email first. We sent a link to ${email}.`),
+    ).toBeVisible();
     await expectNoA11yViolations(page);
-    await page.getByRole("button", { name: "Send the link again" }).click();
-    await expect(page.getByRole("status").filter({ hasText: "We sent a new link." })).toBeVisible();
+    await page.getByRole("button", { name: "Resend the link" }).click();
+    await expect(page).toHaveURL(/\/check-your-inbox$/);
+    await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
+    await expect(page.getByText(email, { exact: true })).toBeVisible();
     await verificationEmail(email, 2);
   });
 
@@ -94,7 +99,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
   }) => {
     await visit("/sign-in");
     await signIn(page, uniqueEmail("nobody"), "not the password");
-    await expect(alert(page, "E-mail or password is incorrect.")).toBeVisible();
+    await expect(alert(page, "Email or password is incorrect.")).toBeVisible();
   });
 
   test("FR-ACC-001 the app is protected and sign-in returns to the page asked for", async ({
@@ -123,6 +128,51 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
 
     await expect(page).toHaveURL(/\/sign-in$/);
     await page.goto("/");
+    await expect(page).toHaveURL(/\/sign-in$/);
+  });
+
+  test("FR-ACC-001 check your inbox resends the link and then waits a minute", async ({
+    page,
+    visit,
+  }) => {
+    const email = uniqueEmail("resend");
+    await signUp(page, visit, email);
+    await verificationEmail(email);
+
+    const resend = page.getByRole("button", { name: "Resend email" });
+    const sent = page.getByRole("status").filter({ hasText: "We sent a new link." });
+    // From the keyboard, which also proves focus stays on the button. Supabase refuses a second
+    // e-mail within a second of the first (max_frequency), so press again until it is accepted.
+    await expect(async () => {
+      await resend.focus();
+      await page.keyboard.press("Enter");
+      await expect(sent).toBeVisible({ timeout: 2000 });
+    }).toPass();
+    await expect(resend).toHaveAttribute("aria-disabled", "true");
+    await expect(resend).toHaveAccessibleDescription(/You can ask for another link in \d+ s\./);
+    await expect(resend).toBeFocused();
+    await expectNoA11yViolations(page);
+    await verificationEmail(email, 2);
+  });
+
+  test("FR-ACC-001 the address stays out of the URL and a different one can be used", async ({
+    page,
+    visit,
+  }) => {
+    const email = uniqueEmail("different");
+    await signUp(page, visit, email);
+    expect(page.url()).not.toContain(encodeURIComponent(email));
+
+    await page.getByRole("link", { name: "Use a different email" }).click();
+
+    await expect(page).toHaveURL(/\/sign-up$/);
+    await expect(page.getByLabel("Your name")).toHaveValue("Ana");
+    await expect(page.getByLabel("Email")).toHaveValue(email);
+    await expect(page.getByLabel("Password", { exact: true })).toHaveValue("");
+  });
+
+  test("FR-ACC-001 check your inbox without a sign-up goes to sign-in", async ({ page }) => {
+    await page.goto("/check-your-inbox");
     await expect(page).toHaveURL(/\/sign-in$/);
   });
 });

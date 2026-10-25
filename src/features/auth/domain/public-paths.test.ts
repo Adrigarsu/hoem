@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { isPublicPath } from "./public-paths";
 
 describe("isPublicPath", () => {
-  it.each(["/sign-in", "/sign-up", "/auth/confirm"])(
+  it.each(["/sign-in", "/sign-up", "/check-your-inbox", "/auth/confirm"])(
     "FR-ACC-001 lets signed-out visitors open %s",
     (path) => {
       expect(isPublicPath(path)).toBe(true);

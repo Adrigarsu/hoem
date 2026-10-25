@@ -62,6 +62,7 @@
   --icon-md: 20px;
   --icon-lg: 24px;
   --sidebar-width: 264px;
+  --column-narrow: 400px;
   --stroke-hairline: 1px;
   --stroke-focus: 2px;
 
@@ -284,6 +285,7 @@
   --spacing-icon-md: var(--icon-md);
   --spacing-icon-lg: var(--icon-lg);
   --spacing-sidebar-width: var(--sidebar-width);
+  --spacing-column-narrow: var(--column-narrow);
 }
 
 @utility duration-fast {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fieldErrors, signInSchema, signUpSchema } from "./schemas";
+import { fieldErrors, readPendingSignUp, signInSchema, signUpSchema } from "./schemas";
 
 const validSignUp = {
   displayName: "Ana",
@@ -114,4 +114,23 @@ describe("fieldErrors", () => {
       password: "passwordTooShort",
     });
   });
+});
+
+describe("readPendingSignUp", () => {
+  it("FR-ACC-001 reads the e-mail and the name saved after signing up", () => {
+    const value = JSON.stringify({ email: "ana@example.com", displayName: "Ana" });
+    expect(readPendingSignUp(value)).toEqual({ email: "ana@example.com", displayName: "Ana" });
+  });
+
+  it("FR-ACC-001 reads an e-mail saved without a name, after resending from sign-in", () => {
+    const value = JSON.stringify({ email: "ana@example.com" });
+    expect(readPendingSignUp(value)).toEqual({ email: "ana@example.com", displayName: "" });
+  });
+
+  it.each([undefined, "", "not json", JSON.stringify({ email: "not an e-mail" }), "null"])(
+    "FR-ACC-001 ignores a missing or tampered value (%s)",
+    (value) => {
+      expect(readPendingSignUp(value)).toBeNull();
+    },
+  );
 });

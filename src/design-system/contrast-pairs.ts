@@ -18,8 +18,12 @@ export const approvedPairs: ColourPair[] = [
   ...["text", "text-secondary", "text-muted"].flatMap((text) => on(text, neutralBackgrounds, TEXT)),
   ...["brand", ...accents].flatMap((accent) => on(accent, pageBackgrounds, TEXT)),
   ...on("on-brand", ["brand", "brand-hover"], TEXT),
+  // The secondary text of the brand panel and the Ø of the inverse logo.
+  ...on("brand-tint", ["brand"], TEXT),
   ...accents.flatMap((accent) => on("on-accent", [accent], TEXT)),
   ...["brand", ...accents].flatMap((accent) => on(`${accent}-ink`, [`${accent}-tint`], TEXT)),
+  // Module chips on the brand panel.
+  ...["meals", "shopping", "expenses"].flatMap((module) => on(`${module}-ink`, ["surface"], TEXT)),
   ...on("border-control", pageBackgrounds, NON_TEXT),
   ...on("focus-ring", pageBackgrounds, NON_TEXT),
 ];
