@@ -20,6 +20,7 @@ else: a new ADR supersedes or amends it, and the old one points to the new one.
 | 012 | [Internationalisation](0012-internationalisation.md)                                | 2026-10-14 | Accepted                                                      |
 | 013 | [Production Supabase project in Ireland](0013-production-supabase-in-ireland.md)    | 2026-10-24 | Proposed                                                      |
 | 014 | [Migration pipeline with expand/contract](0014-migration-pipeline.md)               | 2026-10-24 | Proposed                                                      |
+| 015 | [Locale through an internal rewrite](0015-locale-through-an-internal-rewrite.md)    | 2026-10-25 | Proposed                                                      |
 
 To add one, run `/adr <title>` in Claude Code or copy the structure of an existing file with the
 next free number. New ADRs start as Proposed; the developer changes them to Accepted after review.

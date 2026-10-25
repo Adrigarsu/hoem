@@ -57,24 +57,25 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 ## 3. Architecture decisions
 
-Fourteen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
+Fifteen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
 
-| ADR                                               | Decision                                                                              | Status   |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------- | -------- |
-| [001](adr/0001-modular-monolith.md)               | One Next.js application in one GitHub repository (modular monolith)                   | Accepted |
-| [002](adr/0002-supabase-backend.md)               | Supabase as the backend platform, hosted in the EU                                    | Accepted |
-| [003](adr/0003-drizzle-and-sql-migrations.md)     | Drizzle ORM for queries and schema; plain SQL migrations for policies                 | Accepted |
-| [004](adr/0004-two-layer-authorization.md)        | Authorization in two layers: application services and PostgreSQL RLS                  | Accepted |
-| [005](adr/0005-server-actions-and-rest-api.md)    | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                | Accepted |
-| [006](adr/0006-visibility-at-write-time.md)       | Visibility of private records is decided when they are written                        | Accepted |
-| [007](adr/0007-money-as-integer-cents.md)         | Money stored as integer cents, one currency per household                             | Accepted |
-| [008](adr/0008-reminders-icalendar-web-push.md)   | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push  | Accepted |
-| [009](adr/0009-delete-with-undo.md)               | Deletes are immediate after a 5-second undo window; no soft delete                    | Accepted |
-| [010](adr/0010-testing-strategy.md)               | Test pyramid: test-first for domain and services, end-to-end per story                | Accepted |
-| [011](adr/0011-demo-with-anonymous-sessions.md)   | Demo mode with anonymous sessions and per-visitor copies                              | Accepted |
-| [012](adr/0012-internationalisation.md)           | Internationalisation with next-intl; locale from the profile, not the URL             | Accepted |
-| [013](adr/0013-production-supabase-in-ireland.md) | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
-| [014](adr/0014-migration-pipeline.md)             | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
+| ADR                                                   | Decision                                                                              | Status   |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------- | -------- |
+| [001](adr/0001-modular-monolith.md)                   | One Next.js application in one GitHub repository (modular monolith)                   | Accepted |
+| [002](adr/0002-supabase-backend.md)                   | Supabase as the backend platform, hosted in the EU                                    | Accepted |
+| [003](adr/0003-drizzle-and-sql-migrations.md)         | Drizzle ORM for queries and schema; plain SQL migrations for policies                 | Accepted |
+| [004](adr/0004-two-layer-authorization.md)            | Authorization in two layers: application services and PostgreSQL RLS                  | Accepted |
+| [005](adr/0005-server-actions-and-rest-api.md)        | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                | Accepted |
+| [006](adr/0006-visibility-at-write-time.md)           | Visibility of private records is decided when they are written                        | Accepted |
+| [007](adr/0007-money-as-integer-cents.md)             | Money stored as integer cents, one currency per household                             | Accepted |
+| [008](adr/0008-reminders-icalendar-web-push.md)       | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push  | Accepted |
+| [009](adr/0009-delete-with-undo.md)                   | Deletes are immediate after a 5-second undo window; no soft delete                    | Accepted |
+| [010](adr/0010-testing-strategy.md)                   | Test pyramid: test-first for domain and services, end-to-end per story                | Accepted |
+| [011](adr/0011-demo-with-anonymous-sessions.md)       | Demo mode with anonymous sessions and per-visitor copies                              | Accepted |
+| [012](adr/0012-internationalisation.md)               | Internationalisation with next-intl; locale from the profile, not the URL             | Accepted |
+| [013](adr/0013-production-supabase-in-ireland.md)     | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
+| [014](adr/0014-migration-pipeline.md)                 | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
+| [015](adr/0015-locale-through-an-internal-rewrite.md) | Locale chosen in the proxy and rewritten to a hidden `[locale]` segment               | Proposed |
 
 ## 4. Code organisation and conventions
 
@@ -86,8 +87,9 @@ Code is grouped by feature first and by layer second, so everything about shoppi
 hoem/
 ├── src/
 │   ├── app/                     Next.js routes only: pages, layouts, route handlers
-│   │   ├── (auth)/              sign-in, sign-up, password reset
-│   │   ├── (app)/               signed-in area: home, meals, shopping, expenses, planner, settings
+│   │   ├── [locale]/            hidden locale segment filled in by proxy.ts (ADR-015)
+│   │   │   ├── (auth)/          sign-in, sign-up, password reset
+│   │   │   └── (app)/           signed-in area: home, meals, shopping, expenses, planner, settings
 │   │   └── api/v1/              REST route handlers (thin: parse, call service, respond)
 │   ├── features/
 │   │   ├── households/          one folder per bounded context
@@ -155,7 +157,8 @@ Unexpected errors are logged with a request ID and shown to the user as a generi
 
 - **Configuration** follows the Twelve-Factor App: every secret and URL comes from environment variables, validated at start-up with Zod in `src/lib/env.ts` (public values, also used in the browser) and `src/lib/server-env.ts` (secrets, guarded by `server-only` so a Client Component cannot import them); the app refuses to start if one is missing.
 - **Dates:** timestamps are `timestamptz` in UTC; calendar days (a meal, an expense) are `date`; the user's time zone is applied only when displaying.
-- **Strings:** no literal user-facing text in components; ESLint (`i18next/no-literal-string`) enforces it.
+- **Strings:** no literal user-facing text in components; ESLint (`i18next/no-literal-string`) enforces it on JSX text and on `alt`, `aria-description`, `aria-label`, `label`, `placeholder` and `title`. Messages are typed from `messages/en.json`, so a missing key is a type error.
+- **Formatting values:** `formatMoney`, `formatDay` and `formatInstant` in `src/lib/i18n/format.ts`; money is formatted from integer cents without ever becoming a float.
 - **Formatting and style:** Prettier and ESLint run on every commit through Husky and lint-staged; TypeScript runs in `strict` mode.
 - **Branching:** GitHub Flow. `main` is always deployable; each issue gets a branch and a pull request that must pass CI before merging.
 

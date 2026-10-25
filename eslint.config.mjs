@@ -3,6 +3,7 @@ import prettier from "eslint-config-prettier/flat";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
+import i18next from "eslint-plugin-i18next";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 
 // A hex colour on its own, or a colour function anywhere in a string.
@@ -67,6 +68,26 @@ const eslintConfig = defineConfig([
         {
           selector: `TemplateElement[value.raw=${hardCodedColour}]`,
           message: "Hard-coded colour. Use a design token (NFR-UX-004).",
+        },
+      ],
+    },
+  },
+  {
+    // NFR-I18N-001: user-facing text comes from messages/*.json through next-intl.
+    files: ["src/**/*.tsx"],
+    ignores: ["src/**/*.test.tsx"],
+    plugins: { i18next },
+    rules: {
+      "i18next/no-literal-string": [
+        "error",
+        {
+          mode: "jsx-only",
+          "jsx-attributes": {
+            include: ["alt", "aria-label", "aria-description", "label", "placeholder", "title"],
+          },
+          "should-validate-template": true,
+          // Message keys passed to next-intl's translator are not user-facing text.
+          callees: { exclude: ["^t$", String.raw`^t\.(rich|markup|raw|has)$`] },
         },
       ],
     },
