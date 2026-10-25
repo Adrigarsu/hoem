@@ -409,17 +409,17 @@ Every pull request gets its own preview deployment and must pass the same checks
 
 ### 9.2 Pipeline
 
-GitHub Actions runs these jobs on every pull request; all must pass before merging into `main`.
+GitHub Actions runs these jobs on every pull request; all must pass before merging into `main`. Today rows 1–2 are the `checks` job, 3 is `database`, and 4–5 are `e2e`; the OpenAPI check, Lighthouse and the secret and dependency scans are added with the features that need them.
 
-| Order | Job                                         | Fails when                                                                                                            |
-| ----- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| 1     | Install, type-check, lint, format check     | Any TypeScript, ESLint or Prettier error, including layer and i18n rules                                              |
-| 2     | Unit tests (Vitest) with coverage           | A test fails, or domain and services drop below 80 %                                                                  |
-| 3     | Migrations and database tests in Docker     | A migration fails from scratch, a pgTAP or policy test fails (7.2), or the Drizzle schema changed without a migration |
-| 4     | Build and OpenAPI generation                | The build fails or a route has no schema                                                                              |
-| 5     | End-to-end tests (Playwright) with axe-core | A story test fails or an accessibility violation is found                                                             |
-| 6     | Lighthouse CI on the preview URL            | Any score below 90 (NFR-PERF-002)                                                                                     |
-| 7     | Secret scanning and dependency audit        | A secret is committed or a high-severity vulnerability is found                                                       |
+| Order | Job                                         | Fails when                                                                                                                                                                           |
+| ----- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1     | Install, type-check, lint, format check     | Any TypeScript, ESLint or Prettier error, including layer and i18n rules                                                                                                             |
+| 2     | Unit tests (Vitest) with coverage           | A test fails, or domain and services drop below 80 %                                                                                                                                 |
+| 3     | Migrations and database tests in Docker     | A migration fails from scratch, a pgTAP or policy test fails (7.2), or the Drizzle schema changed without a migration                                                                |
+| 4     | Build and OpenAPI generation                | The build fails (in the `e2e` job) or a route has no schema                                                                                                                          |
+| 5     | End-to-end tests (Playwright) with axe-core | A story test fails, an accessibility violation is found in either theme, or a page scrolls horizontally at 360, 768 or 1440 px (Chromium, Chrome and Safari; Firefox and Edge later) |
+| 6     | Lighthouse CI on the preview URL            | Any score below 90 (NFR-PERF-002)                                                                                                                                                    |
+| 7     | Secret scanning and dependency audit        | A secret is committed or a high-severity vulnerability is found                                                                                                                      |
 
 Merging into `main` applies pending migrations to staging and then to production (production is skipped if staging fails), while Vercel deploys the build. Every migration is backward compatible and merges before the code that uses it (expand/contract, ADR-014), so either can finish first. Releases are tagged with Semantic Versioning (`v1.0.0` at Gate B).
 

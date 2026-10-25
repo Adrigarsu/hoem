@@ -37,6 +37,12 @@ pnpm db:start
 and fill it in with the API URL and the publishable key it printed (`pnpm exec supabase status`
 shows them again). The app refuses to start while a variable is missing.
 
+The end-to-end tests need the Playwright browsers once (Chrome itself must be installed):
+
+```bash
+pnpm exec playwright install chromium webkit
+```
+
 ```bash
 pnpm dev
 ```
@@ -45,23 +51,25 @@ Open http://localhost:3000. Stop Supabase with `pnpm db:stop`.
 
 ## Scripts
 
-| Script             | What it does                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------- |
-| `pnpm dev`         | Start the development server                                                          |
-| `pnpm build`       | Build for production                                                                  |
-| `pnpm start`       | Serve the production build                                                            |
-| `pnpm lint`        | Lint with ESLint and Stylelint (`pnpm lint:fix` to autofix)                           |
-| `pnpm typecheck`   | Type-check with TypeScript                                                            |
-| `pnpm format`      | Format with Prettier (`pnpm format:check` to verify)                                  |
-| `pnpm test`        | Run unit tests with Vitest (`pnpm test:watch`)                                        |
-| `pnpm check`       | Lint, typecheck, format check and tests                                               |
-| `pnpm db:start`    | Start the local Supabase in Docker                                                    |
-| `pnpm db:stop`     | Stop the local Supabase                                                               |
-| `pnpm db:generate` | Generate a migration from `src/db/schema/` (`--custom --name=…` for hand-written SQL) |
-| `pnpm db:migrate`  | Apply pending migrations to the local Supabase                                        |
-| `pnpm db:reset`    | Recreate the local database and apply every migration from scratch                    |
-| `pnpm db:test`     | Run the pgTAP database tests in `supabase/tests/`                                     |
-| `pnpm db:seed`     | Load local seed data (`src/db/seed/`)                                                 |
+| Script               | What it does                                                                              |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| `pnpm dev`           | Start the development server                                                              |
+| `pnpm build`         | Build for production                                                                      |
+| `pnpm start`         | Serve the production build                                                                |
+| `pnpm lint`          | Lint with ESLint and Stylelint (`pnpm lint:fix` to autofix)                               |
+| `pnpm typecheck`     | Type-check with TypeScript                                                                |
+| `pnpm format`        | Format with Prettier (`pnpm format:check` to verify)                                      |
+| `pnpm test`          | Run unit tests with Vitest (`pnpm test:watch`)                                            |
+| `pnpm test:coverage` | Unit tests with coverage; fails below 80 % on domain, services and pure utilities         |
+| `pnpm test:e2e`      | Build and run the Playwright end-to-end tests with axe-core (`pnpm test:e2e:ui` to debug) |
+| `pnpm check`         | Lint, typecheck, format check and tests with coverage                                     |
+| `pnpm db:start`      | Start the local Supabase in Docker                                                        |
+| `pnpm db:stop`       | Stop the local Supabase                                                                   |
+| `pnpm db:generate`   | Generate a migration from `src/db/schema/` (`--custom --name=…` for hand-written SQL)     |
+| `pnpm db:migrate`    | Apply pending migrations to the local Supabase                                            |
+| `pnpm db:reset`      | Recreate the local database and apply every migration from scratch                        |
+| `pnpm db:test`       | Run the pgTAP database tests in `supabase/tests/`                                         |
+| `pnpm db:seed`       | Load local seed data (`src/db/seed/`)                                                     |
 
 ## Project docs
 
