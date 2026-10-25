@@ -14,11 +14,24 @@ export async function expectNoA11yViolations(page: Page) {
     // colour halfway through the switch.
     await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
     await setThemeAttribute(page, theme);
+    await nextPaint(page);
     const { violations } = await new AxeBuilder({ page }).withTags(wcagTags).analyze();
     expect(violations, `axe violations in the ${theme} theme`).toEqual([]);
   }
   await page.emulateMedia({ colorScheme: null, reducedMotion: null });
   await setThemeAttribute(page, chosenTheme);
+}
+
+// Two animation frames: the theme change has been styled and painted, which is what a person
+// sees. WebKit on Linux can still report the old inherited text colour of freshly rendered
+// elements in the same frame as the change, which made axe report contrast that nobody sees.
+async function nextPaint(page: Page) {
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
 }
 
 async function setThemeAttribute(page: Page, theme: string | null) {
