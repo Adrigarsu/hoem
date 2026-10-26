@@ -294,14 +294,14 @@ Every table has RLS enabled with no default access; a row is visible only when a
 
 ### 7.1 Helper functions
 
-Policies call a few `security definer` functions so membership is looked up once, by primary key, instead of repeated subqueries. They are `stable`, have a fixed `search_path` and are not callable through the API.
+Policies call a few `security definer` functions so membership is looked up once, by primary key, instead of repeated subqueries. They are `stable`, have a fixed `search_path` and live in the `private` schema: signed-in users must be able to execute them for the policies to work, and the Data API exposes only `public` and `graphql_public`, so they are not callable through `/rpc`.
 
-| Function                      | Returns true when the current user (`auth.uid()`) …                             |
-| ----------------------------- | ------------------------------------------------------------------------------- |
-| `is_member(hh uuid)`          | belongs to household `hh`                                                       |
-| `is_owner(hh uuid)`           | is an owner of `hh`                                                             |
-| `is_parent(hh uuid)`          | has the family role `parent` in `hh`                                            |
-| `can_manage_members(hh uuid)` | may invite and change roles: owner, or parent in a family household (FR-HH-006) |
+| Function                      | Returns true when the current user (`auth.uid()`) …                                               |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| `is_member(hh uuid)`          | belongs to household `hh`                                                                         |
+| `is_owner(hh uuid)`           | is an owner of `hh`                                                                               |
+| `is_parent(hh uuid)`          | has the family role `parent` in `hh`                                                              |
+| `can_manage_members(hh uuid)` | may invite and change members: in a family household a parent (FR-HH-006), in the others an owner |
 
 ### 7.2 Who can see what
 
@@ -350,7 +350,7 @@ The trigger that fills `visible_to_parents` runs `before insert`, ignores any va
 
 ### 7.4 Other rules enforced in the database
 
-- **Memberships:** members can read the member list of their households; only `can_manage_members` can change roles; the last owner cannot leave or be removed (trigger).
+- **Households and memberships:** members read their households and member lists; owners rename and delete a household; only `can_manage_members` can change members, and only an owner can change or remove an owner or make someone an owner; anyone can leave, but the last owner cannot leave, be removed or be demoted (trigger, which locks the household so two owners leaving at once cannot both succeed); `family_role` is required in family households and refused in the others (trigger). Nobody inserts households or memberships directly: creating a household and joining one go through `security definer` functions that write everything in one step, the household type changes only through the flow that also fixes the family roles (FR-ACC-009; a deferred constraint trigger refuses a type that does not match the roles at commit), and `settings` only through the flows that decide who may change split rules and privacy options (FR-HH-009, FR-HH-010).
 - **Invitations:** readable by managers of the household; accepting goes through a `security definer` function that checks the token hash, the expiry and the e-mail of the signed-in user.
 - **Minors:** a profile with `is_minor` can join only a `family` household, added by a parent (NFR-LEG-001).
 - **Storage:** recipe photos live under `households/{household_id}/…` in a private bucket; storage policies reuse `is_member`, and the app serves them through short-lived signed URLs.
@@ -358,7 +358,7 @@ The trigger that fills `visible_to_parents` runs `before insert`, ignores any va
 
 ### 7.5 Testing the policies
 
-Policies are tested against a local Supabase with real JWTs. One fixture builds a family (two parents, a child, a relative) and a shared flat (two flatmates). Every row of the table in 7.2 becomes a test that signs in as each person and asserts what they can and cannot read, write and delete. A failing policy test blocks the merge.
+Policies are tested with pgTAP (`supabase/tests/database/`, `pnpm db:test`) against a local Supabase, signing in as each person the way PostgREST does after verifying a JWT: `set local role authenticated` and the claims in `request.jwt.claims`. One fixture builds a family (two parents, a child, a relative) and a shared flat (two flatmates). Every row of the table in 7.2 becomes a test that signs in as each person and asserts what they can and cannot read, write and delete. A failing policy test blocks the merge.
 
 ## 8. Background jobs, notifications and real time
 
