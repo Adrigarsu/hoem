@@ -20,7 +20,7 @@ export default defineConfig({
         "src/features/**/domain/**/*.ts",
         "src/features/**/service.ts",
         "src/lib/i18n/{format,locales,resolve-locale}.ts",
-        "src/lib/{validate-env,server-env-schema}.ts",
+        "src/lib/{validate-env,server-env-schema,errors,problem-details,validation}.ts",
         "src/design-system/*.ts",
       ],
       exclude: ["**/*.test.{ts,tsx}"],
