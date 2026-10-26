@@ -30,7 +30,8 @@ export const households = pgTable(
     name: text().notNull(),
     type: householdType().notNull(),
     currency: char({ length: 3 }).notNull().default("EUR"),
-    // Split rules, meal slots in use and, for "other" households, the privacy options.
+    // The type's rules (src/features/households/schemas.ts), written in full when the household is
+    // created (#16); the {} default never reaches a real household.
     settings: jsonb().notNull().default({}),
     createdBy: uuid("created_by").references(() => authUsers.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

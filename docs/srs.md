@@ -169,7 +169,7 @@ The household type decides who can see what. These rules are enforced in the dat
 | Private shopping lists      | Not needed    | Yes, alongside shared lists                                  | Yes, alongside shared lists                           | Configurable |
 | Expense splitting           | Off           | Optional; between parents by default, others can be included | Each member chooses which expenses to share and split | Configurable |
 
-In "other" households the owner sets each rule, choosing among the options the other types use. A new "other" household starts with the shared-flat settings.
+In "other" households the owner sets each rule, choosing among the options the other types use, except the family ones: "other" households have owners and members but no family roles, so private records stay with their creator and splitting is never "between parents". A new "other" household starts with the shared-flat settings.
 
 | ID        | Requirement                                                                                                                                                                                                                                                                                                                                                                   | Priority |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
