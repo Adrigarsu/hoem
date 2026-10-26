@@ -129,6 +129,16 @@ export function SignInForm() {
             autoComplete="current-password"
             showLabel={t("showPassword")}
             error={fieldError("password")}
+            labelAction={
+              <Link
+                href="/forgot-password"
+                // 44 px tall without moving the row: the padding reaches into the gap above the
+                // label (16 px) and the one below it (8 px).
+                className="-mt-4 -mb-2 inline-block pt-4 pb-2 text-label text-brand underline underline-offset-4"
+              >
+                {t("signIn.forgot")}
+              </Link>
+            }
             required
           />
           <Button type="submit" pending={pending} pendingLabel={t("signIn.submitting")}>

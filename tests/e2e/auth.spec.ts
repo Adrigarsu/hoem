@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expectNoA11yViolations } from "./support/accessibility";
 import { expect, test } from "./support/fixtures";
-import { uniqueEmail, verificationEmail } from "./support/mailbox";
+import { uniqueEmail, emailLink } from "./support/mailbox";
 
 const password = "correct horse battery";
 
@@ -34,7 +34,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
     await expect(page.getByText(email, { exact: true })).toBeVisible();
     await expectNoA11yViolations(page);
 
-    const { subject, link } = await verificationEmail(email);
+    const { subject, link } = await emailLink(email);
     expect(subject).toBe("Verify your e-mail for HØEM");
     expect(link).toContain("/auth/confirm?token_hash=");
   });
@@ -42,7 +42,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
   test("FR-ACC-001 verifying the e-mail signs me in and lands on Home", async ({ page, visit }) => {
     const email = uniqueEmail("verify");
     await signUp(page, visit, email);
-    const { link } = await verificationEmail(email);
+    const { link } = await emailLink(email);
 
     await page.goto(link);
 
@@ -58,7 +58,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
     // The Set-Cookie headers as the server sends them, read without a browser engine:
     // Playwright's WebKit on Windows and Linux reports every cookie as SameSite=None and hides
     // the headers of redirects.
-    const response = await page.request.get((await verificationEmail(email)).link, {
+    const response = await page.request.get((await emailLink(email)).link, {
       maxRedirects: 0,
     });
     const session = response
@@ -77,7 +77,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
   }) => {
     const email = uniqueEmail("unverified");
     await signUp(page, visit, email);
-    await verificationEmail(email);
+    await emailLink(email);
 
     await visit("/sign-in");
     await signIn(page, email);
@@ -90,7 +90,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
     await expect(page).toHaveURL(/\/check-your-inbox$/);
     await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
     await expect(page.getByText(email, { exact: true })).toBeVisible();
-    await verificationEmail(email, 2);
+    await emailLink(email, 2);
   });
 
   test("FR-ACC-001 wrong credentials do not reveal which part is wrong", async ({
@@ -108,7 +108,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
   }) => {
     const email = uniqueEmail("return");
     await signUp(page, visit, email);
-    await page.goto((await verificationEmail(email)).link);
+    await page.goto((await emailLink(email)).link);
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/sign-in$/);
 
@@ -121,7 +121,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
   test("FR-ACC-001 signing out ends the session", async ({ page, visit }) => {
     const email = uniqueEmail("signout");
     await signUp(page, visit, email);
-    await page.goto((await verificationEmail(email)).link);
+    await page.goto((await emailLink(email)).link);
     await expectNoA11yViolations(page);
 
     await page.getByRole("button", { name: "Sign out" }).click();
@@ -137,7 +137,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
   }) => {
     const email = uniqueEmail("resend");
     await signUp(page, visit, email);
-    await verificationEmail(email);
+    await emailLink(email);
 
     const resend = page.getByRole("button", { name: "Resend email" });
     const sent = page.getByRole("status").filter({ hasText: "We sent a new link." });
@@ -152,7 +152,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
     await expect(resend).toHaveAccessibleDescription(/You can ask for another link in \d+ s\./);
     await expect(resend).toBeFocused();
     await expectNoA11yViolations(page);
-    await verificationEmail(email, 2);
+    await emailLink(email, 2);
   });
 
   test("FR-ACC-001 the address stays out of the URL and a different one can be used", async ({

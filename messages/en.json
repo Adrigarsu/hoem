@@ -47,12 +47,37 @@
       "failed": "We couldn't send the email. Try again in a few minutes.",
       "wrongAddress": "Wrong address? <link>Use a different email</link>"
     },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "lede": "Enter the email you signed up with and we'll send you a link to choose a new password.",
+      "email": "Email",
+      "submit": "Send link",
+      "submitting": "Sending…",
+      "sentTitle": "Check your inbox",
+      "sent": "If an account exists for <strong>{email}</strong>, we sent it a link to choose a new password.",
+      "note": "The link works for 1 hour. Can't find the email? Look in your spam or promotions folder.",
+      "wrongAddress": "Wrong address? <link>Try a different email</link>",
+      "linkExpired": "That link has expired or was already used. Ask for a new one below."
+    },
+    "resetPassword": {
+      "title": "Choose a new password",
+      "lede": "You'll be signed in with it, and signed out on your other devices.",
+      "password": "New password",
+      "passwordHelp": "At least {min} characters.",
+      "confirmPassword": "Repeat the password",
+      "submit": "Save and sign in",
+      "submitting": "Saving…",
+      "expiredTitle": "This link no longer works",
+      "expired": "Reset links work once and for 1 hour. Ask for a new one and use the latest email.",
+      "askAgain": "Ask for a new link"
+    },
     "signIn": {
       "title": "Sign in",
       "tagline": "Your home, organised together.",
       "lede": "Meals, shopping and money, shared with the people you live with.",
       "email": "Email",
       "password": "Password",
+      "forgot": "Forgot password?",
       "submit": "Sign in",
       "submitting": "Signing in…",
       "noAccount": "New to HØEM? <link>Create an account</link>",

@@ -13,6 +13,9 @@ export async function authGateway(): Promise<AuthGateway> {
     resend: (params) => auth.resend(params),
     verifyOtp: (params) => auth.verifyOtp(params),
     signOut: () => auth.signOut(),
+    resetPasswordForEmail: (email, options) => auth.resetPasswordForEmail(email, options),
+    updatePassword: (password) => auth.updateUser({ password }),
+    signOutOthers: () => auth.signOut({ scope: "others" }),
     // Row-level security returns only the signed-in user's own profile.
     async profileLocale() {
       const { data } = await supabase.from("profiles").select("locale").maybeSingle();

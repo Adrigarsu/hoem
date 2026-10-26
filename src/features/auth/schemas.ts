@@ -40,6 +40,19 @@ export const signInSchema = z.object({
 
 export const resendSchema = z.object({ email });
 
+export const forgotPasswordSchema = z.object({ email });
+
+export const resetPasswordSchema = z
+  .object({
+    tokenHash: z.string().min(1, { error: "required" }),
+    password: newPassword,
+    confirmPassword: z.string(),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    error: "passwordsDoNotMatch",
+    path: ["confirmPassword"],
+  });
+
 // What Check your inbox shows and "Use a different email" puts back in the sign-up form. It
 // travels in an HttpOnly cookie (screens README, "Decisions on the hand-off"), so it is parsed
 // like any other input.

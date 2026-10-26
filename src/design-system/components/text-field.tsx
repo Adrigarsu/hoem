@@ -8,6 +8,9 @@ export type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
   // Rendered inside the field, after the input (the password visibility toggle).
   trailing?: ReactNode;
+  // Beside the label, outside it, so it does not become part of the field's name ("Forgot
+  // password?").
+  labelAction?: ReactNode;
 };
 
 // Label, help and error are linked to the input with htmlFor and aria-describedby, so a screen
@@ -17,6 +20,7 @@ export function TextField({
   help,
   error,
   trailing,
+  labelAction,
   id,
   className = "",
   ...input
@@ -27,12 +31,14 @@ export function TextField({
   const errorId = error ? `${inputId}-error` : undefined;
   const describedBy = [helpId, errorId].filter(Boolean).join(" ") || undefined;
 
+  // labelAction comes last in the DOM, so the tab order is field → action, while `order` shows it
+  // beside the label (the screens draw "Forgot password?" there).
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={inputId} className="text-label text-text">
+    <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <label htmlFor={inputId} className="order-1 text-label text-text">
         {label}
       </label>
-      <div className="flex gap-2">
+      <div className="order-3 flex w-full gap-2">
         <input
           id={inputId}
           aria-invalid={error ? true : undefined}
@@ -43,16 +49,20 @@ export function TextField({
         {trailing}
       </div>
       {help && (
-        <p id={helpId} className="text-small text-text-secondary">
+        <p id={helpId} className="order-4 w-full text-small text-text-secondary">
           {help}
         </p>
       )}
       {error && (
-        <p id={errorId} className="flex items-center gap-1 text-small font-medium text-danger">
+        <p
+          id={errorId}
+          className="order-5 flex w-full items-center gap-1 text-small font-medium text-danger"
+        >
           <CircleAlert aria-hidden="true" className="size-icon-sm shrink-0" strokeWidth={1.5} />
           {error}
         </p>
       )}
+      {labelAction && <div className="order-2">{labelAction}</div>}
     </div>
   );
 }
