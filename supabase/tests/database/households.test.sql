@@ -15,6 +15,16 @@ values
   ('00000000-0000-7000-8000-000000000202', 'marcos@example.com'),
   ('00000000-0000-7000-8000-000000000301', 'olga@example.com');
 
+-- Sign-up gives each of them a personal household (personal-household.test.sql); these tests use
+-- the households below instead.
+delete from public.households
+where created_by in (
+  '00000000-0000-7000-8000-000000000101', '00000000-0000-7000-8000-000000000102',
+  '00000000-0000-7000-8000-000000000103', '00000000-0000-7000-8000-000000000104',
+  '00000000-0000-7000-8000-000000000201', '00000000-0000-7000-8000-000000000202',
+  '00000000-0000-7000-8000-000000000301'
+);
+
 insert into public.households (id, name, type, created_by)
 values
   ('00000000-0000-7000-8000-00000000a001', 'García family', 'family', '00000000-0000-7000-8000-000000000101'),

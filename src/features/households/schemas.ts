@@ -9,7 +9,7 @@ import {
 } from "./domain/household-rules";
 
 // The shape of households.settings (jsonb). Strict, so a typo or a value outside the options is
-// refused on write (#16, #31) and noticed on read, instead of silently changing who sees what.
+// refused on write (#19, #31) and noticed on read, instead of silently changing who sees what.
 // Messages are keys, like every schema in the app (docs/architecture.md §4.2).
 export const householdSettingsSchema = z.strictObject({
   roles: z.enum(roleOptions),

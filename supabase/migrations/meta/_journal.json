@@ -29,6 +29,13 @@
       "when": 1792979070404,
       "tag": "20261026014430_households",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793010685027,
+      "tag": "20261026103125_personal-household",
+      "breakpoints": true
     }
   ]
 }
