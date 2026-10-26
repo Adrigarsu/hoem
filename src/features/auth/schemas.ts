@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { formFieldErrors } from "@/lib/validation";
 
 // Shared by the forms and the Server Actions (NFR-SEC-002). Messages are keys under
 // Auth.validation in messages/en.json, so the UI translates them.
@@ -86,10 +87,5 @@ export type ValidationKey =
 
 // One message key per field (the first problem), for the form to show next to it.
 export function fieldErrors(error: z.ZodError | undefined): Record<string, ValidationKey> {
-  const errors: Record<string, ValidationKey> = {};
-  for (const issue of error?.issues ?? []) {
-    const field = String(issue.path[0]);
-    errors[field] ??= issue.message as ValidationKey;
-  }
-  return errors;
+  return formFieldErrors<ValidationKey>(error);
 }

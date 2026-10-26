@@ -128,6 +128,8 @@ Dependencies only point down; an ESLint rule (`eslint-plugin-boundaries`) fails 
 
 Shared contracts sit beside them: `schemas.ts` (Zod, used by forms, actions and the API) and `index.ts` (the only file other features may import).
 
+**Schemas (NFR-SEC-002).** Each feature exposes its Zod schemas in `schemas.ts`, and every input is parsed with them on the server, whatever the client did. The same schema runs in the form before submitting, so most mistakes show without a round trip, and again in the Server Action or route handler. Messages are message keys (`Auth.validation.*`), never English text, so the form translates them; `formFieldErrors` (`src/lib/validation.ts`) turns a `ZodError` into one key per field for the form, and `ValidationError.fromZod` turns it into the `errors` list of a 422 Problem Details response for the API; both name a field by its full path (`split.userId`), and a rule about the whole input has no field. Errors never echo the rejected value, which may be personal data.
+
 ### 4.3 Naming
 
 | Thing                    | Convention                                   | Example                                      |
@@ -153,8 +155,9 @@ Services throw typed `AppError` subclasses, never strings. Each carries a stable
 | `ConflictError`         | `conflict`          | 409                                                                                                    |
 | `DemoRestrictedError`   | `demo_restricted`   | 403                                                                                                    |
 | `AuthFailedError`       | `auth_failed`       | 401 (sign-up, sign-in or verification refused; the reason never says whether an e-mail has an account) |
+| `AuthFailedError`       | `rate_limited`      | 429 (the same error when Supabase Auth rate-limits the request, so clients back off)                   |
 
-Unexpected errors are logged with a request ID and shown to the user as a generic message with that ID; stack traces never reach the client.
+Unexpected errors are logged with a request ID and shown to the user as a generic message with that ID (`internal_error`, 500); stack traces never reach the client. An error's own message is for the logs only and is never sent, not even for typed errors.
 
 ### 4.5 Other conventions
 
@@ -184,14 +187,13 @@ Requests send the Supabase access token as `Authorization: Bearer <jwt>`. The ro
 
 ### 5.3 Errors
 
-Every error response follows RFC 9457 (Problem Details for HTTP APIs), with content type `application/problem+json`:
+Every error response follows RFC 9457 (Problem Details for HTTP APIs), with content type `application/problem+json`, built by `problemResponse` in `src/lib/problem-details.ts` from the `AppError` a service throws:
 
 ```json
 {
   "type": "https://hoemapp.com/problems/validation_failed",
   "title": "The request has invalid fields",
   "status": 422,
-  "detail": "amountCents must be greater than 0",
   "instance": "/api/v1/households/0192…/expenses",
   "requestId": "req_8f3a…",
   "errors": [{ "field": "amountCents", "code": "too_small" }]

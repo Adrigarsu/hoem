@@ -54,6 +54,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - A feature is imported by others only through its `index.ts`.
 - Business rules live once, in services. Server Actions and API routes stay thin:
   parse input, call the service, map the result.
+- Each feature exposes its Zod schemas in `schemas.ts`; forms and entry points parse with the same
+  schema, and the server always parses, whatever the client did (NFR-SEC-002).
 - `src/app/` contains routes only.
 
 ## Non-negotiables
