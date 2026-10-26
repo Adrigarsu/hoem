@@ -86,8 +86,14 @@ const eslintConfig = defineConfig([
             include: ["alt", "aria-label", "aria-description", "label", "placeholder", "title"],
           },
           "should-validate-template": true,
-          // Message keys passed to next-intl's translator are not user-facing text.
-          callees: { exclude: ["^t$", String.raw`^t\.(rich|markup|raw|has)$`] },
+          // Message keys passed to next-intl's translator are not user-facing text. A component
+          // that reads a second namespace names that translator after it, such as tShell.
+          callees: {
+            exclude: [
+              String.raw`^t(?:[A-Z]\w*)?$`,
+              String.raw`^t(?:[A-Z]\w*)?\.(rich|markup|raw|has)$`,
+            ],
+          },
         },
       ],
     },

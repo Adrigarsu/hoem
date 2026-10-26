@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expectNoA11yViolations } from "./support/accessibility";
 import { expect, test } from "./support/fixtures";
+import { signOut } from "./support/session";
 import { emailLink, uniqueEmail } from "./support/mailbox";
 
 const oldPassword = "correct horse battery";
@@ -17,7 +18,7 @@ async function verifiedAccount(page: Page, visit: (path: string) => Promise<void
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page).toHaveURL(/\/check-your-inbox$/);
   await page.goto((await emailLink(email)).link);
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await signOut(page);
   await expect(page).toHaveURL(/\/sign-in$/);
   return email;
 }
@@ -56,7 +57,7 @@ test.describe("FR-ACC-008 password reset", () => {
     await page.getByRole("button", { name: "Save and sign in" }).click();
 
     await expect(page).toHaveURL(/\/$/);
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut(page);
     await signIn(page, email, oldPassword);
     await expect(
       page.getByRole("alert").filter({ hasText: "Email or password is incorrect." }),
@@ -86,7 +87,7 @@ test.describe("FR-ACC-008 password reset", () => {
     await page.getByLabel("Repeat the password").fill(newPassword);
     await page.getByRole("button", { name: "Save and sign in" }).click();
     await expect(page).toHaveURL(/\/$/);
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut(page);
     await expect(page).toHaveURL(/\/sign-in$/);
 
     await page.goto(path);

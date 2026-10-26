@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDay, formatInstant, formatMoney } from "./format";
+import { formatDay, formatInstant, formatMoney, formatToday } from "./format";
 
 describe("formatMoney", () => {
   it("NFR-I18N-002 formats 4320 EUR cents as €43.20 in English", () => {
@@ -57,5 +57,12 @@ describe("formatInstant", () => {
   it("NFR-I18N-002 shows an instant in the user's time zone", () => {
     const lateEvening = new Date("2026-10-25T23:30:00Z");
     expect(formatInstant(lateEvening, "en", "Europe/Madrid")).toBe("Oct 26, 2026, 12:30 AM");
+  });
+});
+
+describe("formatToday", () => {
+  it("FR-DASH-001 names today's weekday and date in the user's time zone", () => {
+    const lateEvening = new Date("2026-10-25T23:30:00Z");
+    expect(formatToday(lateEvening, "en", "Europe/Madrid")).toBe("Monday, October 26");
   });
 });

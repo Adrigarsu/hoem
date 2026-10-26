@@ -78,6 +78,19 @@ decision wins and the screen's spec says so.
 | Expired link       | Still lands on sign-in with the "link expired" alert: the address is unknown once the cookie has expired, so the "This link has expired" page cannot resend.     |
 | Sign-up name help  | "Shown to the people in your households." is dropped, as in the screen.                                                                                          |
 
+### Decisions taken building the app shell (#17)
+
+| Topic                | Decision                                                                                                                                                                   |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Household switcher   | Not shown until #20 builds it, in the Home header or in the sidebar: a button that does nothing would confuse.                                                             |
+| Desktop Home         | Until the dashboard (M6), desktop shows the mobile content (greeting, Planner, module tiles) in the sidebar shell; "New note", "Add expense" and the metrics come with M6. |
+| Household tile       | Left out until the household has data to show (#19, #28); Home has the Meals, Shopping and Expenses tiles.                                                                 |
+| Empty tiles          | Metas derived for the empty state: "Nothing planned for today", "Your list is empty", "Add one when you spend".                                                            |
+| Profile and settings | `/settings` shows "Coming soon" and the Sign out button until #21 builds the menu.                                                                                         |
+| Tab bar              | Sticky at the bottom instead of fixed, so it takes its own space and never covers content; scroll padding keeps focused controls clear of it and of the avatar button.     |
+| Current destination  | Marked with `aria-current="page"`, the tint and a bold label, so it never relies on colour alone.                                                                          |
+| Not built yet        | Planner, Meals, Shopping, Expenses and Notifications show their `h1` and an EmptyState "Coming soon" with "Back to Home".                                                  |
+
 ## Open questions
 
 Each screen is reviewed against the SRS, the architecture and the existing code by the issue that

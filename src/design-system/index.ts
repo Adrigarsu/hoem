@@ -1,9 +1,17 @@
 export { AuthShell } from "./components/auth-shell";
-export { Button, buttonClassName } from "./components/button";
+export { Avatar } from "./components/avatar";
+export { Button } from "./components/button";
+export { buttonClassName } from "./components/button-class-name";
+export { Card } from "./components/card";
+export { EmptyState } from "./components/empty-state";
 export { FormMessage } from "./components/form-message";
+export { IconButton } from "./components/icon-button";
 export { IconTile } from "./components/icon-tile";
 export { Logo } from "./components/logo";
 export { ModuleChip } from "./components/module-chip";
+export { moduleIcons, type Module } from "./components/module-icons";
 export { Note } from "./components/note";
 export { PasswordField } from "./components/password-field";
 export { TextField } from "./components/text-field";
+export { Tile } from "./components/tile";
+export { Tooltip } from "./components/tooltip";
