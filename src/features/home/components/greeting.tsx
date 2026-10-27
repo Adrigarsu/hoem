@@ -14,7 +14,7 @@ export async function Greeting() {
 
   return (
     <>
-      <h1 className="text-title font-bold md:text-heading">
+      <h1 className="text-title font-bold text-text md:text-heading">
         {t(partOfDay(now, profile.timeZone), { name: profile.displayName })}
       </h1>
       <p className="text-body text-text-secondary">{formatToday(now, locale, profile.timeZone)}</p>

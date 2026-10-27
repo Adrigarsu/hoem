@@ -15,7 +15,7 @@ type ComingSoonProps = {
 export function ComingSoon({ title, children }: ComingSoonProps) {
   const t = useTranslations("Shell.comingSoon");
   return (
-    <Page title={<h1 className="text-title font-bold md:text-heading">{title}</h1>}>
+    <Page title={<h1 className="text-title font-bold text-text md:text-heading">{title}</h1>}>
       <EmptyState
         icon={Construction}
         title={t("title")}

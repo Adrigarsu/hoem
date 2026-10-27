@@ -103,6 +103,8 @@ screenshots of them, for comparing a pull request against the design.
 
 `src/design-system/tokens.css` turns these tokens into CSS variables and Tailwind utilities, and a unit test fails when it drifts from `tokens.json`. Tailwind's own palette, spacing scale and shadows are removed, so only token utilities exist: `bg-surface`, `text-text-secondary`, `border-border-control`, `p-6` (24px), `rounded-lg`, `text-body`, `duration-fast`. Another test checks every pair in "Colour roles" against WCAG 2.2 in both themes, and the linters reject hard-coded colours and arbitrary values such as `bg-[#fff]`.
 
+Every heading and every block of text sets its colour (`text-text`, `text-text-secondary`…) on itself or on its nearest link or control, instead of inheriting it from `body`. WebKit on Linux keeps the old inherited colour of text that comes after the first paint (streamed or client-rendered) when the theme changes, and axe then reports contrast that the theme does not have (#17).
+
 ## Accessibility audit
 
 Every component is checked in two ways before it enters the system:

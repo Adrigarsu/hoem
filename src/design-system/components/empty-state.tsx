@@ -17,7 +17,7 @@ export function EmptyState({ icon, title, text, headingLevel = 2, action }: Empt
   return (
     <section className="flex flex-col items-center gap-3 px-6 py-12 text-center">
       <IconTile icon={icon} />
-      <Heading className="mt-2 text-subtitle">{title}</Heading>
+      <Heading className="mt-2 text-subtitle text-text">{title}</Heading>
       <p className="max-w-column-narrow text-body text-text-secondary">{text}</p>
       {action && <div className="mt-2">{action}</div>}
     </section>

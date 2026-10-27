@@ -53,7 +53,7 @@ function PlannerCard() {
   return (
     <Card aria-labelledby="home-planner">
       <div className="flex items-center justify-between">
-        <h2 id="home-planner" className="flex items-center gap-2 text-subtitle">
+        <h2 id="home-planner" className="flex items-center gap-2 text-subtitle text-text">
           <CalendarDays aria-hidden="true" className="size-icon-md text-brand" strokeWidth={1.5} />
           {tShell("destinations.planner")}
         </h2>
