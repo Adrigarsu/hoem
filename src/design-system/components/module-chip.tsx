@@ -1,17 +1,18 @@
-import { ShoppingCart, UtensilsCrossed, Wallet, type LucideIcon } from "lucide-react";
+import { moduleIcons, type Module } from "./module-icons";
 
 // Each module keeps its accent, always with its icon and name (design-system principle 5).
-const modules: Record<"meals" | "shopping" | "expenses", { icon: LucideIcon; ink: string }> = {
-  meals: { icon: UtensilsCrossed, ink: "text-meals-ink" },
-  shopping: { icon: ShoppingCart, ink: "text-shopping-ink" },
-  expenses: { icon: Wallet, ink: "text-expenses-ink" },
+const inks: Record<Module, string> = {
+  meals: "text-meals-ink",
+  shopping: "text-shopping-ink",
+  expenses: "text-expenses-ink",
 };
 
-type ModuleChipProps = { module: keyof typeof modules; label: string };
+type ModuleChipProps = { module: Module; label: string };
 
 // A list item: put chips inside a <ul>.
 export function ModuleChip({ module, label }: ModuleChipProps) {
-  const { icon: Icon, ink } = modules[module];
+  const Icon = moduleIcons[module];
+  const ink = inks[module];
   return (
     <li
       className={`inline-flex h-control-height-sm items-center gap-2 rounded-full bg-surface px-4 text-label ${ink}`}

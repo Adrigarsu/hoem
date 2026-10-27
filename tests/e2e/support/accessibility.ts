@@ -7,6 +7,9 @@ const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22a", "wcag22
 // Checks the page in each theme, then leaves it as it was, so later steps of the test run in the
 // default theme.
 export async function expectNoA11yViolations(page: Page) {
+  // After a client navigation Next.js sets the new <title> a moment later; axe checks the page
+  // once it has settled, and a page without a title still fails here.
+  await expect(page, "the page has a <title>").toHaveTitle(/\S/);
   const chosenTheme = await page.evaluate(() => document.documentElement.dataset.theme ?? null);
   for (const theme of ["light", "dark"] as const) {
     // The system preference picks the theme; data-theme (the user's choice, #22) overrides it,

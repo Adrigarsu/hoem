@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expectNoA11yViolations } from "./support/accessibility";
 import { expect, test } from "./support/fixtures";
+import { signOut } from "./support/session";
 import { uniqueEmail, emailLink } from "./support/mailbox";
 
 const password = "correct horse battery";
@@ -47,8 +48,9 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
     await page.goto(link);
 
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole("heading", { level: 1, name: "HØEM" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /^Good (morning|afternoon|evening), Ana$/ }),
+    ).toBeVisible();
   });
 
   test("NFR-SEC-004 the session cookies are HttpOnly and SameSite=Lax", async ({ page, visit }) => {
@@ -109,7 +111,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
     const email = uniqueEmail("return");
     await signUp(page, visit, email);
     await page.goto((await emailLink(email)).link);
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut(page);
     await expect(page).toHaveURL(/\/sign-in$/);
 
     await page.goto("/planner?week=2026-W44");
@@ -124,7 +126,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
     await page.goto((await emailLink(email)).link);
     await expectNoA11yViolations(page);
 
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut(page);
 
     await expect(page).toHaveURL(/\/sign-in$/);
     await page.goto("/");

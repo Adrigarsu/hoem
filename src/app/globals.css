@@ -14,6 +14,14 @@
     outline-offset: 2px;
   }
 
+  /* WCAG 2.4.11: on phones, content scrolled into view by keyboard focus never ends up under the
+     sticky tab bar (about 70px) or the avatar button of the app shell. */
+  @media (max-width: 767px) {
+    html {
+      scroll-padding-block: calc(var(--space-16) + var(--space-4));
+    }
+  }
+
   /* NFR-A11Y-006: also stops transitions and animations that do not use the motion tokens. */
   @media (prefers-reduced-motion: reduce) {
     *,

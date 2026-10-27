@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Button, buttonClassName } from "./button";
+import { Button } from "./button";
+import { buttonClassName } from "./button-class-name";
 
 describe("Button", () => {
   it("NFR-A11Y-003 is a native button that does not submit forms unless asked", () => {

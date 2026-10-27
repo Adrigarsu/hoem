@@ -65,3 +65,12 @@ export function formatInstant(
 ): string {
   return new Intl.DateTimeFormat(locale, { ...options, timeZone }).format(instant);
 }
+
+// Today as Home shows it under the greeting: "Monday, October 26".
+export function formatToday(instant: Date, locale: string, timeZone: string): string {
+  return formatInstant(instant, locale, timeZone, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+}

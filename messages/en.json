@@ -4,8 +4,29 @@
     "description": "Meals, shopping, expenses and plans for your household."
   },
   "Home": {
-    "title": "H<brand>Ø</brand>EM",
-    "signOut": "Sign out"
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}"
+    },
+    "open": "Open<hidden> planner</hidden>",
+    "writeNote": "Write a note…",
+    "noNotes": "No notes yet. Write one for the household or just for you.",
+    "yourHome": "Your home",
+    "tiles": {
+      "meals": {
+        "headline": "Plan a meal",
+        "meta": "Nothing planned for today"
+      },
+      "shopping": {
+        "headline": "Add an item",
+        "meta": "Your list is empty"
+      },
+      "expenses": {
+        "headline": "No expenses yet",
+        "meta": "Add one when you spend"
+      }
+    }
   },
   "NotFound": {
     "title": "Page not found",
@@ -99,6 +120,25 @@
       "passwordTooShort": "Use at least {min} characters.",
       "passwordTooLong": "This password is too long. Use 72 characters or fewer.",
       "passwordsDoNotMatch": "The passwords do not match."
-    }
+    },
+    "signOut": "Sign out"
+  },
+  "Shell": {
+    "skipToContent": "Skip to content",
+    "mainNavigation": "Main",
+    "destinations": {
+      "home": "Home",
+      "planner": "Planner",
+      "meals": "Meals",
+      "shopping": "Shopping",
+      "expenses": "Expenses"
+    },
+    "profileAndSettings": "Profile and settings",
+    "comingSoon": {
+      "title": "Coming soon",
+      "text": "{section} isn't ready yet. Everything else in HØEM works as usual.",
+      "backHome": "Back to Home"
+    },
+    "notifications": "Notifications"
   }
 }
