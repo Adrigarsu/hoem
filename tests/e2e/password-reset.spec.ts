@@ -44,6 +44,8 @@ test.describe("FR-ACC-008 password reset", () => {
     page,
     visit,
   }) => {
+    // Two e-mails, two sign-outs through the settings page and axe on four pages.
+    test.slow();
     const email = await verifiedAccount(page, visit);
     await requestReset(page, email);
     await expect(page.getByText(`If an account exists for ${email}`)).toBeVisible();
@@ -56,7 +58,9 @@ test.describe("FR-ACC-008 password reset", () => {
     await page.getByLabel("Repeat the password").fill(newPassword);
     await page.getByRole("button", { name: "Save and sign in" }).click();
 
-    await expect(page).toHaveURL(/\/$/);
+    // Saving checks the link, changes the password and signs out the other sessions: three calls to
+    // Supabase, which take longer than the default wait while every browser project runs at once.
+    await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
     await signOut(page);
     await signIn(page, email, oldPassword);
     await expect(
@@ -86,7 +90,9 @@ test.describe("FR-ACC-008 password reset", () => {
     await page.getByLabel("New password", { exact: true }).fill(newPassword);
     await page.getByLabel("Repeat the password").fill(newPassword);
     await page.getByRole("button", { name: "Save and sign in" }).click();
-    await expect(page).toHaveURL(/\/$/);
+    // Saving checks the link, changes the password and signs out the other sessions: three calls to
+    // Supabase, which take longer than the default wait while every browser project runs at once.
+    await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
     await signOut(page);
     await expect(page).toHaveURL(/\/sign-in$/);
 

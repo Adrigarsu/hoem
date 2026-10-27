@@ -11,7 +11,6 @@ export function TabBar() {
   return (
     <nav
       aria-label={t("mainNavigation")}
-      data-tab-bar
       className="sticky bottom-0 z-10 grid grid-cols-5 border-t border-border bg-surface py-2 md:hidden"
     >
       {tabBarOrder.map((destination) => {
