@@ -93,6 +93,12 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   Practices for custom widgets.
 - Touch targets at least 44×44 px, visible focus, colour never the only signal.
 - No literal user-facing text in components: use next-intl messages (`messages/en.json`).
+- **Screenshots for every UI change.** When an issue adds or changes a page, run
+  `pnpm app:capture <page> …` (add `--signed-in` for pages behind sign-in; paths without the
+  leading slash, `home` is `/`). It writes one collage per page to the ignored `screenshots/`
+  folder: 360, 768 and 1440 px, light and dark. Show the collages to the developer, compare them
+  with the screen in `docs/design-system/screens/`, and list them for the pull request.
+  Never commit them.
 
 ## Testing
 
@@ -141,13 +147,18 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - When an issue is shipped: remove its row, then recommend the next issue and why (what it
   unblocks, what it depends on). If two or more are equally good, give the options with their
   trade-offs and let the developer choose.
+- Every milestone ends with a `docs: <milestone> documentation review` issue, blocked by the
+  rest of the milestone. When a milestone is split into issues, create it too.
 
 ## Definition of done
 
 1. The issue's acceptance criteria are met and covered by tests.
 2. `pnpm check` passes.
 3. UI work is checked with keyboard only and in both themes.
-4. `docs/` is updated if a decision or a documented behaviour changed.
+4. `docs/` is updated: the page of every feature the issue touched (`docs/features/<feature>.md`,
+   created if missing: what it does, privacy rules, requirement IDs, screens), the guide whose
+   commands or steps changed (`docs/guides/`), and `architecture.md` or an ADR if a decision
+   changed. Documentation lives in `docs/`, never in the GitHub wiki.
 5. You summarise what changed, what you left out and any open question.
 6. Instruction files are up to date, so the next issue can start from a cleared session: anything
    a fresh agent would need (a new convention, command, gotcha or decision) is in `AGENTS.md`,

@@ -28,7 +28,8 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "screens:capture": "tsx scripts/capture-screens.ts"
+    "screens:capture": "tsx scripts/capture-screens.ts",
+    "app:capture": "tsx scripts/capture-app.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

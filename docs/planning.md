@@ -11,6 +11,7 @@ this file holds only their order and the reason for it.
 4. Between issues that are otherwise equal, the one that unblocks more issues goes first.
 5. Chores that protect CI or the workflow go first if they slow down every issue (for example a
    flaky or slow pipeline); otherwise they go at the end of their milestone.
+6. The milestone's documentation review is always its last issue.
 
 When an issue is added, place it by these rules and write why in the last column. When an issue
 is shipped, remove its row. The milestone tracking chores (#35–#40) are split into issues before
@@ -37,6 +38,7 @@ their milestone starts.
 | 29  | NFR-LEG-001: children under 14 join only through family  | M1b       | must     | #28        | Builds on accepting invitations             |
 | 34  | FR-ONB-005: setup step for people, skipping steps        | M1b       | must     | #33, #27   | Closes the setup chain                      |
 | 31  | FR-HH-010: configure the rules of an "other" household   | M1b       | should   | #19        | Should                                      |
+| 71  | docs: M1 documentation review                            | M1b       | must     | M1 issues  | Closes M1; needs every M1 feature shipped   |
 | 35  | chore: plan and track M2 Shopping                        | M2        | must     | —          | Split into issues when M1b ends             |
 | 36  | chore: plan and track M3 Meals & recipes                 | M3        | must     | —          | Milestone order                             |
 | 37  | chore: plan and track M4 Expenses & budgets              | M4        | must     | —          | Milestone order                             |
