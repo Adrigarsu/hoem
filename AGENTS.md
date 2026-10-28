@@ -121,6 +121,12 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   policy tests, a domain function with its tests, a service, a screen), stop and tell the developer
   it is a good moment to commit, with the files to stage and a ready Conventional Commit message.
   Do not wait until the whole issue is done.
+- Draft pull request early: after the first commit of an issue, give the developer the commands to
+  push and open a draft pull request (`gh pr create --draft`, title in Conventional Commits,
+  body `Closes #<issue>`), so CI runs on every push. `/ship` later fills the body and marks it ready.
+- Keep the branch up to date by merging, never rebasing: `git fetch origin` then
+  `git merge origin/main`. Do it before `/ship`, and whenever `main` gets a change this branch
+  depends on (a migration, a shared component, a dependency bump).
 
 ## Definition of done
 
@@ -129,6 +135,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 3. UI work is checked with keyboard only and in both themes.
 4. `docs/` is updated if a decision or a documented behaviour changed.
 5. You summarise what changed, what you left out and any open question.
+6. Instruction files are up to date, so the next issue can start from a cleared session: anything
+   a fresh agent would need (a new convention, command, gotcha or decision) is in `AGENTS.md`,
+   `docs/` or a skill, not only in the conversation. Keep them short; remove what is outdated.
 
 ## Working with the developer
 
