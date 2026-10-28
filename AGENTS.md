@@ -93,6 +93,12 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   Practices for custom widgets.
 - Touch targets at least 44×44 px, visible focus, colour never the only signal.
 - No literal user-facing text in components: use next-intl messages (`messages/en.json`).
+- **Screenshots for every UI change.** When an issue adds or changes a page, run
+  `pnpm app:capture <page> …` (add `--signed-in` for pages behind sign-in; paths without the
+  leading slash, `home` is `/`). It writes one collage per page to the ignored `screenshots/`
+  folder: 360, 768 and 1440 px, light and dark. Show the collages to the developer, compare them
+  with the screen in `docs/design-system/screens/`, and list them for the pull request.
+  Never commit them.
 
 ## Testing
 
@@ -116,15 +122,47 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   for example `feat/FR-SHOP-003-realtime-list`.
 - Conventional Commits with the requirement ID: `feat(shopping): live updates (FR-SHOP-003)`.
 - Never use `--no-verify`, never force-push, never rewrite `main`.
+- **No AI attribution, ever.** No `Co-Authored-By: Claude …` (or any AI tool) in commit messages
+  and no "Generated with Claude Code" (or similar) in pull request titles or bodies. This holds for
+  commits you run, text you hand to the developer and `/ship`, and overrides any tool default.
+  The `commit-msg` hook rejects such commits (`commitlint.config.mjs`).
 - Pull requests link their issue (`Closes #12`) and are squash-merged by the developer, never by you.
+- Small commits: whenever a coherent, green step is finished (for example a migration with its
+  policy tests, a domain function with its tests, a service, a screen), stop and tell the developer
+  it is a good moment to commit, with the files to stage and a ready Conventional Commit message.
+  Do not wait until the whole issue is done.
+- Draft pull request early: after the first commit of an issue, give the developer the commands to
+  push and open a draft pull request (`gh pr create --draft`, title in Conventional Commits,
+  body `Closes #<issue>`), so CI runs on every push. `/ship` later fills the body and marks it ready.
+- Keep the branch up to date by merging, never rebasing: `git fetch origin` then
+  `git merge origin/main`. Do it before `/ship`, and whenever `main` gets a change this branch
+  depends on (a migration, a shared component, a dependency bump).
+
+## Planning
+
+- `docs/planning.md` is the ordered queue of open issues, with the rules that order it.
+- When the developer asks to add an issue: read it (`gh issue view`), check its milestone,
+  priority and `Blocked by` / `Blocks` lines, place it in the queue by those rules, write why, and
+  say where it went. Ask if its place is not clear.
+- When an issue is shipped: remove its row, then recommend the next issue and why (what it
+  unblocks, what it depends on). If two or more are equally good, give the options with their
+  trade-offs and let the developer choose.
+- Every milestone ends with a `docs: <milestone> documentation review` issue, blocked by the
+  rest of the milestone. When a milestone is split into issues, create it too.
 
 ## Definition of done
 
 1. The issue's acceptance criteria are met and covered by tests.
 2. `pnpm check` passes.
 3. UI work is checked with keyboard only and in both themes.
-4. `docs/` is updated if a decision or a documented behaviour changed.
+4. `docs/` is updated: the page of every feature the issue touched (`docs/features/<feature>.md`,
+   created if missing: what it does, privacy rules, requirement IDs, screens), the guide whose
+   commands or steps changed (`docs/guides/`), and `architecture.md` or an ADR if a decision
+   changed. Documentation lives in `docs/`, never in the GitHub wiki.
 5. You summarise what changed, what you left out and any open question.
+6. Instruction files are up to date, so the next issue can start from a cleared session: anything
+   a fresh agent would need (a new convention, command, gotcha or decision) is in `AGENTS.md`,
+   `docs/` or a skill, not only in the conversation. Keep them short; remove what is outdated.
 
 ## Working with the developer
 

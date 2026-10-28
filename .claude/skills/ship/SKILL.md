@@ -2,7 +2,7 @@
 name: ship
 description: Finish the current task - verify it, commit and open a pull request. Use when the developer says the work is ready to ship.
 disable-model-invocation: true
-allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log *)
+allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git fetch origin) Bash(git merge origin/main) Bash(gh pr view *)
 ---
 
 ## Branch
@@ -16,13 +16,25 @@ allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log
 ## Steps
 
 1. If the current branch is `main`, stop: work must happen on a branch.
-2. Run `pnpm check`. If it fails, fix the cause and run it again. Do not continue until it passes.
-3. Go through the Definition of done in `AGENTS.md` and list anything that is not met.
-   If something important is missing, stop and ask.
-4. Commit any remaining changes with Conventional Commits that include the requirement ID.
-   Never use `--no-verify`.
-5. Push the branch and open a pull request with `gh pr create`. Follow
+2. Run `git fetch origin` and `git merge origin/main` (never rebase). If there are conflicts,
+   stop and show them to me.
+3. Run `pnpm check`. If it fails, fix the cause and run it again. Do not continue until it passes.
+4. Go through the Definition of done in `AGENTS.md` and list anything that is not met.
+   If something important is missing, stop and ask. If the issue touched the UI, the collages
+   from `pnpm app:capture` are required: take them if they are missing or out of date, and
+   compare them with the screen in `docs/design-system/screens/`.
+5. Update the instruction files (Definition of done, item 6): add to `AGENTS.md`, `docs/` or a
+   skill whatever this issue taught that the next cleared session needs, and remove what is now
+   outdated. Keep the additions short. Check item 4: the feature pages in `docs/features/` and
+   the guides in `docs/guides/` match what this issue changed. Remove the shipped issue's row from `docs/planning.md`.
+6. Commit any remaining changes with Conventional Commits that include the requirement ID.
+   Never use `--no-verify`. No AI attribution in commits or the PR (no `Co-Authored-By: Claude`,
+   no "Generated with Claude Code"): the developer is the only author.
+7. Push the branch. If `gh pr view` finds a draft pull request for it, update its title and body
+   with `gh pr edit` and mark it ready with `gh pr ready`; otherwise open one with `gh pr create`. Follow
    `.github/pull_request_template.md` if it exists; otherwise include: summary, requirement IDs,
    `Closes #<issue>`, how it was tested, screenshots needed for UI changes, and what is out of scope.
-6. Reply with the PR link and remind me to read the diff before squash-merging.
-   **Never merge the pull request yourself.**
+8. Reply with the PR link, list the collage files in `screenshots/` so I can drag them into the
+   PR, and remind me to read the diff before squash-merging.
+   **Never merge the pull request yourself.** Recommend the next issue from `docs/planning.md` and why, or give
+   options if no single one is clearly best. Then tell me the session can be cleared (`/clear`).

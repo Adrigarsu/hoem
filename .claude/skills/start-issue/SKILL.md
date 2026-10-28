@@ -18,11 +18,13 @@ allowed-tools: Bash(gh issue view *) Bash(git status *) Bash(git switch *) Bash(
 
 1. If the working tree has uncommitted changes, stop and tell me. Otherwise switch to `main`
    and pull.
-2. Find the requirement IDs in the issue. Read them in `docs/srs.md` and the related sections
+2. If the issue body has a `Blocked by:` line, run `gh issue view <n> --json number,title,state`
+   for each issue listed. If any is still open, stop and tell me which ones.
+3. Find the requirement IDs in the issue. Read them in `docs/srs.md` and the related sections
    of `docs/architecture.md`.
-3. Create the branch `<type>/<REQ-ID>-<short-name>` from `main`
+4. Create the branch `<type>/<REQ-ID>-<short-name>` from `main`
    (type: feat, fix, refactor, test, docs or chore).
-4. Propose a plan and **wait for my approval before writing code**:
+5. Propose a plan and **wait for my approval before writing code**:
    - files to create or change, grouped by layer (domain, data, service, entry point, UI)
    - the tests you will write first, named with the requirement ID
    - risks, especially for privacy and accessibility
