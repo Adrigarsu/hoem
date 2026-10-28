@@ -117,6 +117,10 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - Conventional Commits with the requirement ID: `feat(shopping): live updates (FR-SHOP-003)`.
 - Never use `--no-verify`, never force-push, never rewrite `main`.
 - Pull requests link their issue (`Closes #12`) and are squash-merged by the developer, never by you.
+- Small commits: whenever a coherent, green step is finished (for example a migration with its
+  policy tests, a domain function with its tests, a service, a screen), stop and tell the developer
+  it is a good moment to commit, with the files to stage and a ready Conventional Commit message.
+  Do not wait until the whole issue is done.
 
 ## Definition of done
 
