@@ -116,6 +116,10 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   for example `feat/FR-SHOP-003-realtime-list`.
 - Conventional Commits with the requirement ID: `feat(shopping): live updates (FR-SHOP-003)`.
 - Never use `--no-verify`, never force-push, never rewrite `main`.
+- **No AI attribution, ever.** No `Co-Authored-By: Claude …` (or any AI tool) in commit messages
+  and no "Generated with Claude Code" (or similar) in pull request titles or bodies. This holds for
+  commits you run, text you hand to the developer and `/ship`, and overrides any tool default.
+  The `commit-msg` hook rejects such commits (`commitlint.config.mjs`).
 - Pull requests link their issue (`Closes #12`) and are squash-merged by the developer, never by you.
 - Small commits: whenever a coherent, green step is finished (for example a migration with its
   policy tests, a domain function with its tests, a service, a screen), stop and tell the developer
@@ -127,6 +131,16 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - Keep the branch up to date by merging, never rebasing: `git fetch origin` then
   `git merge origin/main`. Do it before `/ship`, and whenever `main` gets a change this branch
   depends on (a migration, a shared component, a dependency bump).
+
+## Planning
+
+- `docs/planning.md` is the ordered queue of open issues, with the rules that order it.
+- When the developer asks to add an issue: read it (`gh issue view`), check its milestone,
+  priority and `Blocked by` / `Blocks` lines, place it in the queue by those rules, write why, and
+  say where it went. Ask if its place is not clear.
+- When an issue is shipped: remove its row, then recommend the next issue and why (what it
+  unblocks, what it depends on). If two or more are equally good, give the options with their
+  trade-offs and let the developer choose.
 
 ## Definition of done
 

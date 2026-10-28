@@ -23,12 +23,14 @@ allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log
    If something important is missing, stop and ask.
 5. Update the instruction files (Definition of done, item 6): add to `AGENTS.md`, `docs/` or a
    skill whatever this issue taught that the next cleared session needs, and remove what is now
-   outdated. Keep the additions short.
+   outdated. Keep the additions short. Remove the shipped issue's row from `docs/planning.md`.
 6. Commit any remaining changes with Conventional Commits that include the requirement ID.
-   Never use `--no-verify`.
+   Never use `--no-verify`. No AI attribution in commits or the PR (no `Co-Authored-By: Claude`,
+   no "Generated with Claude Code"): the developer is the only author.
 7. Push the branch. If `gh pr view` finds a draft pull request for it, update its title and body
    with `gh pr edit` and mark it ready with `gh pr ready`; otherwise open one with `gh pr create`. Follow
    `.github/pull_request_template.md` if it exists; otherwise include: summary, requirement IDs,
    `Closes #<issue>`, how it was tested, screenshots needed for UI changes, and what is out of scope.
 8. Reply with the PR link and remind me to read the diff before squash-merging.
-   **Never merge the pull request yourself.** Then tell me the session can be cleared (`/clear`).
+   **Never merge the pull request yourself.** Recommend the next issue from `docs/planning.md` and why, or give
+   options if no single one is clearly best. Then tell me the session can be cleared (`/clear`).
