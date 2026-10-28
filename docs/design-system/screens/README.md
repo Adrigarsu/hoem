@@ -91,6 +91,16 @@ decision wins and the screen's spec says so.
 | Current destination  | Marked with `aria-current="page"`, the tint and a bold label, so it never relies on colour alone.                                                                          |
 | Not built yet        | Planner, Meals, Shopping, Expenses and Notifications show their `h1` and an EmptyState "Coming soon" with "Back to Home".                                                  |
 
+### Decisions taken building the launch screen (#18)
+
+| Topic         | Decision                                                                                                                                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| When it shows | `src/proxy.ts` checks the session before any HTML is sent, and the shell of every page is prerendered, so `loading.tsx` shows only while a signed-in page is still loading, mostly on a slow navigation.       |
+| Size          | It fills the content area, not the full viewport: the sidebar and the tab bar stay visible and usable, so a slow navigation never hides them or leaves focus under a cover.                                    |
+| Element       | A `div` with `aria-busy="true"`, not a `main`: it renders inside the shell's `main`. The visible text is hidden from screen readers; a `status` gets the same text once it is on the page, so it is announced. |
+| Indicator     | `on-brand`, as `splash.md` says; `splash.html` paints it with `surface`. New tokens: `progress-width` (120 px) and `duration-indeterminate` (1200 ms).                                                         |
+| Page title    | Next.js empties the title until the new page's metadata arrives, so the launch screen sets "HØEM" while it is shown (WCAG 2.4.2).                                                                              |
+
 ## Open questions
 
 Each screen is reviewed against the SRS, the architecture and the existing code by the issue that
