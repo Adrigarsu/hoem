@@ -12,6 +12,7 @@ export { ModuleChip } from "./components/module-chip";
 export { moduleIcons, type Module } from "./components/module-icons";
 export { Note } from "./components/note";
 export { PasswordField } from "./components/password-field";
+export { ProgressBar } from "./components/progress-bar";
 export { TextField } from "./components/text-field";
 export { Tile } from "./components/tile";
 export { Tooltip } from "./components/tooltip";

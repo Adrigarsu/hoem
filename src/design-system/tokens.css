@@ -63,12 +63,14 @@
   --icon-lg: 24px;
   --sidebar-width: 264px;
   --column-narrow: 400px;
+  --progress-width: 120px;
   --stroke-hairline: 1px;
   --stroke-focus: 2px;
 
   --duration-fast: 150ms;
   --duration-base: 200ms;
   --duration-slow: 300ms;
+  --duration-indeterminate: 1200ms;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -158,6 +160,7 @@
     --duration-fast: 0.01ms;
     --duration-base: 0.01ms;
     --duration-slow: 0.01ms;
+    --duration-indeterminate: 0.01ms;
   }
 }
 
@@ -225,6 +228,18 @@
   --radius-full: 9999px;
 
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* The indeterminate progress bar: the indicator slides across its track and back. */
+  --animate-progress: progress var(--duration-indeterminate) var(--ease-standard) infinite alternate;
+
+  @keyframes progress {
+    from {
+      translate: -100%;
+    }
+    to {
+      translate: 125%;
+    }
+  }
   --default-transition-duration: var(--duration-fast);
   --default-transition-timing-function: var(--ease-standard);
 }
@@ -286,6 +301,7 @@
   --spacing-icon-lg: var(--icon-lg);
   --spacing-sidebar-width: var(--sidebar-width);
   --spacing-column-narrow: var(--column-narrow);
+  --spacing-progress-width: var(--progress-width);
 }
 
 @utility duration-fast {

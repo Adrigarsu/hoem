@@ -20,7 +20,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Suspense>
         <AvatarFab />
       </Suspense>
-      <main id="main" tabIndex={-1} className="flex-1">
+      <main id="main" tabIndex={-1} className="flex flex-1 flex-col">
         {children}
       </main>
       <TabBar />

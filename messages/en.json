@@ -123,6 +123,9 @@
     },
     "signOut": "Sign out"
   },
+  "Splash": {
+    "loading": "Opening your home…"
+  },
   "Shell": {
     "skipToContent": "Skip to content",
     "mainNavigation": "Main",
