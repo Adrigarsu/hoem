@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { parseEnv as parseEnvFile } from "node:util";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import type { HouseholdType } from "@/features/households";
 import { validateEnv } from "@/lib/validate-env";
 
 // The same rules as src/lib/env.ts, which cannot be imported here: it reads process.env when it
@@ -28,19 +29,46 @@ function localSupabase() {
   return config;
 }
 
-// The households an account can read, through the Data API with that account's own session, so
-// row-level security applies as it does in the app.
-export async function householdsOf(email: string, password: string) {
+// A Data API client signed in as that account, so row-level security applies as it does in the app.
+async function signedInAs(email: string, password: string) {
   const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY } = localSupabase();
   const supabase = createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     auth: { persistSession: false },
   });
-  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-  if (signInError) throw signInError;
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return supabase;
+}
 
+// The households an account can read.
+export async function householdsOf(email: string, password: string) {
+  const supabase = await signedInAs(email, password);
   const { data, error } = await supabase
     .from("households")
     .select("name, type, settings, memberships(role)");
   if (error) throw error;
   return data;
+}
+
+// Creates a household through the same function the app calls and returns the settings the
+// database stored for it.
+export async function createHouseholdAs(
+  email: string,
+  password: string,
+  name: string,
+  type: HouseholdType,
+) {
+  const supabase = await signedInAs(email, password);
+  const { data: id, error } = await supabase.rpc("create_household", {
+    name,
+    household_type: type,
+  });
+  if (error) throw error;
+  const { data, error: readError } = await supabase
+    .from("households")
+    .select("settings")
+    .eq("id", z.uuid().parse(id))
+    .single();
+  if (readError) throw readError;
+  return data.settings;
 }
