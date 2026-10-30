@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(32);
+select plan(37);
 
 -- People: Lucía owns a flat shared with Marcos and Ana; Pilar owns a family with Carla, who is under
 -- 14; Olga and Nico belong to no shared household (Nico is a minor).
@@ -50,6 +50,22 @@ values
   ('00000000-0000-7000-8000-00000000b001', '00000000-0000-7000-8000-000000000503', 'member', null),
   ('00000000-0000-7000-8000-00000000b002', '00000000-0000-7000-8000-000000000504', 'owner', 'parent'),
   ('00000000-0000-7000-8000-00000000b002', '00000000-0000-7000-8000-000000000505', 'member', 'child');
+
+-- The stable code a statement fails with, read from the HINT the app matches.
+create function pg_temp.hint_of(statement text)
+returns text
+language plpgsql
+as $$
+declare
+  code text;
+begin
+  execute statement;
+  return null;
+exception when others then
+  get stacked diagnostics code = pg_exception_hint;
+  return code;
+end;
+$$;
 
 -- Structure and privileges.
 
@@ -401,6 +417,51 @@ select throws_ok(
   '42501', null,
   'NFR-SEC-001 the type cannot be changed by updating the table directly'
 );
+
+-- The codes the app matches (src/features/households/repository.ts).
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub": "00000000-0000-7000-8000-000000000507", "role": "authenticated"}';
+
+select is(
+  pg_temp.hint_of($$ select public.create_household('Nico''s flat', 'shared_flat') $$),
+  'minor_creator',
+  'NFR-LEG-001 a minor creating a household fails with the code minor_creator'
+);
+
+set local request.jwt.claims = '{"sub": "00000000-0000-7000-8000-000000000504", "role": "authenticated"}';
+
+select is(
+  pg_temp.hint_of(
+    $$ select public.change_household_type('00000000-0000-7000-8000-00000000b002', 'shared_flat') $$
+  ),
+  'minor_member',
+  'NFR-LEG-001 leaving family with a minor fails with the code minor_member'
+);
+
+select is(
+  pg_temp.hint_of(
+    $$ select public.change_household_type('00000000-0000-7000-8000-00000000b002', 'single') $$
+  ),
+  'other_members',
+  'FR-ACC-009 "single" with other members fails with the code other_members'
+);
+
+select is(
+  pg_temp.hint_of(
+    $$ select public.change_household_type('00000000-0000-7000-8000-00000000b001', 'single') $$
+  ),
+  'not_owner',
+  'FR-ACC-009 a change by someone who is not an owner fails with the code not_owner'
+);
+
+select is(
+  pg_temp.hint_of($$ select public.create_household('   ', 'other') $$),
+  'invalid_name',
+  'FR-ACC-009 a household without a name fails with the code invalid_name'
+);
+
+reset role;
 
 select * from finish();
 rollback;

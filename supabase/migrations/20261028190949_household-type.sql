@@ -75,6 +75,9 @@ $$;
 
 drop function private.single_household_settings();
 
+-- Every refusal carries a stable code in its HINT, which the app matches instead of the message
+-- (src/features/households/repository.ts), so rewording a message never breaks it.
+
 -- The caller owns the new household; in a family the caller starts as a parent, the only role a
 -- lone founder can have (FR-HH-006). Errors carry a stable message the service maps to its codes.
 create function private.create_household(name text, household_type public.household_type)
@@ -89,15 +92,17 @@ declare
   new_household_id uuid;
 begin
   if caller is null then
-    raise exception 'not authenticated' using errcode = 'insufficient_privilege';
+    raise exception 'not authenticated'
+      using errcode = 'insufficient_privilege', hint = 'not_authenticated';
   end if;
   -- Children under 14 join a family through a parent (NFR-LEG-001), never on their own.
   if exists (select 1 from public.profiles where id = caller and is_minor) then
     raise exception 'people under 14 join a household through a parent'
-      using errcode = 'insufficient_privilege';
+      using errcode = 'insufficient_privilege', hint = 'minor_creator';
   end if;
   if clean_name is null or char_length(clean_name) not between 1 and 60 then
-    raise exception 'a household needs a name of 1 to 60 characters' using errcode = 'check_violation';
+    raise exception 'a household needs a name of 1 to 60 characters'
+      using errcode = 'check_violation', hint = 'invalid_name';
   end if;
 
   insert into public.households (name, type, settings, created_by)
@@ -141,7 +146,8 @@ begin
     select 1 from public.memberships as m
     where m.household_id = current_household.id and m.user_id = caller and m.role = 'owner'
   ) then
-    raise exception 'only an owner changes the household type' using errcode = 'insufficient_privilege';
+    raise exception 'only an owner changes the household type'
+      using errcode = 'insufficient_privilege', hint = 'not_owner';
   end if;
 
   if new_type = current_household.type then
@@ -153,7 +159,7 @@ begin
     where m.household_id = current_household.id and m.user_id <> caller
   ) then
     raise exception 'a single-person household cannot have other members'
-      using errcode = 'check_violation';
+      using errcode = 'check_violation', hint = 'other_members';
   end if;
 
   -- Children under 14 belong only to family households (NFR-LEG-001).
@@ -164,7 +170,7 @@ begin
     where m.household_id = current_household.id and p.is_minor
   ) then
     raise exception 'a household with someone under 14 must stay a family'
-      using errcode = 'check_violation';
+      using errcode = 'check_violation', hint = 'minor_member';
   end if;
 
   if new_type = 'family' then
@@ -173,7 +179,8 @@ begin
       where m.household_id = current_household.id
         and coalesce(family_roles ->> m.user_id::text, '') not in ('parent', 'child', 'relative')
     ) then
-      raise exception 'every member needs a family role' using errcode = 'check_violation';
+      raise exception 'every member needs a family role'
+        using errcode = 'check_violation', hint = 'family_role_missing';
     end if;
     if exists (
       select 1 from jsonb_object_keys(family_roles) as k(user_id)
@@ -183,10 +190,11 @@ begin
       )
     ) then
       raise exception 'family roles were given for people outside the household'
-        using errcode = 'check_violation';
+        using errcode = 'check_violation', hint = 'family_role_outsider';
     end if;
     if not exists (select 1 from jsonb_each_text(family_roles) as r where r.value = 'parent') then
-      raise exception 'a family needs at least one parent' using errcode = 'check_violation';
+      raise exception 'a family needs at least one parent'
+        using errcode = 'check_violation', hint = 'family_needs_parent';
     end if;
   end if;
 
