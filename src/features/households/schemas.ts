@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { formFieldErrors } from "@/lib/validation";
 import {
+  familyRoles,
+  householdTypes,
   mealPlanOptions,
   mealSlots,
   privateExpenseOptions,
@@ -37,3 +40,33 @@ export function householdSettingsSchemaFor(type: HouseholdType) {
     }
   });
 }
+
+// The forms of #19 (FR-ACC-009, FR-HH-007). Messages are keys under Households.validation.
+export type ValidationKey = "required" | "tooLong" | "noParent";
+
+export function fieldErrors(error: z.ZodError | undefined): Record<string, ValidationKey> {
+  return formFieldErrors<ValidationKey>(error);
+}
+
+// The same limits as private.create_household, which checks them again.
+const householdName = z.string().trim().min(1, { error: "required" }).max(60, { error: "tooLong" });
+const householdId = z.uuid();
+
+export const createHouseholdSchema = z.object({
+  name: householdName,
+  type: z.enum(householdTypes, { error: "required" }),
+});
+
+export const renameHouseholdSchema = z.object({ householdId, name: householdName });
+
+// Family roles by member id; read only when the new type is family. Whether every member has one
+// is checked by the service and the database, which know the members.
+export const changeHouseholdTypeSchema = z.object({
+  householdId,
+  type: z.enum(householdTypes, { error: "required" }),
+  familyRoles: z.record(z.uuid(), z.enum(familyRoles)).default({}),
+});
+
+export type CreateHouseholdInput = z.infer<typeof createHouseholdSchema>;
+export type RenameHouseholdInput = z.infer<typeof renameHouseholdSchema>;
+export type ChangeHouseholdTypeInput = z.infer<typeof changeHouseholdTypeSchema>;

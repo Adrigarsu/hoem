@@ -57,6 +57,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - Each feature exposes its Zod schemas in `schemas.ts`; forms and entry points parse with the same
   schema, and the server always parses, whatever the client did (NFR-SEC-002).
 - `src/app/` contains routes only.
+- `cacheComponents` is on: a repository calls `await connection()` before using Supabase (it reads
+  the clock), and a client component that reads the URL (`usePathname`) sits inside `<Suspense>`
+  (see `NavLink`), or routes with a dynamic segment fail to build.
 
 ## Non-negotiables
 
@@ -93,6 +96,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   Practices for custom widgets.
 - Touch targets at least 44×44 px, visible focus, colour never the only signal.
 - No literal user-facing text in components: use next-intl messages (`messages/en.json`).
+- React resets a `<form>` after a successful action: a controlled field that must keep its value
+  (such as the household type select) lives outside the form.
 - **Screenshots for every UI change.** When an issue adds or changes a page, run
   `pnpm app:capture <page> …` (add `--signed-in` for pages behind sign-in; paths without the
   leading slash, `home` is `/`). It writes one collage per page to the ignored `screenshots/`
@@ -107,6 +112,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   `it("FR-EXP-007 hides a private expense from flatmates", …)`.
 - Query components by role and accessible name, not by class names or test IDs.
 - Every RLS change needs a policy test that signs in as each affected role.
+- E2E specs import a feature's pure modules (`domain/`, `schemas.ts`) directly: its `index.ts` also
+  brings `server-only` code, which Playwright cannot load.
 
 ## Code style
 

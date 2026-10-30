@@ -1,6 +1,6 @@
 # Household settings
 
-**Reference:** `household-settings.html` · **Requirements:** FR-ACC-005, FR-ACC-006, FR-ACC-009, FR-HH-001, FR-HH-006 to 010, FR-ONB-006 · **Issues:** M1-06, M1-13, M1-14, M1-17, M1-18 · **Route:** `/settings/household`
+**Reference:** `household-settings.html` · **Requirements:** FR-ACC-005, FR-ACC-006, FR-ACC-009, FR-HH-001, FR-HH-006 to 010, FR-ONB-006 · **Issues:** M1-06, M1-13, M1-14, M1-17, M1-18 · **Route:** `/settings/household` (`/settings/household/[id]` until #20)
 
 ## Layout — mobile (360 px), owner of a shared flat (drawn)
 
@@ -28,7 +28,7 @@ ListRow, Avatar, Badge, IconButton + Menu, Field + Input, Select, Button (second
 
 - **Member (not owner)**: everything is read-only except "Leave household"; the type select is disabled with the text "Only owners can change this".
 - **Family, parent**: family roles shown; parents can invite and change roles; the split row reads "Parents decide" (FR-HH-009).
-- **Changing the type**: warning dialog (FR-HH-007); to Family, assign a family role to every member first.
+- **Changing the type**: warning dialog (FR-HH-007); to Family, assign a family role to every member first. Built in #19: see `household-type.md`.
 - **"Other" household** (FR-HH-010): an extra row "Privacy rules" opens the rules screen.
 - **Last owner leaving**: blocked with "Make someone else owner first."
 - **Pending invitations**: listed under the members with "Pending" Badge and cancel.

@@ -1,4 +1,6 @@
-import { defaultSettings, householdSettingsSchemaFor } from "@/features/households";
+// The pure parts of the feature: its index also brings server-only code, which Playwright cannot load.
+import { defaultSettings } from "@/features/households/domain/household-rules";
+import { householdSettingsSchemaFor } from "@/features/households/schemas";
 import { householdsOf } from "./support/database";
 import { expect, test } from "./support/fixtures";
 import { verifiedAccount } from "./support/accounts";

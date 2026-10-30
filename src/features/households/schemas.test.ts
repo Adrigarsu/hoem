@@ -7,7 +7,14 @@ import {
   householdTypes,
   type HouseholdSettings,
 } from "./domain/household-rules";
-import { householdSettingsSchema, householdSettingsSchemaFor } from "./schemas";
+import {
+  changeHouseholdTypeSchema,
+  createHouseholdSchema,
+  fieldErrors,
+  householdSettingsSchema,
+  householdSettingsSchemaFor,
+  renameHouseholdSchema,
+} from "./schemas";
 
 describe("householdSettingsSchema", () => {
   it.each(["single", "family", "shared_flat", "other"] as const)(
@@ -96,5 +103,67 @@ describe("household types and family roles", () => {
   it("FR-HH-001 match the database enums", () => {
     expect([...householdTypes]).toEqual(householdType.enumValues);
     expect([...familyRoles]).toEqual(familyRole.enumValues);
+  });
+});
+
+const householdId = "00000000-0000-7000-8000-00000000a001";
+const lucia = "00000000-0000-7000-8000-000000000001";
+
+describe("createHouseholdSchema", () => {
+  it("FR-ACC-009 accepts a name and a type, trimming the name", () => {
+    expect(createHouseholdSchema.parse({ name: "  Calle Mayor 5 ", type: "shared_flat" })).toEqual({
+      name: "Calle Mayor 5",
+      type: "shared_flat",
+    });
+  });
+
+  it("FR-ACC-009 needs a name", () => {
+    expect(
+      fieldErrors(createHouseholdSchema.safeParse({ name: "   ", type: "family" }).error),
+    ).toEqual({ name: "required" });
+  });
+
+  it("FR-ACC-009 limits the name to 60 characters", () => {
+    expect(
+      fieldErrors(createHouseholdSchema.safeParse({ name: "a".repeat(61), type: "family" }).error),
+    ).toEqual({ name: "tooLong" });
+  });
+
+  it("FR-ACC-009 needs one of the four types", () => {
+    expect(
+      fieldErrors(createHouseholdSchema.safeParse({ name: "Home", type: "castle" }).error),
+    ).toEqual({ type: "required" });
+  });
+});
+
+describe("renameHouseholdSchema", () => {
+  it("FR-ACC-009 names the household by its id", () => {
+    expect(renameHouseholdSchema.safeParse({ householdId: "1", name: "Home" }).success).toBe(false);
+  });
+});
+
+describe("changeHouseholdTypeSchema", () => {
+  it("FR-HH-007 accepts the family roles by member id", () => {
+    expect(
+      changeHouseholdTypeSchema.parse({
+        householdId,
+        type: "family",
+        familyRoles: { [lucia]: "parent" },
+      }),
+    ).toEqual({ householdId, type: "family", familyRoles: { [lucia]: "parent" } });
+  });
+
+  it("FR-HH-007 needs no family roles for the other types", () => {
+    expect(changeHouseholdTypeSchema.parse({ householdId, type: "other" }).familyRoles).toEqual({});
+  });
+
+  it("FR-HH-007 refuses a family role that does not exist", () => {
+    expect(
+      changeHouseholdTypeSchema.safeParse({
+        householdId,
+        type: "family",
+        familyRoles: { [lucia]: "boss" },
+      }).success,
+    ).toBe(false);
   });
 });

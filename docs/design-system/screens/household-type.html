@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Household type · HØEM screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="prototype-household.css">
+</head>
+<body>
+<div class="doc">
+<header>
+<h1>Household settings: name and type</h1>
+<p class="lede">The "Details" section of <code>household-settings</code> and the type-change flow (FR-ACC-009, FR-HH-007, NFR-LEG-001). Prototype for #19, pending approval. Members (#26) and "How the household works" (#30, #31) are added later.</p>
+<p class="meta">Flow: choose a type → warning → (Family only) family roles → saved. Every dialog is a native <code>&lt;dialog&gt;</code>; focus returns to the type select when it closes.</p>
+</header>
+
+<section class="group">
+<h2>1 · Owner</h2>
+<p>Name and type are edited separately: "Save name" saves the name; choosing another type opens the warning at once, so the type never changes silently.</p>
+<div class="row" data-themes>
+<template>
+<div class="device device--mobile">
+  <main class="page">
+    <a class="back" href="#">‹ Profile</a>
+    <div class="intro">
+      <h1 class="title">Calle Mayor 5</h1>
+      <p class="sub">Household settings · you're the owner</p>
+    </div>
+    <section class="section">
+      <h2>Details</h2>
+      <div class="field">
+        <label for="a1">Name</label>
+        <input id="a1" class="input" value="Calle Mayor 5">
+      </div>
+      <div class="actions"><a class="btn btn--secondary btn--sm" href="#">Save name</a></div>
+      <div class="field">
+        <label for="a2">Type</label>
+        <select id="a2" class="select" aria-describedby="a3"><option>Shared flat</option></select>
+        <p id="a3" class="help">Changing the type never reveals existing private data.</p>
+      </div>
+    </section>
+  </main>
+  <nav class="tabbar"><span>Home</span><span>Meals</span><span>Shopping</span><span>Expenses</span><span>Planner</span></nav>
+</div>
+</template>
+</div>
+</section>
+
+<section class="group">
+<h2>2 · Member (not owner)</h2>
+<p>Read-only. The disabled controls say why in text, not only by their colour.</p>
+<div class="row" data-themes>
+<template>
+<div class="device device--mobile">
+  <main class="page">
+    <a class="back" href="#">‹ Profile</a>
+    <div class="intro">
+      <h1 class="title">Calle Mayor 5</h1>
+      <p class="sub">Household settings · you're a member</p>
+    </div>
+    <section class="section">
+      <h2>Details</h2>
+      <div class="field">
+        <label for="b1">Name</label>
+        <input id="b1" class="input" value="Calle Mayor 5" disabled aria-describedby="b3">
+      </div>
+      <div class="field">
+        <label for="b2">Type</label>
+        <select id="b2" class="select" disabled aria-describedby="b3"><option>Shared flat</option></select>
+        <p id="b3" class="help">Only owners can change this.</p>
+      </div>
+    </section>
+  </main>
+  <nav class="tabbar"><span>Home</span><span>Meals</span><span>Shopping</span><span>Expenses</span><span>Planner</span></nav>
+</div>
+</template>
+</div>
+</section>
+
+<section class="group">
+<h2>3 · Warning before changing the type (FR-HH-007)</h2>
+<p>Opens as soon as the owner picks another type. "Keep Shared flat" closes it and puts the select back. For Family the primary button continues to the roles; for the other types it saves.</p>
+<div class="row" data-themes>
+<template>
+<div class="device device--mobile">
+  <main class="page">
+    <a class="back" href="#">‹ Profile</a>
+    <div class="intro"><h1 class="title">Calle Mayor 5</h1><p class="sub">Household settings · you're the owner</p></div>
+  </main>
+  <div class="scrim">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="c1">
+      <h2 id="c1">Change to Family?</h2>
+      <p>The new rules only apply to things created from now on. Everything already saved keeps who can see it.</p>
+      <ul>
+        <li>Parents will see the private expenses children add from now on.</li>
+        <li>The family shares one meal plan.</li>
+        <li>Only parents invite people and set roles.</li>
+      </ul>
+      <div class="actions actions--stack">
+        <a class="btn btn--secondary" href="#">Keep Shared flat</a>
+        <a class="btn btn--primary" href="#">Continue</a>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+</div>
+</section>
+
+<section class="group">
+<h2>4 · Family roles (only when the new type is Family)</h2>
+<p>One row per member, without names until members can see each other's (#26): "You" and "Member 2, 3…" in the order they joined. You are pre-set as a parent and can change it; everyone else needs a role before "Change to Family" saves, and nothing is pre-chosen for them, so nobody becomes a parent by accident. Being an owner and being a parent are separate: an owner can be a relative, a member can be a parent. A family needs at least one parent.</p>
+<div class="row" data-themes>
+<template>
+<div class="device device--mobile">
+  <main class="page"><div class="intro"><h1 class="title">Calle Mayor 5</h1></div></main>
+  <div class="scrim">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="d1">
+      <h2 id="d1">Who is who in the family?</h2>
+      <p>Parents manage the family and see children's private expenses from now on.</p>
+      <ul class="people">
+        <li class="person">
+          <label class="name" for="d0">You · Owner</label>
+          <select id="d0" class="select"><option>Parent</option></select>
+        </li>
+        <li class="person">
+          <label class="name" for="d2">Member 2 · Member</label>
+          <select id="d2" class="select"><option>Child</option></select>
+        </li>
+        <li class="person">
+          <label class="name" for="d3">Member 3 · Member</label>
+          <select id="d3" class="select"><option>Choose a role</option></select>
+        </li>
+      </ul>
+      <div class="actions actions--stack">
+        <a class="btn btn--secondary" href="#">Back</a>
+        <a class="btn btn--primary" href="#">Change to Family</a>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+</div>
+</section>
+
+<section class="group">
+<h2>4b · Family roles: a member without a role</h2>
+<p>Nothing is saved. Focus moves to the first select without a role; the error is linked to it. Without any parent, the error "A family needs at least one parent" is shown above the buttons.</p>
+<div class="row" data-themes>
+<template>
+<div class="device device--mobile">
+  <main class="page"><div class="intro"><h1 class="title">Calle Mayor 5</h1></div></main>
+  <div class="scrim">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="e1">
+      <h2 id="e1">Who is who in the family?</h2>
+      <p>Parents manage the family and see children's private expenses from now on.</p>
+      <ul class="people">
+        <li class="person">
+          <label class="name" for="e0">You · Owner</label>
+          <select id="e0" class="select"><option>Parent</option></select>
+        </li>
+        <li class="person">
+          <label class="name" for="e2">Member 2 · Member</label>
+          <select id="e2" class="select"><option>Child</option></select>
+        </li>
+        <li class="person">
+          <label class="name" for="e3">Member 3 · Member</label>
+          <select id="e3" class="select select--error" aria-invalid="true" aria-describedby="e4"><option>Choose a role</option></select>
+          <p id="e4" class="error"><span aria-hidden="true">⚠</span> Choose a role for Member 3</p>
+        </li>
+      </ul>
+      <div class="actions actions--stack">
+        <a class="btn btn--secondary" href="#">Back</a>
+        <a class="btn btn--primary" href="#">Change to Family</a>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+</div>
+</section>
+
+<section class="group">
+<h2>5 · "Just me" with other members</h2>
+<p>Shown instead of the warning. "Just me" is for one person, so the type cannot change while others belong. Once #26 builds the Members section, a "Go to members" action is added.</p>
+<div class="row" data-themes>
+<template>
+<div class="device device--mobile">
+  <main class="page"><div class="intro"><h1 class="title">Calle Mayor 5</h1><p class="sub">Household settings · you're the owner</p></div></main>
+  <div class="scrim">
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="f1" aria-describedby="f2">
+      <h2 id="f1">"Just me" is for one person</h2>
+      <p id="f2">Calle Mayor 5 has 2 other members. Remove them first, then change the type.</p>
+      <div class="actions actions--stack">
+        <a class="btn btn--primary" href="#">Keep Shared flat</a>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+</div>
+</section>
+
+<section class="group">
+<h2>6 · A family with a child under 14 (NFR-LEG-001)</h2>
+<p>Shown instead of the warning when the owner picks any type other than Family and a member is a minor. No names: the owner already knows who it is, and the dialog does not reveal ages.</p>
+<div class="row" data-themes>
+<template>
+<div class="device device--mobile">
+  <main class="page"><div class="intro"><h1 class="title">García family</h1><p class="sub">Household settings · you're the owner</p></div></main>
+  <div class="scrim">
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="g1" aria-describedby="g2">
+      <h2 id="g1">This household must stay a family</h2>
+      <p id="g2">Someone in it is under 14, and children under 14 can only belong to a family household.</p>
+      <div class="actions actions--stack">
+        <a class="btn btn--primary" href="#">Keep Family</a>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+</div>
+</section>
+
+<section class="group">
+<h2>7 · Saved</h2>
+<p>The select shows the new type and a success message under it is announced politely. No undo: the change is confirmed in the dialog, and changing back is another confirmed change.</p>
+<div class="row" data-themes>
+<template>
+<div class="device device--mobile">
+  <main class="page">
+    <a class="back" href="#">‹ Profile</a>
+    <div class="intro"><h1 class="title">Calle Mayor 5</h1><p class="sub">Household settings · you're the owner</p></div>
+    <section class="section">
+      <h2>Details</h2>
+      <div class="field"><label for="h1">Name</label><input id="h1" class="input" value="Calle Mayor 5"></div>
+      <div class="actions"><a class="btn btn--secondary btn--sm" href="#">Save name</a></div>
+      <div class="field">
+        <label for="h2">Type</label>
+        <select id="h2" class="select" aria-describedby="h3"><option>Family</option></select>
+        <p id="h3" class="help">Changing the type never reveals existing private data.</p>
+      </div>
+      <div class="notice notice--success" role="status">Calle Mayor 5 is now a family household.</div>
+    </section>
+  </main>
+  
+  <nav class="tabbar"><span>Home</span><span>Meals</span><span>Shopping</span><span>Expenses</span><span>Planner</span></nav>
+</div>
+</template>
+</div>
+</section>
+
+<section class="group">
+<h2>Desktop (1440): content column of the shell, dialogs centred</h2>
+<p>Desktop is not designed for household settings: the content column (max 720 px) of the desktop shell, sections as Cards. Dialogs are centred modals, at most 440 px wide (<code>dialog-width</code>), on every width.</p>
+<div class="stack" data-themes>
+<template>
+<div class="device device--desktop">
+  <aside class="sidebar"><span class="hh">Calle Mayor 5</span><span>Home</span><span>Meals</span><span>Shopping</span><span>Expenses</span><span>Planner</span></aside>
+  <main class="page page--column">
+    <a class="back" href="#">‹ Profile</a>
+    <div class="intro"><h1 class="title">Calle Mayor 5</h1><p class="sub">Household settings · you're the owner</p></div>
+    <section class="section">
+      <h2>Details</h2>
+      <div class="field"><label for="i1">Name</label><input id="i1" class="input" value="Calle Mayor 5"></div>
+      <div class="actions"><a class="btn btn--secondary btn--sm" href="#">Save name</a></div>
+      <div class="field"><label for="i2">Type</label><select id="i2" class="select"><option>Shared flat</option></select><p class="help">Changing the type never reveals existing private data.</p></div>
+    </section>
+  </main>
+  <div class="scrim">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="i3">
+      <h2 id="i3">Change to Family?</h2>
+      <p>The new rules only apply to things created from now on. Everything already saved keeps who can see it.</p>
+      <ul>
+        <li>Parents will see the private expenses children add from now on.</li>
+        <li>The family shares one meal plan.</li>
+        <li>Only parents invite people and set roles.</li>
+      </ul>
+      <div class="actions"><a class="btn btn--secondary" href="#">Keep Shared flat</a><a class="btn btn--primary" href="#">Continue</a></div>
+    </div>
+  </div>
+</div>
+</template>
+</div>
+</section>
+</div>
+<script src="prototype-household.js"></script>
+</body>
+</html>
