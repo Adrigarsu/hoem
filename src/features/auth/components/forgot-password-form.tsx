@@ -4,11 +4,10 @@ import { Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useRef, useState, type FormEvent } from "react";
-import { Button, FormMessage, IconTile, Note, TextField } from "@/design-system";
+import { Button, FormMessage, IconTile, Note, TextField, useFormFocus } from "@/design-system";
 import { requestPasswordResetAction, type AuthFormState } from "../actions";
 import { fieldErrors, forgotPasswordSchema, type ValidationKey } from "../schemas";
 import { BackToSignIn } from "./back-to-sign-in";
-import { useFormFocus } from "./use-form-focus";
 
 const initialState: AuthFormState = { status: "idle" };
 

@@ -2,11 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { useActionState, useState, type FormEvent } from "react";
-import { Button, FormMessage, PasswordField, TextField } from "@/design-system";
+import { Button, FormMessage, PasswordField, TextField, useFormFocus } from "@/design-system";
 import { signUpAction, type AuthFormState } from "../actions";
 import { fieldErrors, passwordMinLength, signUpSchema, type ValidationKey } from "../schemas";
 import { BackToSignIn } from "./back-to-sign-in";
-import { useFormFocus } from "./use-form-focus";
 
 const initialState: AuthFormState = { status: "idle" };
 

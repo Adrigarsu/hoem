@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useRef, useState, type FormEvent } from "react";
-import { Button, buttonClassName, FormMessage, PasswordField } from "@/design-system";
+import { Button, buttonClassName, FormMessage, PasswordField, useFormFocus } from "@/design-system";
 import { resetPasswordAction, type AuthFormState } from "../actions";
 import {
   fieldErrors,
@@ -13,7 +13,6 @@ import {
   type ValidationKey,
 } from "../schemas";
 import { BackToSignIn } from "./back-to-sign-in";
-import { useFormFocus } from "./use-form-focus";
 
 const initialState: AuthFormState = { status: "idle" };
 

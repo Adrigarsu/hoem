@@ -63,6 +63,9 @@
   --icon-lg: 24px;
   --sidebar-width: 264px;
   --column-narrow: 400px;
+  --column: 480px;
+  --content-width: 720px;
+  --dialog-width: 440px;
   --progress-width: 120px;
   --stroke-hairline: 1px;
   --stroke-focus: 2px;
@@ -301,6 +304,9 @@
   --spacing-icon-lg: var(--icon-lg);
   --spacing-sidebar-width: var(--sidebar-width);
   --spacing-column-narrow: var(--column-narrow);
+  --spacing-column: var(--column);
+  --spacing-content-width: var(--content-width);
+  --spacing-dialog-width: var(--dialog-width);
   --spacing-progress-width: var(--progress-width);
 }
 
