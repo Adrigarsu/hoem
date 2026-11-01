@@ -72,7 +72,7 @@ select is_empty(
     select 1 from pg_proc as p
     where p.pronamespace = 'private'::regnamespace
       and p.proname in (
-        'personal_household_name', 'single_household_settings', 'create_personal_household'
+        'personal_household_name', 'default_household_settings', 'create_personal_household'
       )
       and (
         has_function_privilege('authenticated', p.oid, 'execute')
