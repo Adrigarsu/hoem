@@ -143,5 +143,103 @@
       "backHome": "Back to Home"
     },
     "notifications": "Notifications"
+  },
+  "Households": {
+    "types": {
+      "single": "Just me",
+      "family": "Family",
+      "shared_flat": "Shared flat",
+      "other": "Something else"
+    },
+    "typeDescriptions": {
+      "single": "A household of one",
+      "family": "Parents, children and relatives",
+      "shared_flat": "Flatmates who share some costs",
+      "other": "Choose your own rules later"
+    },
+    "roles": {
+      "owner": "Owner",
+      "member": "Member"
+    },
+    "familyRoles": {
+      "parent": "Parent",
+      "child": "Child",
+      "relative": "Relative"
+    },
+    "validation": {
+      "required": "Give the household a name",
+      "tooLong": "Use at most 60 characters",
+      "typeRequired": "Choose who lives there",
+      "roleRequired": "Choose a role for {member}",
+      "noParent": "A family needs at least one parent"
+    },
+    "new": {
+      "title": "New household",
+      "lede": "The type decides who can see private expenses and how costs are shared. You can change it later.",
+      "back": "Back",
+      "name": "Household name",
+      "who": "Who lives there?",
+      "cancel": "Cancel",
+      "create": "Create household",
+      "creating": "Creating…",
+      "minorCreator": "People under 14 join a household through a parent, who adds them to a family."
+    },
+    "settings": {
+      "title": "Household settings",
+      "back": "Profile",
+      "youAreOwner": "Household settings · you're the owner",
+      "youAreMember": "Household settings · you're a member",
+      "created": "{name} is ready. You're its owner.",
+      "details": "Details",
+      "name": "Name",
+      "saveName": "Save name",
+      "savingName": "Saving…",
+      "nameSaved": "Name saved.",
+      "type": "Type",
+      "typeHelp": "Changing the type never reveals existing private data.",
+      "onlyOwners": "Only owners can change this.",
+      "typeSaved": "{type, select, single {{name} is now just for you.} family {{name} is now a family household.} shared_flat {{name} is now a shared flat.} other {{name} now follows its own rules.}}"
+    },
+    "typeChange": {
+      "title": "Change to {type}?",
+      "lede": "The new rules only apply to things created from now on. Everything already saved keeps who can see it.",
+      "keep": "Keep {type}",
+      "continue": "Continue",
+      "change": "Change type",
+      "changing": "Changing…",
+      "consequences": {
+        "single": ["Only you belong to it.", "Nothing is shared or split."],
+        "family": [
+          "Parents will see the private expenses children add from now on.",
+          "The family shares one meal plan.",
+          "Only parents invite people and set roles."
+        ],
+        "shared_flat": [
+          "Private expenses are seen only by whoever adds them.",
+          "Everyone can keep private shopping lists and meal plans.",
+          "Owners invite people and set roles."
+        ],
+        "other": [
+          "It starts with the shared-flat rules; you can adjust them later.",
+          "Private expenses are seen only by whoever adds them."
+        ]
+      },
+      "rolesTitle": "Who is who in the family?",
+      "rolesLede": "Parents manage the family and see children's private expenses from now on.",
+      "you": "You",
+      "member": "Member {n}",
+      "chooseRole": "Choose a role",
+      "back": "Back",
+      "changeToFamily": "Change to Family",
+      "otherMembersTitle": "\"Just me\" is for one person",
+      "otherMembers": "{name} has {count, plural, one {# other member} other {# other members}}. Remove them first, then change the type.",
+      "minorTitle": "This household must stay a family",
+      "minor": "Someone in it is under 14, and children under 14 can only belong to a family household.",
+      "keepFamily": "Keep Family"
+    },
+    "list": {
+      "title": "Your households",
+      "create": "Create a new household"
+    }
   }
 }

@@ -52,9 +52,16 @@ async function openPlannerWhileItLoads(page: Page) {
       return route.continue();
     },
   );
+  // The router shows the loading boundary only once it knows the route tree, so the click waits
+  // for that prefetch too; on a busy machine it can land after the content prefetch has failed.
+  const isPlannerTreePrefetch = (request: Request) =>
+    new URL(request.url()).pathname === "/planner" &&
+    Boolean(segment(request)) &&
+    !/__PAGE__$/.test(segment(request) ?? "");
   const contentPrefetchFailed = page.waitForEvent("requestfailed", isPlannerContentPrefetch);
+  const treePrefetched = page.waitForEvent("requestfinished", isPlannerTreePrefetch);
   await page.goto("/");
-  await contentPrefetchFailed;
+  await Promise.all([contentPrefetchFailed, treePrefetched]);
   await page.getByRole("link", { name: "Open planner" }).click();
   return release;
 }

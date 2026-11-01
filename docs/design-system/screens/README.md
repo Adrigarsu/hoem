@@ -35,6 +35,8 @@ The HTML uses the token names from `docs/design-system/tokens.json` as CSS custo
 | 20  | Add expense             | `add-expense`        | sheet / dialog                  | ✓ + child view            | dialog          | M4        |
 | 21  | Profile and settings    | `profile`            | `/settings`                     | ✓                         | ✓               | M1a       |
 | 22  | Household settings      | `household-settings` | `/settings/household`           | ✓                         | not designed    | M1a / M1b |
+| 23  | New household           | `new-household`      | `/households/new`               | ✓ + error                 | centred column  | M1a       |
+| 24  | Household type          | `household-type`     | part of household settings      | ✓ + dialogs               | ✓ (derived)     | M1a       |
 
 "Not designed" on desktop: use the mobile layout inside the desktop shell (sidebar + content column, max width 720 px) until a desktop design exists. "Derived" and "new" screens were built for this hand-off from existing pieces; review them before building.
 
@@ -100,6 +102,18 @@ decision wins and the screen's spec says so.
 | Element       | A `div` with `aria-busy="true"`, not a `main`: it renders inside the shell's `main`. The visible text is hidden from screen readers; a `status` gets the same text once it is on the page, so it is announced. |
 | Indicator     | `on-brand`, as `splash.md` says; `splash.html` paints it with `surface`. New tokens: `progress-width` (120 px) and `duration-indeterminate` (1200 ms).                                                         |
 | Page title    | Next.js empties the title until the new page's metadata arrives, so the launch screen sets "HØEM" while it is shown (WCAG 2.4.2).                                                                              |
+
+### Decisions taken building the household type (#19)
+
+| Topic            | Decision                                                                                                                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create           | Variant A of `new-household`: a standalone form without progress bar, because the setup guide does not exist yet. #32 may make creating step 1 of the guide (variant B), so name and type are not asked twice. |
+| Route            | `/settings/household/[id]` until #20 adds the active household. `/settings` lists the user's households and "Create a new household" until #21 builds the profile menu.                                        |
+| Owner and parent | Separate: an owner can be a relative, a member can be a parent. The owner changing the type is pre-set as a parent; a family needs at least one parent.                                                        |
+| Member names     | Members cannot read each other's profiles yet, so the roles dialog says "You" and "Member 2, 3…" in joining order; names come with #26.                                                                        |
+| Dialogs          | Centred native `<dialog>`s on every width (the design system's Dialog), not bottom sheets. New tokens: `column` (480 px), `content-width` (720 px), `dialog-width` (440 px).                                   |
+| Saved            | A success message under the select instead of a toast; the app has no Toast yet.                                                                                                                               |
+| Under 14         | Only the database knows ages, so the refusal appears after "Change type", not before.                                                                                                                          |
 
 ## Open questions
 

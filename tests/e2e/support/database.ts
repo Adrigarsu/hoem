@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { parseEnv as parseEnvFile } from "node:util";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import type { HouseholdType } from "@/features/households";
+import type { HouseholdType } from "@/features/households/domain/household-rules";
 import { validateEnv } from "@/lib/validate-env";
 
 // The same rules as src/lib/env.ts, which cannot be imported here: it reads process.env when it

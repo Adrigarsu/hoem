@@ -4,11 +4,10 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useActionState, useId, useState, type FormEvent, type ReactNode } from "react";
-import { Button, FormMessage, Logo, PasswordField, TextField } from "@/design-system";
+import { Button, FormMessage, Logo, PasswordField, TextField, useFormFocus } from "@/design-system";
 import { resendFromSignInAction, signInAction, type AuthFormState } from "../actions";
 import type { AuthErrorKey } from "../domain/auth-errors";
 import { fieldErrors, signInSchema, type ValidationKey } from "../schemas";
-import { useFormFocus } from "./use-form-focus";
 
 const initialState: AuthFormState = { status: "idle" };
 
