@@ -1,10 +1,10 @@
 import "server-only";
 import { connection } from "next/server";
 import { z } from "zod";
-import { ForbiddenError } from "@/lib/errors";
 import { createClient } from "@/lib/supabase/server";
 import { familyRoles, householdTypes } from "./domain/household-rules";
-import { TypeChangeRefusedError, type HouseholdGateway, type TypeChangeRefusal } from "./service";
+import { databaseError } from "./database-error";
+import type { HouseholdGateway } from "./service";
 
 const householdRow = z.object({ id: z.uuid(), name: z.string(), type: z.enum(householdTypes) });
 
@@ -15,24 +15,6 @@ const memberRow = z
     family_role: z.enum(familyRoles).nullable(),
   })
   .transform((row) => ({ userId: row.user_id, role: row.role, familyRole: row.family_role }));
-
-// The messages private.change_household_type raises for a type the household cannot take
-// (supabase/migrations/20261028190949_household-type.sql).
-const refusals: Record<string, TypeChangeRefusal> = {
-  "a single-person household cannot have other members": "otherMembers",
-  "a household with someone under 14 must stay a family": "minor",
-};
-
-type PostgrestError = { code: string; message: string };
-
-// Known refusals become typed errors the service and the forms understand; anything else is a
-// fault and is thrown as it is, to be logged, never shown.
-function databaseError(error: PostgrestError): Error {
-  const refusal = refusals[error.message];
-  if (refusal) return new TypeChangeRefusedError(refusal);
-  if (error.code === "42501") return new ForbiddenError(error.message);
-  return Object.assign(new Error(error.message), { code: error.code });
-}
 
 export async function householdGateway(): Promise<HouseholdGateway> {
   // Per request only: Supabase reads the clock to check the session, which a prerender refuses.

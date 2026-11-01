@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { ForbiddenError, ValidationError } from "@/lib/errors";
+import { ValidationError } from "@/lib/errors";
 import { householdSettingsPath } from "./paths";
 import { householdGateway } from "./repository";
 import {
@@ -55,8 +55,7 @@ export async function createHouseholdAction(
   try {
     id = await households.createHousehold(await householdGateway(), parsed.data);
   } catch (error) {
-    // The database refuses people under 14 (NFR-LEG-001); nothing else is forbidden here.
-    if (error instanceof ForbiddenError) {
+    if (error instanceof households.MinorCannotCreateError) {
       return { status: "refused", refusal: "minorCreator", values };
     }
     throw error;

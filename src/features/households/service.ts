@@ -44,6 +44,14 @@ export class TypeChangeRefusedError extends ConflictError {
   }
 }
 
+// People under 14 join a family through a parent and never create a household (NFR-LEG-001).
+// Only the database knows ages, so the gateway throws it.
+export class MinorCannotCreateError extends ForbiddenError {
+  constructor() {
+    super("People under 14 cannot create a household");
+  }
+}
+
 export type HouseholdSettingsView = Household & {
   isOwner: boolean;
   members: (Member & { isYou: boolean })[];
