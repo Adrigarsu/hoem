@@ -6,11 +6,13 @@ import {
   ValidationError,
 } from "@/lib/errors";
 import {
+  activeHousehold,
   changeHouseholdType,
   createHousehold,
   householdSettings,
   myHouseholds,
   renameHousehold,
+  switchHousehold,
   TypeChangeRefusedError,
   type HouseholdGateway,
   type Member,
@@ -21,6 +23,13 @@ const lucia = "00000000-0000-7000-8000-000000000001";
 const marcos = "00000000-0000-7000-8000-000000000002";
 
 const flat = { id: householdId, name: "Calle Mayor 5", type: "shared_flat" as const };
+const home = {
+  id: "00000000-0000-7000-8000-00000000a002",
+  name: "My home",
+  type: "single" as const,
+  memberCount: 1,
+};
+const flatSummary = { ...flat, memberCount: 2 };
 const flatmates: Member[] = [
   { userId: lucia, role: "owner", familyRole: null },
   { userId: marcos, role: "member", familyRole: null },
@@ -30,11 +39,13 @@ function gateway(overrides: Partial<HouseholdGateway> = {}): HouseholdGateway {
   return {
     signedInUserId: vi.fn(async () => lucia),
     createHousehold: vi.fn(async () => householdId),
-    myHouseholds: vi.fn(async () => [flat]),
+    myHouseholds: vi.fn(async () => [flatSummary]),
     householdById: vi.fn(async () => flat),
     membersOf: vi.fn(async () => flatmates),
     renameHousehold: vi.fn(async () => {}),
     changeHouseholdType: vi.fn(async () => {}),
+    preferredHouseholdId: vi.fn(async () => null),
+    rememberHousehold: vi.fn(async () => {}),
     ...overrides,
   };
 }
@@ -61,13 +72,64 @@ describe("createHousehold", () => {
 
 describe("myHouseholds", () => {
   it("FR-ACC-004 lists the households the user belongs to", async () => {
-    expect(await myHouseholds(gateway())).toEqual([flat]);
+    expect(await myHouseholds(gateway())).toEqual([flatSummary]);
   });
 
   it("FR-ACC-004 refuses without a session", async () => {
     await expect(
       myHouseholds(gateway({ signedInUserId: vi.fn(async () => null) })),
     ).rejects.toBeInstanceOf(NotAuthenticatedError);
+  });
+});
+
+describe("activeHousehold", () => {
+  it("FR-ACC-004 lists the user's households and marks the one they chose", async () => {
+    const households = gateway({
+      myHouseholds: vi.fn(async () => [home, flatSummary]),
+      preferredHouseholdId: vi.fn(async () => flat.id),
+    });
+    expect(await activeHousehold(households)).toEqual({
+      active: flatSummary,
+      households: [home, flatSummary],
+    });
+  });
+
+  it("FR-ACC-004 falls back to the first household after the user left the chosen one", async () => {
+    const households = gateway({
+      myHouseholds: vi.fn(async () => [home]),
+      preferredHouseholdId: vi.fn(async () => flat.id),
+    });
+    expect(await activeHousehold(households)).toEqual({ active: home, households: [home] });
+  });
+
+  it("FR-ACC-004 refuses without a session", async () => {
+    await expect(
+      activeHousehold(gateway({ signedInUserId: vi.fn(async () => null) })),
+    ).rejects.toBeInstanceOf(NotAuthenticatedError);
+  });
+});
+
+describe("switchHousehold", () => {
+  it("FR-ACC-004 remembers a household the user belongs to as the active one", async () => {
+    const households = gateway();
+    await switchHousehold(households, { householdId });
+    expect(households.rememberHousehold).toHaveBeenCalledWith(householdId);
+  });
+
+  it("FR-ACC-004 refuses a household the user does not belong to", async () => {
+    const households = gateway({ householdById: vi.fn(async () => null) });
+    await expect(switchHousehold(households, { householdId })).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+    expect(households.rememberHousehold).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-004 refuses without a session", async () => {
+    const households = gateway({ signedInUserId: vi.fn(async () => null) });
+    await expect(switchHousehold(households, { householdId })).rejects.toBeInstanceOf(
+      NotAuthenticatedError,
+    );
+    expect(households.rememberHousehold).not.toHaveBeenCalled();
   });
 });
 

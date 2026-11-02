@@ -66,7 +66,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - **Authorization twice:** services check membership and role, and Postgres RLS enforces the
   same rules with the user's own JWT. Never use the service-role key while handling a request.
   Never disable RLS.
-- Every query on household data is scoped by `household_id`.
+- Every query on household data is scoped by `household_id`. The active household comes from
+  `currentHousehold()` (`@/features/households`), never straight from the `hoem-household`
+  cookie (ADR-017).
 - Visibility of private records is decided at write time (`visible_to_parents`, set by a
   trigger). Never use the current household type to decide visibility.
 - Money is integer cents (`amountCents: number` in TS, `bigint` in SQL). Never floats.

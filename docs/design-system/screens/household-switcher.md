@@ -33,3 +33,5 @@ Sheet (mobile) / Menu (desktop), ListRow, IconTile, Button.
 ## Accessibility
 
 Focus moves into the sheet and is trapped; Escape and the close button return focus to the household button. Arrow keys move between rows on desktop.
+
+**Built (#20):** the WAI-ARIA menu button at every width instead of a modal sheet on phones; the active row is a `menuitemradio` with `aria-checked`, and the chosen row reads "Switching…" instead of a spinner. See the decisions in `README.md`.

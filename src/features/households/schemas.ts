@@ -67,6 +67,10 @@ export const changeHouseholdTypeSchema = z.object({
   familyRoles: z.record(z.uuid(), z.enum(familyRoles)).default({}),
 });
 
+// The household chosen in the switcher (FR-ACC-004).
+export const switchHouseholdSchema = z.object({ householdId });
+
 export type CreateHouseholdInput = z.infer<typeof createHouseholdSchema>;
 export type RenameHouseholdInput = z.infer<typeof renameHouseholdSchema>;
 export type ChangeHouseholdTypeInput = z.infer<typeof changeHouseholdTypeSchema>;
+export type SwitchHouseholdInput = z.infer<typeof switchHouseholdSchema>;

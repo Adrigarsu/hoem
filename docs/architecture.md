@@ -57,7 +57,7 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 ## 3. Architecture decisions
 
-Sixteen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
+Seventeen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
 
 | ADR                                                   | Decision                                                                              | Status   |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------- | -------- |
@@ -77,6 +77,7 @@ Sixteen decisions shape the system. Each lives as its own file in `docs/adr/`, w
 | [014](adr/0014-migration-pipeline.md)                 | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
 | [015](adr/0015-locale-through-an-internal-rewrite.md) | Locale chosen in the proxy and rewritten to a hidden `[locale]` segment               | Proposed |
 | [016](adr/0016-session-only-in-httponly-cookies.md)   | Session only in HttpOnly cookies; no Supabase browser client                          | Proposed |
+| [017](adr/0017-active-household-in-a-cookie.md)       | Active household in an HttpOnly cookie, checked against memberships on every request  | Proposed |
 
 ## 4. Code organisation and conventions
 

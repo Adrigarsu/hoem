@@ -2,11 +2,20 @@ import "server-only";
 import { connection } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { chosenHousehold, rememberActiveHousehold } from "./active-household-cookie";
 import { familyRoles, householdTypes } from "./domain/household-rules";
 import { databaseError } from "./database-error";
 import type { HouseholdGateway } from "./service";
 
 const householdRow = z.object({ id: z.uuid(), name: z.string(), type: z.enum(householdTypes) });
+
+// PostgREST returns an embedded count as a one-element array.
+const householdSummaryRow = householdRow
+  .extend({ memberships: z.tuple([z.object({ count: z.number().int() })]) })
+  .transform(({ memberships, ...household }) => ({
+    ...household,
+    memberCount: memberships[0].count,
+  }));
 
 const memberRow = z
   .object({
@@ -37,10 +46,10 @@ export async function householdGateway(): Promise<HouseholdGateway> {
     async myHouseholds() {
       const { data, error } = await supabase
         .from("households")
-        .select("id, name, type")
+        .select("id, name, type, memberships(count)")
         .order("created_at");
       if (error) throw databaseError(error);
-      return z.array(householdRow).parse(data);
+      return z.array(householdSummaryRow).parse(data);
     },
     async householdById(id) {
       const { data, error } = await supabase
@@ -73,5 +82,7 @@ export async function householdGateway(): Promise<HouseholdGateway> {
       });
       if (error) throw databaseError(error);
     },
+    preferredHouseholdId: chosenHousehold,
+    rememberHousehold: rememberActiveHousehold,
   };
 }

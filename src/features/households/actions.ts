@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { ValidationError } from "@/lib/errors";
+import { NotFoundError, ValidationError } from "@/lib/errors";
 import { householdSettingsPath } from "./paths";
 import { householdGateway } from "./repository";
 import {
@@ -10,6 +10,7 @@ import {
   createHouseholdSchema,
   fieldErrors,
   renameHouseholdSchema,
+  switchHouseholdSchema,
   type ValidationKey,
 } from "./schemas";
 import * as households from "./service";
@@ -116,4 +117,18 @@ export async function changeHouseholdTypeAction(
   }
   revalidatePath(settingsRoute, "page");
   return { status: "saved", values };
+}
+
+// The switcher (FR-ACC-004). Every page shows the active household, so the whole app is refreshed.
+// A household the user just left is not an error: the refresh drops it from the list.
+export async function switchHouseholdAction(householdId: string): Promise<void> {
+  const parsed = switchHouseholdSchema.safeParse({ householdId });
+  if (parsed.success) {
+    try {
+      await households.switchHousehold(await householdGateway(), parsed.data);
+    } catch (error) {
+      if (!(error instanceof NotFoundError)) throw error;
+    }
+  }
+  revalidatePath("/", "layout");
 }

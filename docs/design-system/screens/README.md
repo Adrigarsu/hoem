@@ -129,6 +129,19 @@ decision wins and the screen's spec says so.
 | Read aloud       | A visually hidden comma separates a row's label from its value ("Appearance, System").                                                             |
 | New token        | `avatar-lg` (56 px) for the account avatar.                                                                                                        |
 
+### Decisions taken building the household switcher (#20)
+
+| Topic           | Decision                                                                                                                                                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pattern         | The WAI-ARIA menu button at every width: a bottom sheet on phones and a menu under the sidebar button on wider screens, with the same keyboard behaviour. Not a modal dialog on phones, so one widget does both.          |
+| Active row      | `menuitemradio` with `aria-checked="true"` instead of `aria-current`, the state a menu of choices announces; the check icon, border and tint show it too.                                                                 |
+| Keyboard        | Enter, Space and ↓ open on the active household, ↑ on the last item; ↑ ↓ wrap, Home and End jump; Escape and Tab close and return focus to the button. The sheet's Close button and the scrim are for touch and pointers. |
+| Where on phones | Only the Home header, as in `home.md`; other pages switch from Home.                                                                                                                                                      |
+| Switching       | The chosen row reads "Switching…" (the theme has no spinner animation); on success the menu closes, focus returns to the button and a status message says which household is now active.                                  |
+| "Just me"       | A single household shows only its type, never "1 member".                                                                                                                                                                 |
+| Sidebar rows    | Smaller icon (32 px) and padding, so "Shared flat · 2 members" and "Create a new household" fit the 264 px sidebar on one line.                                                                                           |
+| Kept            | The household in settings stays at `/settings/household/[id]`, and creating a household still opens its settings: #20 adds only the switcher.                                                                             |
+
 ## Open questions
 
 Each screen is reviewed against the SRS, the architecture and the existing code by the issue that

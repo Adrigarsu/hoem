@@ -10,7 +10,14 @@ export {
 } from "./domain/household-rules";
 export { householdSettingsSchema, householdSettingsSchemaFor } from "./schemas";
 export { HouseholdDetails } from "./components/household-details";
+export { HouseholdSwitcher } from "./components/household-switcher";
 export { NewHouseholdForm } from "./components/new-household-form";
 export { householdSettingsPath, newHouseholdPath } from "./paths";
 export { householdGateway } from "./repository";
-export { householdSettings, myHouseholds, type HouseholdSettingsView } from "./service";
+export { currentHousehold } from "./current-household";
+export {
+  householdSettings,
+  myHouseholds,
+  type ActiveHouseholdView,
+  type HouseholdSettingsView,
+} from "./service";

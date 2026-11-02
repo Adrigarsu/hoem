@@ -259,6 +259,15 @@
     "list": {
       "title": "Your households",
       "create": "Create a new household"
+    },
+    "switcher": {
+      "switch": ", switch household",
+      "title": "Your households",
+      "close": "Close",
+      "members": "{count, plural, one {# member} other {# members}}",
+      "create": "Create a new household",
+      "switching": "Switching…",
+      "switchedTo": "{name} is now the active household."
     }
   }
 }
