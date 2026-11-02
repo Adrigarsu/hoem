@@ -10,12 +10,18 @@ function initials(name: string): string {
     .toLocaleUpperCase();
 }
 
+const sizes = {
+  md: "size-10 text-label",
+  // The account card of Profile and settings.
+  lg: "size-avatar-lg text-subtitle",
+};
+
 // Decorative: the button or link around it carries the person's name.
-export function Avatar({ name }: { name: string }) {
+export function Avatar({ name, size = "md" }: { name: string; size?: keyof typeof sizes }) {
   return (
     <span
       aria-hidden="true"
-      className="inline-grid size-10 shrink-0 place-items-center rounded-full bg-brand-tint text-label text-brand-ink"
+      className={`inline-grid shrink-0 place-items-center rounded-full bg-brand-tint text-brand-ink ${sizes[size]}`}
     >
       {initials(name)}
     </span>

@@ -21,14 +21,13 @@ their milestone starts.
 
 | #   | Issue                                                    | Milestone | Priority | Blocked by | Why here                                          |
 | --- | -------------------------------------------------------- | --------- | -------- | ---------- | ------------------------------------------------- |
-| 21  | FR-NAV-003: profile and settings menu with sign-out      | M1a       | must     | —          | Unblocks #22, #23, #26                            |
 | 20  | FR-ACC-004: switch the active household from the header  | M1a       | must     | —          | Replaces the provisional /settings/household/[id] |
-| 22  | FR-ACC-007: edit my profile, avatar, theme and language  | M1a       | must     | #21        | Entry point is the profile menu                   |
-| 23  | FR-ACC-007: delete my account                            | M1a       | must     | #21        | Entry point is the profile menu                   |
+| 22  | FR-ACC-007: edit my profile, avatar, theme and language  | M1a       | must     | —          | Entry point is the profile menu                   |
+| 23  | FR-ACC-007: delete my account                            | M1a       | must     | —          | Entry point is the profile menu                   |
 | 25  | FR-ACC-002: sign in with Google                          | M1a       | should   | —          | Should; independent                               |
 | 55  | ci: cache Playwright system libraries, time out installs | M1a       | should   | —          | Move up if CI installs keep stalling              |
 | 50  | chore: run end-to-end tests in Firefox and Edge          | M1a       | should   | —          | Widens browser coverage; no feature depends       |
-| 26  | FR-ACC-006: see household members and manage roles       | M1b       | must     | #21        | Unblocks #27, #30                                 |
+| 26  | FR-ACC-006: see household members and manage roles       | M1b       | must     | —          | Unblocks #27, #30                                 |
 | 32  | FR-ONB-001: guided household setup, step 1 and progress  | M1b       | must     | —          | Starts the setup chain #33 → #34                  |
 | 27  | FR-ACC-005: invite people to a household by e-mail       | M1b       | must     | #26        | Unblocks #28, #34                                 |
 | 30  | FR-HH-009: parents decide who can split expenses         | M1b       | must     | #26        | Needs member roles                                |

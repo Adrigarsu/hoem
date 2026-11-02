@@ -1,67 +1,50 @@
 import type { Metadata } from "next";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { buttonClassName } from "@/design-system";
 import { SignOutButton } from "@/features/auth";
-import {
-  householdGateway,
-  householdSettingsPath,
-  myHouseholds,
-  newHouseholdPath,
-} from "@/features/households";
-import { ComingSoon } from "@/features/shell";
+import { householdGateway, myHouseholds } from "@/features/households";
+import { ownProfile } from "@/features/profile";
+import { SettingsMenu } from "@/features/settings";
+import { Page } from "@/features/shell";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/settings">): Promise<Metadata> {
   const locale = await setLocaleFromParams(params);
-  const t = await getTranslations({ locale, namespace: "Shell" });
-  return { title: t("profileAndSettings") };
+  const t = await getTranslations({ locale, namespace: "Settings" });
+  return { title: t("title") };
 }
 
-// #21 builds the profile and settings menu; until then this page keeps sign-out and the households
-// (profile.md, "Households") within reach.
+// Profile and settings (FR-NAV-003, profile.md), opened from the avatar on phones and the sidebar
+// on wider screens.
 export default async function SettingsPage({ params }: PageProps<"/[locale]/settings">) {
   const locale = await setLocaleFromParams(params);
-  const t = await getTranslations({ locale, namespace: "Shell" });
-  const tHouseholds = await getTranslations({ locale, namespace: "Households" });
-  const households = await myHouseholds(await householdGateway());
+  const t = await getTranslations({ locale, namespace: "Settings" });
+  const [profile, households] = await Promise.all([
+    ownProfile(),
+    householdGateway().then(myHouseholds),
+  ]);
+
   return (
-    <ComingSoon title={t("profileAndSettings")}>
-      <SignOutButton />
-      <section aria-labelledby="your-households" className="flex w-full flex-col gap-3 text-left">
-        <h2 id="your-households" className="text-subtitle text-text">
-          {tHouseholds("list.title")}
-        </h2>
-        <ul className="flex flex-col gap-2">
-          {households.map((household) => (
-            <li key={household.id}>
-              <Link
-                href={householdSettingsPath(household.id)}
-                className="flex min-h-control-height items-center justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3 hover:bg-surface-subtle"
-              >
-                <span className="flex flex-col">
-                  <span className="text-body-strong text-text">{household.name}</span>
-                  <span className="text-small text-text-secondary">
-                    {tHouseholds(`types.${household.type}`)}
-                  </span>
-                </span>
-                <ChevronRight
-                  aria-hidden="true"
-                  className="size-icon-md text-text-secondary"
-                  strokeWidth={1.5}
-                />
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <Link href={newHouseholdPath} className={buttonClassName("secondary")}>
-          <Plus aria-hidden="true" className="size-icon-md" strokeWidth={1.5} />
-          {tHouseholds("list.create")}
-        </Link>
-      </section>
-    </ComingSoon>
+    <Page
+      title={
+        <div className="flex flex-col gap-2">
+          {/* Wider screens keep the sidebar, so only phones need a way back. */}
+          <Link
+            href="/"
+            className="-ml-3 inline-flex h-control-height items-center gap-1 self-start rounded-md px-3 text-label text-brand hover:bg-surface-subtle md:hidden"
+          >
+            <ChevronLeft aria-hidden="true" className="size-icon-md" strokeWidth={1.5} />
+            {t("back")}
+          </Link>
+          <h1 className="text-title font-bold text-text md:text-heading">{t("title")}</h1>
+          <p className="hidden text-body text-text-secondary md:block">{t("subtitle")}</p>
+        </div>
+      }
+    >
+      <SettingsMenu profile={profile} households={households} signOut={<SignOutButton />} />
+    </Page>
   );
 }

@@ -10,6 +10,7 @@ import {
   householdSettings,
   type HouseholdSettingsView,
 } from "@/features/households";
+import { settingsPaths } from "@/features/settings";
 import { Page } from "@/features/shell";
 import { NotFoundError } from "@/lib/errors";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
@@ -46,7 +47,7 @@ export default async function HouseholdSettingsPage({ params, searchParams }: Pr
       title={
         <div className="flex flex-col gap-2">
           <Link
-            href="/settings"
+            href={settingsPaths.settings}
             className="-ml-3 inline-flex h-control-height items-center gap-1 self-start rounded-md px-3 text-label text-brand hover:bg-surface-subtle"
           >
             <ChevronLeft aria-hidden="true" className="size-icon-md" strokeWidth={1.5} />

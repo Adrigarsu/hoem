@@ -67,6 +67,7 @@
   --content-width: 720px;
   --dialog-width: 440px;
   --progress-width: 120px;
+  --avatar-lg: 56px;
   --stroke-hairline: 1px;
   --stroke-focus: 2px;
 
@@ -308,6 +309,7 @@
   --spacing-content-width: var(--content-width);
   --spacing-dialog-width: var(--dialog-width);
   --spacing-progress-width: var(--progress-width);
+  --spacing-avatar-lg: var(--avatar-lg);
 }
 
 @utility duration-fast {
