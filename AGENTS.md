@@ -104,6 +104,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   folder: 360, 768 and 1440 px, light and dark. Show the collages to the developer, compare them
   with the screen in `docs/design-system/screens/`, and list them for the pull request.
   Never commit them.
+  It captures whatever answers on `APP_URL` (default port 3000): if that is an old server, run
+  `pnpm build`, `pnpm start --port 3200` (Playwright uses 3100) and capture with
+  `APP_URL=http://localhost:3200`.
 
 ## Testing
 
@@ -111,6 +114,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - Test names start with the requirement ID:
   `it("FR-EXP-007 hides a private expense from flatmates", …)`.
 - Query components by role and accessible name, not by class names or test IDs.
+  jsdom joins the text of sibling spans without the spaces a browser adds, so a name built from
+  several spans may need a looser match (`/^Appearance ?, ?System$/`) in unit tests.
 - Every RLS change needs a policy test that signs in as each affected role.
 - E2E specs import a feature's pure modules (`domain/`, `schemas.ts`) directly: its `index.ts` also
   brings `server-only` code, which Playwright cannot load.
