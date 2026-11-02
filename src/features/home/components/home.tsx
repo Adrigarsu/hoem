@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Suspense } from "react";
 import { Card, IconButton, Tile } from "@/design-system";
+import { HouseholdSwitcher } from "@/features/households";
 import { destinations, Page } from "@/features/shell";
 import { homeTiles } from "../domain/tiles";
 import { Greeting, GreetingSkeleton } from "./greeting";
@@ -20,7 +21,17 @@ export function Home() {
           <Greeting />
         </Suspense>
       }
-      actions={<IconButton icon={Bell} label={tShell("notifications")} href="/notifications" />}
+      actions={
+        <>
+          {/* Wider screens have the switcher in the sidebar. */}
+          <div className="mr-auto min-w-0 md:hidden">
+            <Suspense>
+              <HouseholdSwitcher placement="header" />
+            </Suspense>
+          </div>
+          <IconButton icon={Bell} label={tShell("notifications")} href="/notifications" />
+        </>
+      }
     >
       <div className="grid items-start gap-4 md:gap-6 lg:grid-cols-2">
         <PlannerCard />

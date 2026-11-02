@@ -5,15 +5,18 @@ import {
   NotFoundError,
   ValidationError,
 } from "@/lib/errors";
+import { pickActiveHousehold } from "./domain/active-household";
 import type { FamilyRole, HouseholdType } from "./domain/household-rules";
 import { familyRoleProblems, typeChangeBlock } from "./domain/type-change";
 import type {
   ChangeHouseholdTypeInput,
   CreateHouseholdInput,
   RenameHouseholdInput,
+  SwitchHouseholdInput,
 } from "./schemas";
 
 export type Household = { id: string; name: string; type: HouseholdType };
+export type HouseholdSummary = Household & { memberCount: number };
 export type Member = { userId: string; role: "owner" | "member"; familyRole: FamilyRole | null };
 
 export type HouseholdGateway = {
@@ -21,7 +24,7 @@ export type HouseholdGateway = {
   signedInUserId(): Promise<string | null>;
   createHousehold(name: string, type: HouseholdType): Promise<string>;
   // Only the households the user belongs to: row-level security hides the rest.
-  myHouseholds(): Promise<Household[]>;
+  myHouseholds(): Promise<HouseholdSummary[]>;
   // Null for a household the user does not belong to: row-level security hides it.
   householdById(id: string): Promise<Household | null>;
   // In the order they joined, so "Member 2" stays the same person between visits.
@@ -32,6 +35,10 @@ export type HouseholdGateway = {
     type: HouseholdType,
     familyRoles: Record<string, FamilyRole>,
   ): Promise<void>;
+  // The household the user last chose on this device (FR-ACC-004). Only a preference: anyone can
+  // put any id in a cookie, so it is never used without checking membership first.
+  preferredHouseholdId(): Promise<string | null>;
+  rememberHousehold(id: string): Promise<void>;
 };
 
 // A type the household cannot take: "single" while others belong, or anything but family while
@@ -51,6 +58,12 @@ export class MinorCannotCreateError extends ForbiddenError {
     super("People under 14 cannot create a household");
   }
 }
+
+export type ActiveHouseholdView = {
+  // Null only for someone who belongs to no household.
+  active: HouseholdSummary | null;
+  households: HouseholdSummary[];
+};
 
 export type HouseholdSettingsView = Household & {
   isOwner: boolean;
@@ -82,9 +95,26 @@ export async function createHousehold(
   return gateway.createHousehold(input.name, input.type);
 }
 
-export async function myHouseholds(gateway: HouseholdGateway): Promise<Household[]> {
+// The household every screen works on (FR-ACC-004), picked among the ones row-level security lets
+// the user read, so a household they left is never active and never listed.
+export async function activeHousehold(gateway: HouseholdGateway): Promise<ActiveHouseholdView> {
   await requireUser(gateway);
-  return gateway.myHouseholds();
+  const [households, preferredId] = await Promise.all([
+    gateway.myHouseholds(),
+    gateway.preferredHouseholdId(),
+  ]);
+  return { active: pickActiveHousehold(households, preferredId), households };
+}
+
+// Not belonging looks the same as the household not existing (NFR-SEC-001).
+export async function switchHousehold(
+  gateway: HouseholdGateway,
+  input: SwitchHouseholdInput,
+): Promise<void> {
+  await requireUser(gateway);
+  const household = await gateway.householdById(input.householdId);
+  if (!household) throw new NotFoundError("Household not found");
+  await gateway.rememberHousehold(household.id);
 }
 
 export async function householdSettings(

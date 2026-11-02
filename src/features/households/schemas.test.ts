@@ -14,6 +14,7 @@ import {
   householdSettingsSchema,
   householdSettingsSchemaFor,
   renameHouseholdSchema,
+  switchHouseholdSchema,
 } from "./schemas";
 
 describe("householdSettingsSchema", () => {
@@ -165,5 +166,16 @@ describe("changeHouseholdTypeSchema", () => {
         familyRoles: { [lucia]: "boss" },
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("switchHouseholdSchema", () => {
+  it("FR-ACC-004 accepts a household id", () => {
+    const householdId = "00000000-0000-7000-8000-00000000a001";
+    expect(switchHouseholdSchema.parse({ householdId })).toEqual({ householdId });
+  });
+
+  it("FR-ACC-004 rejects anything that is not a household id", () => {
+    expect(switchHouseholdSchema.safeParse({ householdId: "../settings" }).success).toBe(false);
   });
 });

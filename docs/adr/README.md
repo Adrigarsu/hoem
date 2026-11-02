@@ -22,6 +22,7 @@ else: a new ADR supersedes or amends it, and the old one points to the new one.
 | 014 | [Migration pipeline with expand/contract](0014-migration-pipeline.md)               | 2026-10-24 | Proposed                                                      |
 | 015 | [Locale through an internal rewrite](0015-locale-through-an-internal-rewrite.md)    | 2026-10-25 | Proposed                                                      |
 | 016 | [Session only in HttpOnly cookies](0016-session-only-in-httponly-cookies.md)        | 2026-10-25 | Proposed                                                      |
+| 017 | [Active household in an HttpOnly cookie](0017-active-household-in-a-cookie.md)      | 2026-11-02 | Proposed                                                      |
 
 To add one, run `/adr <title>` in Claude Code or copy the structure of an existing file with the
 next free number. New ADRs start as Proposed; the developer changes them to Accepted after review.

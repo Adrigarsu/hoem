@@ -72,3 +72,10 @@ export async function createHouseholdAs(
   if (readError) throw readError;
   return data.settings;
 }
+
+// Deletes a household the account owns, so the account is no longer a member of it.
+export async function deleteHouseholdAs(email: string, password: string, name: string) {
+  const supabase = await signedInAs(email, password);
+  const { error } = await supabase.from("households").delete().eq("name", name);
+  if (error) throw error;
+}

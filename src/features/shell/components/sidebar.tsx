@@ -1,13 +1,14 @@
 import { useTranslations } from "next-intl";
 import { Suspense } from "react";
 import { Logo } from "@/design-system";
+import { HouseholdSwitcher } from "@/features/households";
 import { destinations, sidebarOrder } from "../domain/destinations";
 import { destinationIcons } from "./destination-icons";
 import { NavLink } from "./nav-link";
 import { SidebarProfile } from "./profile-entries";
 
 // From bp-md. The current entry gets the tint and a bolder label, so it is marked by more than
-// colour. The household switcher joins it under the logo in #20.
+// colour. The household switcher sits under the logo (FR-ACC-004).
 export function Sidebar() {
   const t = useTranslations("Shell");
   const tMetadata = useTranslations("Metadata");
@@ -16,6 +17,9 @@ export function Sidebar() {
       <div className="px-3">
         <Logo label={tMetadata("title")} />
       </div>
+      <Suspense>
+        <HouseholdSwitcher placement="sidebar" />
+      </Suspense>
       <nav aria-label={t("mainNavigation")} className="flex flex-col gap-1">
         {sidebarOrder.map((destination) => {
           const Icon = destinationIcons[destination];
