@@ -25,6 +25,11 @@ export const profiles = pgTable(
   (table) => [
     check("profiles_display_name_length", sql`char_length(${table.displayName}) between 1 and 50`),
     check("profiles_theme", sql`${table.theme} in ('system', 'light', 'dark')`),
+    // The file always sits in the owner's own folder of the avatars bucket (FR-ACC-007).
+    check(
+      "profiles_avatar_path_own_folder",
+      sql`${table.avatarPath} is null or starts_with(${table.avatarPath}, ${table.id}::text || '/')`,
+    ),
     pgPolicy("profiles_select_own", {
       for: "select",
       to: authenticatedRole,

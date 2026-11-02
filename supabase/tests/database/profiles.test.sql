@@ -127,9 +127,9 @@ select throws_ok(
 
 select throws_ok(
   $$ update public.profiles set avatar_path = 'x/y.png' where id = '00000000-0000-7000-8000-000000000001' $$,
-  '42501',
+  '23514',
   null,
-  'NFR-SEC-001 avatar_path is not writable until avatars exist'
+  'FR-ACC-007 avatar_path cannot point outside the user''s own folder'
 );
 
 select throws_ok(
