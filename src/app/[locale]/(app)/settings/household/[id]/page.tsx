@@ -3,6 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 import { FormMessage } from "@/design-system";
 import {
   HouseholdDetails,
@@ -11,9 +12,10 @@ import {
   type HouseholdSettingsView,
 } from "@/features/households";
 import { settingsPaths } from "@/features/settings";
-import { Page } from "@/features/shell";
+import { LaunchScreen, Page } from "@/features/shell";
 import { NotFoundError } from "@/lib/errors";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
+import type { Locale } from "@/lib/i18n/locales";
 
 type Props = PageProps<"/[locale]/settings/household/[id]">;
 
@@ -34,9 +36,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // Household settings (household-settings.md): #19 builds Details; Members (#26) and the rules
-// (#30, #31) come later.
+// (#30, #31) come later. The data loads inside <Suspense>, like Settings: opening it from Settings
+// keeps the settings segment mounted, so the (app) loading screen does not cover that navigation.
 export default async function HouseholdSettingsPage({ params, searchParams }: Props) {
   const locale = await setLocaleFromParams(params);
+  return (
+    <Suspense fallback={<LaunchScreen />}>
+      <HouseholdSettings locale={locale} params={params} searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function HouseholdSettings({
+  locale,
+  params,
+  searchParams,
+}: Pick<Props, "params" | "searchParams"> & { locale: Locale }) {
   const { id } = await params;
   const { created } = await searchParams;
   const t = await getTranslations({ locale, namespace: "Households.settings" });

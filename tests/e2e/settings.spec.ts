@@ -32,6 +32,10 @@ test.describe("FR-NAV-003 profile and settings", () => {
     test.skip(!isPhone(page), "The avatar button is for phones");
     await page.getByRole("link", { name: "Profile and settings" }).click();
     await expect(page).toHaveURL(/\/settings$/);
+    // The page streams in after the URL changes; let the navigation finish before reloading it.
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Profile and settings" }),
+    ).toBeVisible();
     await visit("/settings");
 
     await expectEverySection(page);
@@ -45,6 +49,10 @@ test.describe("FR-NAV-003 profile and settings", () => {
     test.skip(isPhone(page), "The sidebar is for wider screens");
     await page.getByRole("link", { name: "Lucía Profile and settings" }).click();
     await expect(page).toHaveURL(/\/settings$/);
+    // The page streams in after the URL changes; let the navigation finish before reloading it.
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Profile and settings" }),
+    ).toBeVisible();
     await visit("/settings");
 
     await expectEverySection(page);

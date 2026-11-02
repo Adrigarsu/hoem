@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 import { SignOutButton } from "@/features/auth";
-import { householdGateway, myHouseholds } from "@/features/households";
+import { currentHousehold } from "@/features/households";
 import { ownProfile } from "@/features/profile";
 import { SettingsMenu } from "@/features/settings";
-import { Page } from "@/features/shell";
+import { LaunchScreen, Page } from "@/features/shell";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
+import type { Locale } from "@/lib/i18n/locales";
 
 export async function generateMetadata({
   params,
@@ -18,13 +20,23 @@ export async function generateMetadata({
 }
 
 // Profile and settings (FR-NAV-003, profile.md), opened from the avatar on phones and the sidebar
-// on wider screens.
+// on wider screens. The data loads inside <Suspense>: coming back from a settings page keeps the
+// settings segment mounted, so the (app) loading screen does not cover that navigation.
 export default async function SettingsPage({ params }: PageProps<"/[locale]/settings">) {
   const locale = await setLocaleFromParams(params);
+  return (
+    <Suspense fallback={<LaunchScreen />}>
+      <Settings locale={locale} />
+    </Suspense>
+  );
+}
+
+async function Settings({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "Settings" });
   const [profile, households] = await Promise.all([
     ownProfile(),
-    householdGateway().then(myHouseholds),
+    // The same read as the sidebar switcher, so the households are queried once per request.
+    currentHousehold().then(({ households }) => households),
   ]);
 
   return (
