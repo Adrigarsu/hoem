@@ -6,7 +6,7 @@ import messages from "../../../../messages/en.json";
 import { HouseholdMenu } from "./household-menu";
 
 const actions = vi.hoisted(() => ({
-  switchHouseholdAction: vi.fn(async (_: string) => {}),
+  switchHouseholdAction: vi.fn(async (_: string) => true),
 }));
 vi.mock("../actions", () => actions);
 
@@ -84,6 +84,15 @@ describe("HouseholdMenu", () => {
     expect(screen.getByRole("status")).toHaveTextContent(
       "Calle Mayor 5 is now the active household.",
     );
+  });
+
+  it("FR-ACC-004 announces nothing when the user no longer belongs to the chosen household", async () => {
+    actions.switchHouseholdAction.mockResolvedValueOnce(false);
+    renderMenu();
+    await userEvent.click(switcher());
+    await userEvent.click(screen.getByRole("menuitemradio", { name: /^Calle Mayor 5/ }));
+    await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument());
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 
   it("FR-ACC-004 closes with Escape and returns focus to the switcher", async () => {

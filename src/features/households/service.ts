@@ -95,11 +95,6 @@ export async function createHousehold(
   return gateway.createHousehold(input.name, input.type);
 }
 
-export async function myHouseholds(gateway: HouseholdGateway): Promise<HouseholdSummary[]> {
-  await requireUser(gateway);
-  return gateway.myHouseholds();
-}
-
 // The household every screen works on (FR-ACC-004), picked among the ones row-level security lets
 // the user read, so a household they left is never active and never listed.
 export async function activeHousehold(gateway: HouseholdGateway): Promise<ActiveHouseholdView> {

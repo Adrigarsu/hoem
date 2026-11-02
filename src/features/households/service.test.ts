@@ -10,7 +10,6 @@ import {
   changeHouseholdType,
   createHousehold,
   householdSettings,
-  myHouseholds,
   renameHousehold,
   switchHousehold,
   TypeChangeRefusedError,
@@ -66,18 +65,6 @@ describe("createHousehold", () => {
         name: "Calle Mayor 5",
         type: "shared_flat",
       }),
-    ).rejects.toBeInstanceOf(NotAuthenticatedError);
-  });
-});
-
-describe("myHouseholds", () => {
-  it("FR-ACC-004 lists the households the user belongs to", async () => {
-    expect(await myHouseholds(gateway())).toEqual([flatSummary]);
-  });
-
-  it("FR-ACC-004 refuses without a session", async () => {
-    await expect(
-      myHouseholds(gateway({ signedInUserId: vi.fn(async () => null) })),
     ).rejects.toBeInstanceOf(NotAuthenticatedError);
   });
 });

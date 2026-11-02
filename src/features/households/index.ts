@@ -15,9 +15,4 @@ export { NewHouseholdForm } from "./components/new-household-form";
 export { householdSettingsPath, newHouseholdPath } from "./paths";
 export { householdGateway } from "./repository";
 export { currentHousehold } from "./current-household";
-export {
-  householdSettings,
-  myHouseholds,
-  type ActiveHouseholdView,
-  type HouseholdSettingsView,
-} from "./service";
+export { householdSettings, type ActiveHouseholdView, type HouseholdSettingsView } from "./service";

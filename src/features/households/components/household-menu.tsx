@@ -26,14 +26,14 @@ type HouseholdMenuProps = {
 export function HouseholdMenu({ households, active, placement }: HouseholdMenuProps) {
   const t = useTranslations("Households");
   const [open, setOpen] = useState(false);
-  // The item to focus once the menu is on the page.
-  const [focusIndex, setFocusIndex] = useState(0);
   const [switchingId, setSwitchingId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
+  // The item to focus once the menu is on the page.
+  const openFocus = useRef(0);
 
   const activeIndex = Math.max(
     households.findIndex((household) => household.id === active.id),
@@ -44,8 +44,18 @@ export function HouseholdMenu({ households, active, placement }: HouseholdMenuPr
   const compact = placement === "sidebar";
 
   useEffect(() => {
-    if (open) itemRefs.current[focusIndex]?.focus();
-  }, [open, focusIndex]);
+    if (open) itemRefs.current[openFocus.current]?.focus();
+  }, [open]);
+
+  // The phone sheet covers the page, so the page behind it does not scroll.
+  useEffect(() => {
+    if (!open || placement !== "header") return;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [open, placement]);
 
   // A click anywhere else closes the menu, leaving focus where the click put it.
   useEffect(() => {
@@ -58,7 +68,7 @@ export function HouseholdMenu({ households, active, placement }: HouseholdMenuPr
   }, [open]);
 
   function openAt(index: number) {
-    setFocusIndex(index);
+    openFocus.current = index;
     setOpen(true);
   }
 
@@ -93,7 +103,6 @@ export function HouseholdMenu({ households, active, placement }: HouseholdMenuPr
     const next = target(event.key, current);
     if (next === null) return;
     event.preventDefault();
-    setFocusIndex(next);
     itemRefs.current[next]?.focus();
   }
 
@@ -105,10 +114,20 @@ export function HouseholdMenu({ households, active, placement }: HouseholdMenuPr
     }
     setSwitchingId(household.id);
     startTransition(async () => {
-      await switchHouseholdAction(household.id);
-      setSwitchingId(null);
-      setAnnouncement(t("switcher.switchedTo", { name: household.name }));
-      close();
+      try {
+        const switched = await switchHouseholdAction(household.id);
+        // Not switched: the user no longer belongs to it, and the refresh drops it from the list.
+        if (switched) setAnnouncement(t("switcher.switchedTo", { name: household.name }));
+      } finally {
+        setSwitchingId(null);
+      }
+      // Focus goes back to the button only if it was still in the menu: the user may have clicked
+      // elsewhere while waiting.
+      const focus = document.activeElement;
+      const focusInMenu =
+        !focus || focus === document.body || containerRef.current?.contains(focus);
+      setOpen(false);
+      if (focusInMenu) buttonRef.current?.focus();
     });
   }
 

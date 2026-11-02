@@ -120,15 +120,17 @@ export async function changeHouseholdTypeAction(
 }
 
 // The switcher (FR-ACC-004). Every page shows the active household, so the whole app is refreshed.
-// A household the user just left is not an error: the refresh drops it from the list.
-export async function switchHouseholdAction(householdId: string): Promise<void> {
-  const parsed = switchHouseholdSchema.safeParse({ householdId });
-  if (parsed.success) {
-    try {
-      await households.switchHousehold(await householdGateway(), parsed.data);
-    } catch (error) {
-      if (!(error instanceof NotFoundError)) throw error;
-    }
-  }
+// False when nothing changed: a household the user just left is not an error, the refresh drops it
+// from the list.
+export async function switchHouseholdAction(householdId: string): Promise<boolean> {
   revalidatePath("/", "layout");
+  const parsed = switchHouseholdSchema.safeParse({ householdId });
+  if (!parsed.success) return false;
+  try {
+    await households.switchHousehold(await householdGateway(), parsed.data);
+    return true;
+  } catch (error) {
+    if (error instanceof NotFoundError) return false;
+    throw error;
+  }
 }
