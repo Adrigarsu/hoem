@@ -59,7 +59,11 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - `src/app/` contains routes only.
 - `cacheComponents` is on: a repository calls `await connection()` before using Supabase (it reads
   the clock), and a client component that reads the URL (`usePathname`) sits inside `<Suspense>`
-  (see `NavLink`), or routes with a dynamic segment fail to build.
+  (see `NavLink`), or routes with a dynamic segment fail to build. A page that reads data renders
+  it inside its own `<Suspense>` (see `settings/page.tsx`): the `(app)` `loading.tsx` does not
+  cover a navigation inside the same segment (`/settings/account` → `/settings`), and `next dev`
+  reports it as a blocking route. In E2E, wait for the new page's heading after clicking a link
+  before calling `visit` on the same URL, or Safari interrupts the navigation.
 
 ## Non-negotiables
 
@@ -145,9 +149,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   policy tests, a domain function with its tests, a service, a screen), stop and tell the developer
   it is a good moment to commit, with the files to stage and a ready Conventional Commit message.
   Do not wait until the whole issue is done.
-- Draft pull request early: after the first commit of an issue, give the developer the commands to
-  push and open a draft pull request (`gh pr create --draft`, title in Conventional Commits,
-  body `Closes #<issue>`), so CI runs on every push. `/ship` later fills the body and marks it ready.
+- Draft pull request at the start: `/start-issue` opens it on an empty first commit
+  (`gh pr create --draft`, title in Conventional Commits, body `Closes #<issue>`), so CI runs on
+  every push. `/ship` later fills the body and marks it ready.
 - Keep the branch up to date by merging, never rebasing: `git fetch origin` then
   `git merge origin/main`. Do it before `/ship`, and whenever `main` gets a change this branch
   depends on (a migration, a shared component, a dependency bump).
