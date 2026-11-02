@@ -144,6 +144,25 @@
     },
     "notifications": "Notifications"
   },
+  "Settings": {
+    "title": "Profile and settings",
+    "subtitle": "Your account, preferences and households",
+    "back": "Home",
+    "backToSettings": "Back to settings",
+    "account": "Account",
+    "yourAccount": "Your account",
+    "editProfile": "Edit profile",
+    "household": "Household",
+    "preferences": "Preferences",
+    "appearance": "Appearance",
+    "theme": {
+      "system": "System"
+    },
+    "notifications": "Notifications",
+    "privacy": "Privacy and data",
+    "download": "Download my data",
+    "delete": "Delete account"
+  },
   "Households": {
     "types": {
       "single": "Just me",

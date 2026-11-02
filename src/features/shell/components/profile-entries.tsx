@@ -2,9 +2,10 @@ import { ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Avatar, Tooltip } from "@/design-system";
 import { ownProfile } from "@/features/profile";
+import { settingsPaths } from "@/features/settings";
 import { NavLink } from "./nav-link";
 
-const settings = "/settings";
+const settings = settingsPaths.settings;
 
 // Fixed at the top right on phones (FR-NAV-001); pages keep that corner free.
 export async function AvatarFab() {

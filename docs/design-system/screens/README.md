@@ -82,16 +82,15 @@ decision wins and the screen's spec says so.
 
 ### Decisions taken building the app shell (#17)
 
-| Topic                | Decision                                                                                                                                                                   |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Household switcher   | Not shown until #20 builds it, in the Home header or in the sidebar: a button that does nothing would confuse.                                                             |
-| Desktop Home         | Until the dashboard (M6), desktop shows the mobile content (greeting, Planner, module tiles) in the sidebar shell; "New note", "Add expense" and the metrics come with M6. |
-| Household tile       | Left out until the household has data to show (#19, #28); Home has the Meals, Shopping and Expenses tiles.                                                                 |
-| Empty tiles          | Metas derived for the empty state: "Nothing planned for today", "Your list is empty", "Add one when you spend".                                                            |
-| Profile and settings | `/settings` shows "Coming soon" and the Sign out button until #21 builds the menu.                                                                                         |
-| Tab bar              | Sticky at the bottom instead of fixed, so it takes its own space and never covers content; scroll padding keeps focused controls clear of it and of the avatar button.     |
-| Current destination  | Marked with `aria-current="page"`, the tint and a bold label, so it never relies on colour alone.                                                                          |
-| Not built yet        | Planner, Meals, Shopping, Expenses and Notifications show their `h1` and an EmptyState "Coming soon" with "Back to Home".                                                  |
+| Topic               | Decision                                                                                                                                                                   |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Household switcher  | Not shown until #20 builds it, in the Home header or in the sidebar: a button that does nothing would confuse.                                                             |
+| Desktop Home        | Until the dashboard (M6), desktop shows the mobile content (greeting, Planner, module tiles) in the sidebar shell; "New note", "Add expense" and the metrics come with M6. |
+| Household tile      | Left out until the household has data to show (#19, #28); Home has the Meals, Shopping and Expenses tiles.                                                                 |
+| Empty tiles         | Metas derived for the empty state: "Nothing planned for today", "Your list is empty", "Add one when you spend".                                                            |
+| Tab bar             | Sticky at the bottom instead of fixed, so it takes its own space and never covers content; scroll padding keeps focused controls clear of it and of the avatar button.     |
+| Current destination | Marked with `aria-current="page"`, the tint and a bold label, so it never relies on colour alone.                                                                          |
+| Not built yet       | Planner, Meals, Shopping, Expenses and Notifications show their `h1` and an EmptyState "Coming soon" with "Back to Home".                                                  |
 
 ### Decisions taken building the launch screen (#18)
 
@@ -108,12 +107,27 @@ decision wins and the screen's spec says so.
 | Topic            | Decision                                                                                                                                                                                                       |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Create           | Variant A of `new-household`: a standalone form without progress bar, because the setup guide does not exist yet. #32 may make creating step 1 of the guide (variant B), so name and type are not asked twice. |
-| Route            | `/settings/household/[id]` until #20 adds the active household. `/settings` lists the user's households and "Create a new household" until #21 builds the profile menu.                                        |
+| Route            | `/settings/household/[id]` until #20 adds the active household.                                                                                                                                                |
 | Owner and parent | Separate: an owner can be a relative, a member can be a parent. The owner changing the type is pre-set as a parent; a family needs at least one parent.                                                        |
 | Member names     | Members cannot read each other's profiles yet, so the roles dialog says "You" and "Member 2, 3…" in joining order; names come with #26.                                                                        |
 | Dialogs          | Centred native `<dialog>`s on every width (the design system's Dialog), not bottom sheets. New tokens: `column` (480 px), `content-width` (720 px), `dialog-width` (440 px).                                   |
 | Saved            | A success message under the select instead of a toast; the app has no Toast yet.                                                                                                                               |
 | Under 14         | Only the database knows ages, so the refusal appears after "Change type", not before.                                                                                                                          |
+
+### Decisions taken building profile and settings (#21)
+
+| Topic            | Decision                                                                                                                                           |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Desktop layout   | The mobile menu of rows on every width, in a `content-width` column with the subtitle; #22 turns the sections into the desktop cards with forms.   |
+| Back link        | Phones only, to Home rather than the previous page, so it works when the page is opened directly. Wider screens keep the sidebar.                  |
+| Section titles   | Account, Household, Preferences and Privacy and data are cards with a visible `h2`, so each is a named region (the mobile frame has no "Account"). |
+| Language         | Left out until #22: English is the only language in the MVP, so the row would have nothing to change.                                              |
+| Notifications    | No value on the right: "On" would be false until push exists (M5).                                                                                 |
+| Switch household | Left out until #20 builds the switcher.                                                                                                            |
+| Households       | Every household the user belongs to, opening its settings, with "Create a new household": the active household arrives with #20.                   |
+| Not built yet    | Account, Appearance, Notifications, Download my data and Delete account open their own page with "Coming soon" and "Back to settings".             |
+| Read aloud       | A visually hidden comma separates a row's label from its value ("Appearance, System").                                                             |
+| New token        | `avatar-lg` (56 px) for the account avatar.                                                                                                        |
 
 ## Open questions
 

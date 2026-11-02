@@ -11,9 +11,11 @@ export async function profileGateway(): Promise<ProfileGateway> {
   const supabase = await createClient();
   return {
     // getClaims verifies the JWT signature, like the proxy does.
-    async signedInUserId() {
+    async signedInUser() {
       const { data } = await supabase.auth.getClaims();
-      return data?.claims.sub ?? null;
+      if (!data) return null;
+      // Every way to sign up asks for an email; without one the menu leaves out the email line.
+      return { id: data.claims.sub, email: data.claims.email ?? "" };
     },
     async profileById(userId) {
       const { data, error } = await supabase
