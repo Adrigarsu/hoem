@@ -2,7 +2,7 @@
 name: ship
 description: Finish the current task - verify it, commit and open a pull request. Use when the developer says the work is ready to ship.
 disable-model-invocation: true
-allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git fetch origin) Bash(git merge origin/main) Bash(gh pr view *)
+allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git fetch origin) Bash(git merge origin/main) Bash(gh pr view *) Bash(gh pr list *)
 ---
 
 ## Branch
@@ -34,6 +34,8 @@ allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log
    with `gh pr edit` and mark it ready with `gh pr ready`; otherwise open one with `gh pr create`. Follow
    `.github/pull_request_template.md` if it exists; otherwise include: summary, requirement IDs,
    `Closes #<issue>`, how it was tested, screenshots needed for UI changes, and what is out of scope.
+   If the issue was split, also list its earlier parts, from
+   `gh pr list --state all --search '"Part of #<issue>" in:body'`.
 8. Reply with the PR link, list the collage files in `screenshots/` so I can drag them into the
    PR, and remind me to read the diff before squash-merging.
    **Never merge the pull request yourself.** Recommend the next issue from `docs/planning.md` and why, or give

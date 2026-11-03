@@ -154,6 +154,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - Draft pull request at the start: `/start-issue` opens it on an empty first commit
   (`gh pr create --draft`, title in Conventional Commits, body `Closes #<issue>`), so CI runs on
   every push. `/ship` later fills the body and marks it ready.
+- An issue split across pull requests, such as a migration that must merge first (ADR-014): each
+  earlier part has its own branch from `main` and a body with `Part of #<issue>`, never `Closes`
+  (`/start-partial`, `/ship-partial`). The last part closes the issue through `/ship`.
 - Keep the branch up to date by merging, never rebasing: `git fetch origin` then
   `git merge origin/main`. Do it before `/ship`, and whenever `main` gets a change this branch
   depends on (a migration, a shared component, a dependency bump).
