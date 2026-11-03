@@ -115,8 +115,8 @@ select is_empty(
   'FR-ACC-003 deleting an account deletes the personal household it was alone in'
 );
 
--- A household with other members still keeps an owner: deleting its last owner's account waits
--- for #23 to decide what happens to it.
+-- A household with other members keeps an owner: its last owner's account cannot be deleted until
+-- someone else is an owner (FR-ACC-007).
 insert into auth.users (id, email)
 values ('00000000-0000-7000-8000-000000000403', 'guest@example.com');
 
@@ -129,7 +129,7 @@ select throws_ok(
   $$ delete from auth.users where id = '00000000-0000-7000-8000-000000000401' $$,
   '23514',
   'a household must keep at least one owner',
-  'NFR-SEC-001 deleting the last owner of a household with other members is still refused'
+  'NFR-SEC-001 deleting the last owner of a household with other members is refused'
 );
 
 -- Deleting every account of a household in one statement deletes it, whatever order the rows go in.
