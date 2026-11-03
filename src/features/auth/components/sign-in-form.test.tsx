@@ -30,6 +30,11 @@ describe("SignInForm", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Your account has been deleted.");
   });
 
+  it("FR-ACC-007 moves the focus to that message, so a screen reader reads it", () => {
+    renderForm("deleted=1");
+    expect(screen.getByRole("status")).toHaveFocus();
+  });
+
   it("FR-ACC-007 says nothing about a deletion on a normal visit", () => {
     renderForm("");
     expect(screen.queryByRole("status")).not.toBeInTheDocument();

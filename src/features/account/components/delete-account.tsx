@@ -3,7 +3,7 @@
 import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useActionState, useState, type FormEvent } from "react";
+import { useActionState, useEffect, useRef, useState, type FormEvent } from "react";
 import { Button, Dialog, FormMessage, TextField, useFormFocus } from "@/design-system";
 import { deleteAccountAction, type DeleteAccountState } from "../actions";
 import type { BlockingLink } from "../blocking-links";
@@ -24,10 +24,24 @@ export function DeleteAccount({ email, blockers }: DeleteAccountProps) {
   const t = useTranslations("Settings");
   const [open, setOpen] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // The menu of phones and the cards of wider screens each have this dialog. Turning a phone hides
+  // the block it opened from, and a modal inside a hidden block would leave the page inert.
+  useEffect(() => {
+    if (!open) return;
+    function closeIfHidden() {
+      if (!buttonRef.current?.offsetParent) setOpen(false);
+    }
+    window.addEventListener("resize", closeIfHidden);
+    return () => window.removeEventListener("resize", closeIfHidden);
+  }, [open]);
+
   return (
     <div className="-mx-3">
       {/* Each tone keeps an approved colour pair on hover too: danger-ink on danger-tint. */}
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen(true)}
         className="flex min-h-control-height w-full items-center gap-3 rounded-md px-3 py-2 text-left text-danger hover:bg-danger-tint hover:text-danger-ink"
@@ -115,6 +129,8 @@ function DeleteAccountDialog({ open, email, blockers, onCancel, onClosed }: Dial
       <Dialog
         open={open}
         onClose={onClosed}
+        // Closing would look like cancelling, but the server is already deleting the account.
+        dismissible={!pending}
         title={t("title")}
         description={
           <>
@@ -124,7 +140,7 @@ function DeleteAccountDialog({ open, email, blockers, onCancel, onClosed }: Dial
         }
         actions={
           <>
-            <Button variant="secondary" onClick={onCancel}>
+            <Button variant="secondary" onClick={onCancel} disabled={pending}>
               {t("cancel")}
             </Button>
             <Button type="submit" variant="danger" pending={pending} pendingLabel={t("deleting")}>

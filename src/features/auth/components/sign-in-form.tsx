@@ -42,7 +42,7 @@ export function SignInForm() {
   const linkError = linkErrors.find((key) => key === searchParams.get("error"));
   const formError =
     state.status === "failed" ? state.error : state.status === "idle" ? linkError : undefined;
-  const { formRef, messageRef } = useFormFocus(errors, Boolean(formError));
+  const { formRef, messageRef } = useFormFocus(errors, Boolean(formError) || accountDeleted);
   const unverifiedEmail = formError === "emailNotConfirmed" ? state.values?.email : undefined;
 
   function validate(event: FormEvent<HTMLFormElement>) {
@@ -74,7 +74,11 @@ export function SignInForm() {
         </p>
       </div>
       <div className="flex flex-col gap-4">
-        {accountDeleted && <FormMessage tone="success">{t("signIn.deleted")}</FormMessage>}
+        {accountDeleted && (
+          <FormMessage ref={messageRef} tone="success">
+            {t("signIn.deleted")}
+          </FormMessage>
+        )}
         {unverifiedEmail ? (
           <FormMessage ref={messageRef} tone="warning">
             {t("signIn.unverified", { email: unverifiedEmail })}{" "}

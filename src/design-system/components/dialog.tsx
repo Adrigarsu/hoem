@@ -15,6 +15,8 @@ type DialogProps = {
   // Anything else, such as fields; not part of the description.
   children?: ReactNode;
   actions: ReactNode;
+  // False holds back Escape while something irreversible is under way.
+  dismissible?: boolean;
 };
 
 // A modal on the native <dialog>: showModal traps focus, makes the page behind inert, closes on
@@ -27,6 +29,7 @@ export function Dialog({
   description,
   children,
   actions,
+  dismissible = true,
 }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -36,7 +39,11 @@ export function Dialog({
     const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
+    // Next.js keeps the previous route in a hidden <Activity>, which only runs this cleanup: a modal
+    // left open would stay in the top layer, invisible, and make the next page inert.
+    return () => {
+      if (dialog.open) dialog.close();
+    };
   }, [open]);
 
   return (
@@ -46,6 +53,9 @@ export function Dialog({
       aria-labelledby={titleId}
       aria-describedby={bodyId}
       onClose={onClose}
+      onCancel={(event) => {
+        if (!dismissible) event.preventDefault();
+      }}
       className="m-auto w-full max-w-dialog-width bg-transparent p-4 backdrop:bg-scrim"
     >
       {/* The transparent padding keeps the panel off the screen edges on phones. */}

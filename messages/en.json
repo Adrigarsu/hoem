@@ -178,7 +178,7 @@
     "failed": "We could not delete your account. Try again.",
     "blocked": {
       "title": "Make someone else owner first",
-      "lede": "You are the last owner of these households, and other people belong to them. Nothing has been deleted.",
+      "lede": "You are the last owner of a household other people belong to. Your account has not been deleted.",
       "close": "Close"
     },
     "validation": {

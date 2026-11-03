@@ -38,16 +38,36 @@ test.describe("FR-ACC-007 delete my account", () => {
 
     await expect(page).toHaveURL(/\/sign-in\?deleted=1$/);
     await expect(signInNotice(page)).toHaveText("Your account has been deleted.");
+    await expect(signInNotice(page)).toBeFocused();
 
-    await visit("/");
-    await expect(page).toHaveURL(/\/sign-in/);
-
-    await page.getByLabel("Email").fill(email);
+    // Without reloading: the dialog of the page before must not leave this one inert.
+    await expect(page.locator("dialog[open]")).toHaveCount(0);
+    const emailField = page.getByRole("textbox", { name: "Email" });
+    await emailField.click();
+    await emailField.fill(email);
     await page.getByLabel("Password", { exact: true }).fill(password);
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await expect(
       page.getByRole("alert").filter({ hasText: "Email or password is incorrect." }),
     ).toBeVisible();
+
+    await visit("/");
+    await expect(page).toHaveURL(/\/sign-in/);
+  });
+
+  test("FR-ACC-007 turning a phone closes the dialog instead of leaving the page inert", async ({
+    page,
+    visit,
+  }) => {
+    test.skip((page.viewportSize()?.width ?? 0) >= 768, "Only phones change layout by turning");
+    await visit("/settings");
+    await openDialog(page);
+
+    await page.setViewportSize({ width: 800, height: 360 });
+
+    await expect(page.locator("dialog[open]")).toHaveCount(0);
+    await deleteButton(page).click();
+    await expect(dialog(page)).toBeVisible();
   });
 
   test("FR-ACC-007 a wrong e-mail deletes nothing", async ({ page, visit }) => {

@@ -103,6 +103,22 @@ describe("DeleteAccount", () => {
     expect(within(dialog).getByRole("link", { name: "Calle Mayor 5" })).toBeInTheDocument();
   });
 
+  it("FR-ACC-007 cannot be cancelled once the deletion is on its way", async () => {
+    vi.mocked(deleteAccountAction).mockReturnValueOnce(new Promise(() => undefined));
+    renderIt();
+    const user = await openDialog();
+    await user.type(field(), email);
+    await user.click(submit());
+    expect(await screen.findByRole("button", { name: "Cancel" })).toBeDisabled();
+    expect(screen.getByRole("dialog", { name: "Delete your account?" })).toBeInTheDocument();
+  });
+
+  it("FR-ACC-007 a refusal does not claim that nothing was deleted, as the photo may be gone", async () => {
+    renderIt([flat]);
+    await openDialog();
+    expect(screen.getByRole("alertdialog")).toHaveTextContent("Your account has not been deleted.");
+  });
+
   it("FR-ACC-007 cancelling forgets what was typed", async () => {
     renderIt();
     const user = await openDialog();
