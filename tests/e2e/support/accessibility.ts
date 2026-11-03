@@ -18,11 +18,34 @@ export async function expectNoA11yViolations(page: Page) {
     await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
     await setThemeAttribute(page, theme);
     await nextPaint(page);
-    const { violations } = await analyzeWithoutStickyOverlap(page);
+    const violations = await analyzeUntilColoursSettle(page);
     expect(violations, `axe violations in the ${theme} theme`).toEqual([]);
   }
   await page.emulateMedia({ colorScheme: null, reducedMotion: null });
   await setThemeAttribute(page, chosenTheme);
+}
+
+// WebKit on Linux can report the old theme's inherited text colour after the switch, so a contrast
+// failure there is checked again until this limit: a stale colour clears, a real violation stays.
+// Other rules and other browsers fail on the first pass. A contrast failure that lasts less than
+// the limit passes in WebKit, so only the other browsers can catch one.
+// A plain loop, not toPass: toPass would cut off a pass in progress, and axe takes seconds in WebKit.
+const colourSettleLimitMs = 5_000;
+
+async function analyzeUntilColoursSettle(page: Page) {
+  const canHaveStaleColours = page.context().browser()?.browserType().name() === "webkit";
+  let { violations } = await analyzeWithoutStickyOverlap(page);
+  // Counted from the end of the first pass, so a slow pass still gets its recheck.
+  const deadline = Date.now() + colourSettleLimitMs;
+  while (canHaveStaleColours && isOnlyContrast(violations) && Date.now() < deadline) {
+    await nextPaint(page);
+    ({ violations } = await analyzeWithoutStickyOverlap(page));
+  }
+  return violations;
+}
+
+function isOnlyContrast(violations: { id: string }[]) {
+  return violations.length > 0 && violations.every(({ id }) => id === "color-contrast");
 }
 
 // axe does not scroll, so it reports a link that happens to end under the sticky tab bar at the top
@@ -50,8 +73,7 @@ async function analyzeWithoutStickyOverlap(page: Page) {
 }
 
 // Two animation frames: the theme change has been styled and painted, which is what a person
-// sees. WebKit on Linux can still report the old inherited text colour of freshly rendered
-// elements in the same frame as the change, which made axe report contrast that nobody sees.
+// sees. This does not guarantee fresh colours in WebKit: see analyzeUntilColoursSettle.
 async function nextPaint(page: Page) {
   await page.evaluate(
     () =>
