@@ -2,7 +2,7 @@ import { z } from "zod";
 import { formFieldErrors } from "@/lib/validation";
 
 // Messages are keys under Account.validation (docs/architecture.md §4.2).
-export type ValidationKey = "required" | "tooLong";
+export type ValidationKey = "required" | "tooLong" | "wrongEmail";
 
 export function fieldErrors(error: z.ZodError | undefined): Record<string, ValidationKey> {
   return formFieldErrors<ValidationKey>(error);

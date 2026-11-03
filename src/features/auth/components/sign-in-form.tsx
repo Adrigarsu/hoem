@@ -37,6 +37,8 @@ export function SignInForm() {
   const [clientErrors, setClientErrors] = useState<Record<string, ValidationKey>>();
   const errors = clientErrors ?? state.fieldErrors;
 
+  // A fixed text: nothing from the address reaches the page (FR-ACC-007).
+  const accountDeleted = searchParams.get("deleted") === "1" && state.status === "idle";
   const linkError = linkErrors.find((key) => key === searchParams.get("error"));
   const formError =
     state.status === "failed" ? state.error : state.status === "idle" ? linkError : undefined;
@@ -72,6 +74,7 @@ export function SignInForm() {
         </p>
       </div>
       <div className="flex flex-col gap-4">
+        {accountDeleted && <FormMessage tone="success">{t("signIn.deleted")}</FormMessage>}
         {unverifiedEmail ? (
           <FormMessage ref={messageRef} tone="warning">
             {t("signIn.unverified", { email: unverifiedEmail })}{" "}

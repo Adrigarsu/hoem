@@ -16,12 +16,12 @@ shows one by width.
 - **Preferences**: Appearance and Language (`/settings/appearance`, `/settings/language` on phones,
   with the current value on the row), and Notifications.
 - **Privacy and data**: "Download my data" and "Delete account". Delete account is shown as
-  destructive with its text, a bin icon and the `danger` colour.
+  destructive with its text, a bin icon and the `danger` colour, and opens a dialog
+  (`docs/features/account.md`).
 - **Sign out**: last on phones, in the Privacy card on wider screens. It ends the Supabase session
   and lands on `/sign-in`.
-- **Not built yet**: Notifications (M5), Download my data
-  (NFR-LEG-003) and Delete account (#23) open their own page with an EmptyState "Coming soon" and
-  "Back to settings".
+- **Not built yet**: Notifications (M5) and Download my data (NFR-LEG-003) open their own page with
+  an EmptyState "Coming soon" and "Back to settings".
 
 ## Privacy rules
 
@@ -34,7 +34,8 @@ shows one by width.
 
 - Code: `src/features/settings/` (paths in `domain/sections.ts`, `components/settings-menu.tsx` and `settings-cards.tsx`);
   the page is `src/app/[locale]/(app)/settings/page.tsx`. The sign-out form comes from
-  `src/features/auth`, the profile from `src/features/profile`.
+  `src/features/auth`, the profile from `src/features/profile`, Delete account from
+  `src/features/account`.
 - Tests: `src/features/settings/**/*.test.ts(x)`, `tests/e2e/settings.spec.ts`.
 
 ## Requirements

@@ -125,7 +125,7 @@ decision wins and the screen's spec says so.
 | Notifications    | No value on the right: "On" would be false until push exists (M5).                                                                                 |
 | Switch household | Left out until #20 builds the switcher.                                                                                                            |
 | Households       | Every household the user belongs to, opening its settings, with "Create a new household": the active household arrives with #20.                   |
-| Not built yet    | Account, Appearance, Notifications, Download my data and Delete account open their own page with "Coming soon" and "Back to settings".             |
+| Not built yet    | Notifications and Download my data open their own page with "Coming soon" and "Back to settings". Delete account opens its dialog.                 |
 | Read aloud       | A visually hidden comma separates a row's label from its value ("Appearance, System").                                                             |
 | New token        | `avatar-lg` (56 px) for the account avatar.                                                                                                        |
 

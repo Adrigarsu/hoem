@@ -3,6 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { DeleteAccount, ownDeletionBlockers } from "@/features/account";
 import { SignOutButton } from "@/features/auth";
 import { currentHousehold } from "@/features/households";
 import { AccountForm, LanguageField, ownProfile, ThemeForm } from "@/features/profile";
@@ -33,10 +34,11 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
 
 async function Settings({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "Settings" });
-  const [profile, households] = await Promise.all([
+  const [profile, households, blockers] = await Promise.all([
     ownProfile(),
     // The same read as the sidebar switcher, so the households are queried once per request.
     currentHousehold().then(({ households }) => households),
+    ownDeletionBlockers(),
   ]);
 
   return (
@@ -62,6 +64,7 @@ async function Settings({ locale }: { locale: Locale }) {
         households={households}
         locale={locale}
         signOut={<SignOutButton />}
+        deleteAccount={<DeleteAccount email={profile.email} blockers={blockers} />}
       />
       <SettingsCards
         households={households}
@@ -69,6 +72,7 @@ async function Settings({ locale }: { locale: Locale }) {
         theme={<ThemeForm theme={profile.theme} />}
         language={<LanguageField locale={locale} />}
         signOut={<SignOutButton />}
+        deleteAccount={<DeleteAccount email={profile.email} blockers={blockers} />}
       />
     </Page>
   );

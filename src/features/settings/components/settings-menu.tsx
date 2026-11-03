@@ -19,11 +19,19 @@ type SettingsMenuProps = {
   locale: Locale;
   // The sign-out form, from the auth feature.
   signOut: ReactNode;
+  // From the account feature.
+  deleteAccount: ReactNode;
 };
 
 // The profile and settings menu of phones (FR-NAV-003, profile.md): each row opens its own page.
 // Wider screens get SettingsCards instead.
-export function SettingsMenu({ profile, households, locale, signOut }: SettingsMenuProps) {
+export function SettingsMenu({
+  profile,
+  households,
+  locale,
+  signOut,
+  deleteAccount,
+}: SettingsMenuProps) {
   const t = useTranslations("Settings");
   const tLanguage = useTranslations("Profile.language");
   return (
@@ -67,7 +75,7 @@ export function SettingsMenu({ profile, households, locale, signOut }: SettingsM
       </Section>
 
       <Section id="settings-privacy" title={t("privacy")}>
-        <PrivacyRows />
+        <PrivacyRows deleteAccount={deleteAccount} />
       </Section>
 
       {signOut}
