@@ -122,7 +122,7 @@ jobs:
         run: >-
           pnpm test:e2e tests/e2e/household-switcher.spec.ts tests/e2e/household-type.spec.ts
           -g "lists my households|the owner creates a shared flat"
-          --project=safari-360 --project=safari-768 --project=safari-1440
+          --project=safari-360 --project=safari-768 --project=safari-1440 --project=chromium-360
           --repeat-each=5 --retries=0 --reporter=list
 
       - name: End-to-end tests
