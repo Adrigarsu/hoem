@@ -14,6 +14,8 @@ Deleting your own account (FR-ACC-007, NFR-LEG-003). Editing the profile is in
   The user lands on `/sign-in`, which says "Your account has been deleted."
 - **Last owner of a household with other members**: the dialog shows only "Make someone else owner
   first" with links to those households, and nothing is deleted. Choosing a new owner comes with #26.
+- **While deleting**: Cancel and Escape do nothing, because the server is already deleting the account.
+  Turning a phone with the dialog open closes it and forgets what was typed.
 - **If it fails**: the dialog says so, keeps what was typed and the user can retry. The photo may
   already be gone: the avatar then shows the initials.
 
@@ -27,7 +29,11 @@ Deleting your own account (FR-ACC-007, NFR-LEG-003). Editing the profile is in
   behind.
 - Typing the e-mail prevents accidents, not attacks: someone holding an open session could type it.
 - Other devices keep a valid token for up to an hour. It reads nothing and cannot store a photo, but
-  those devices show an error page until it expires.
+  those devices show an error page until it expires. The same happens on this device if clearing the
+  session fails.
+- After the redirect, without a reload, the fields of `/settings` stay hidden in the DOM with the
+  deleted account's name and e-mail, until the page is reloaded.
+- Anyone can open `/sign-in?deleted=1` and see the notice: it is a fixed text and reveals nothing.
 - A table or bucket with private records must delete them with the account: a foreign key cannot tell
   private rows from shared ones, and does not reach Storage (`AGENTS.md`, ADR-019).
 

@@ -21,7 +21,6 @@ their milestone starts.
 
 | #   | Issue                                                    | Milestone | Priority | Blocked by | Why here                                       |
 | --- | -------------------------------------------------------- | --------- | -------- | ---------- | ---------------------------------------------- |
-| 23  | FR-ACC-007: delete my account                            | M1a       | must     | —          | Entry point is the profile menu                |
 | 25  | FR-ACC-002: sign in with Google                          | M1a       | should   | —          | Should; independent                            |
 | 79  | FR-ACC-007: remove my profile photo                      | M1a       | should   | —          | Follows #22; privacy control, smaller than #80 |
 | 80  | FR-ACC-007: change my e-mail and password                | M1a       | should   | —          | Follows #22; touches auth                      |
