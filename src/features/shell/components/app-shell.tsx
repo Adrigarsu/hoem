@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Suspense, type ReactNode } from "react";
-import { AvatarFab } from "./profile-entries";
+import { AvatarFab, ProfileTheme } from "./profile-entries";
 import { Sidebar } from "./sidebar";
 import { TabBar } from "./tab-bar";
 
@@ -19,6 +19,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Sidebar />
       <Suspense>
         <AvatarFab />
+        <ProfileTheme />
       </Suspense>
       <main id="main" tabIndex={-1} className="flex flex-1 flex-col">
         {children}

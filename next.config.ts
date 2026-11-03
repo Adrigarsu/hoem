@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
   experimental: {
     // src/app/global-not-found.tsx: the 404 page for URLs outside the [locale] layout.
     globalNotFound: true,
+    // FR-ACC-007: a profile photo goes through a Server Action (ADR-016), up to 2 MB plus the form's
+    // own overhead. The default limit is 1 MB.
+    serverActions: { bodySizeLimit: "3mb" },
   },
   turbopack: {
     rules: {

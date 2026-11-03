@@ -1,4 +1,5 @@
 import { AuthFailedError } from "@/lib/errors";
+import type { Theme } from "@/lib/theme/theme";
 import { authErrorKey } from "./domain/auth-errors";
 import type { SignInInput, SignUpInput } from "./schemas";
 
@@ -6,6 +7,10 @@ import type { SignInInput, SignUpInput } from "./schemas";
 // rules here are tested without a network. Passwords go straight to Supabase Auth: they are never
 // stored, logged or put in an error (NFR-SEC-003).
 type AuthResult = Promise<{ error: { code?: string } | null }>;
+
+// What the browser keeps from the profile, for the proxy (locale) and the first paint (theme).
+// Null when the profile could not be read, so the cookies keep what they have.
+export type ProfilePreferences = { locale: string | null; theme: Theme | null };
 
 export type AuthGateway = {
   signUp(params: {
@@ -24,7 +29,7 @@ export type AuthGateway = {
   resetPasswordForEmail(email: string, options: { redirectTo: string }): AuthResult;
   updatePassword(password: string): AuthResult;
   signOutOthers(): AuthResult;
-  profileLocale(): Promise<string | null>;
+  profilePreferences(): Promise<ProfilePreferences>;
 };
 
 export type VerificationType = "email" | "signup";
@@ -57,7 +62,7 @@ export async function signUp(auth: AuthGateway, input: SignUpInput, context: Sig
 
 export async function signIn(auth: AuthGateway, input: SignInInput) {
   await run(auth.signInWithPassword({ email: input.email, password: input.password }));
-  return { locale: await auth.profileLocale() };
+  return auth.profilePreferences();
 }
 
 export async function resendVerification(auth: AuthGateway, email: string, confirmUrl: string) {
@@ -68,7 +73,7 @@ export async function resendVerification(auth: AuthGateway, email: string, confi
 // session.
 export async function verifyEmail(auth: AuthGateway, tokenHash: string, type: VerificationType) {
   await run(auth.verifyOtp({ token_hash: tokenHash, type }));
-  return { locale: await auth.profileLocale() };
+  return auth.profilePreferences();
 }
 
 export async function signOut(auth: AuthGateway) {
@@ -104,5 +109,5 @@ export async function resetPassword(auth: AuthGateway, tokenHash: string, passwo
   // A reset often follows a stolen password, so the other sessions go. The new password is
   // already saved: a failure here must not tell the user that the reset failed.
   await auth.signOutOthers();
-  return { locale: await auth.profileLocale() };
+  return auth.profilePreferences();
 }

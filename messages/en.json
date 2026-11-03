@@ -156,12 +156,15 @@
     "preferences": "Preferences",
     "appearance": "Appearance",
     "theme": {
-      "system": "System"
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
     },
     "notifications": "Notifications",
     "privacy": "Privacy and data",
     "download": "Download my data",
-    "delete": "Delete account"
+    "delete": "Delete account",
+    "language": "Language"
   },
   "Households": {
     "types": {
@@ -269,5 +272,37 @@
       "switching": "Switching…",
       "switchedTo": "{name} is now the active household."
     }
+  },
+  "Profile": {
+    "photo": {
+      "change": "Change photo",
+      "uploading": "Uploading…",
+      "help": "JPEG or PNG, up to 2 MB",
+      "saved": "Photo updated",
+      "tooLarge": "That file is too large. Choose a photo of 2 MB or less. Your photo has not changed.",
+      "wrongType": "That file is not a JPEG or PNG image. Your photo has not changed.",
+      "failed": "We could not save your photo. Try again. Your photo has not changed."
+    },
+    "name": "Name",
+    "email": "Email",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Changes saved",
+    "validation": {
+      "required": "Enter your name",
+      "tooLong": "Use 50 characters or fewer"
+    },
+    "theme": {
+      "title": "Appearance",
+      "help": "Follows your device by default",
+      "label": "Theme",
+      "saved": "Changes saved",
+      "failed": "We could not save your theme. Try again."
+    },
+    "language": {
+      "label": "Language",
+      "en": "English"
+    },
+    "failed": "We could not save your name. Try again."
   }
 }

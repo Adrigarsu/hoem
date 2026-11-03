@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { toTheme } from "@/lib/theme/theme";
 import type { AuthGateway } from "./service";
 
 // Supabase Auth and the profile lookup behind the AuthGateway the service expects.
@@ -16,10 +17,17 @@ export async function authGateway(): Promise<AuthGateway> {
     resetPasswordForEmail: (email, options) => auth.resetPasswordForEmail(email, options),
     updatePassword: (password) => auth.updateUser({ password }),
     signOutOthers: () => auth.signOut({ scope: "others" }),
-    // Row-level security returns only the signed-in user's own profile.
-    async profileLocale() {
-      const { data } = await supabase.from("profiles").select("locale").maybeSingle();
-      return data?.locale ?? null;
+    // Names the user's own row although row-level security limits it today: #26 lets members read
+    // each other's profiles, and several rows would make this query fail.
+    async profilePreferences() {
+      const { data: session } = await auth.getClaims();
+      if (!session) return { locale: null, theme: null };
+      const { data } = await supabase
+        .from("profiles")
+        .select("locale, theme")
+        .eq("id", session.claims.sub)
+        .maybeSingle();
+      return { locale: data?.locale ?? null, theme: data ? toTheme(data.theme) : null };
     },
   };
 }

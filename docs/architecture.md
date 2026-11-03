@@ -59,25 +59,26 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 Seventeen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
 
-| ADR                                                   | Decision                                                                              | Status   |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------- | -------- |
-| [001](adr/0001-modular-monolith.md)                   | One Next.js application in one GitHub repository (modular monolith)                   | Accepted |
-| [002](adr/0002-supabase-backend.md)                   | Supabase as the backend platform, hosted in the EU                                    | Accepted |
-| [003](adr/0003-drizzle-and-sql-migrations.md)         | Drizzle ORM for queries and schema; plain SQL migrations for policies                 | Accepted |
-| [004](adr/0004-two-layer-authorization.md)            | Authorization in two layers: application services and PostgreSQL RLS                  | Accepted |
-| [005](adr/0005-server-actions-and-rest-api.md)        | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                | Accepted |
-| [006](adr/0006-visibility-at-write-time.md)           | Visibility of private records is decided when they are written                        | Accepted |
-| [007](adr/0007-money-as-integer-cents.md)             | Money stored as integer cents, one currency per household                             | Accepted |
-| [008](adr/0008-reminders-icalendar-web-push.md)       | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push  | Accepted |
-| [009](adr/0009-delete-with-undo.md)                   | Deletes are immediate after a 5-second undo window; no soft delete                    | Accepted |
-| [010](adr/0010-testing-strategy.md)                   | Test pyramid: test-first for domain and services, end-to-end per story                | Accepted |
-| [011](adr/0011-demo-with-anonymous-sessions.md)       | Demo mode with anonymous sessions and per-visitor copies                              | Accepted |
-| [012](adr/0012-internationalisation.md)               | Internationalisation with next-intl; locale from the profile, not the URL             | Accepted |
-| [013](adr/0013-production-supabase-in-ireland.md)     | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
-| [014](adr/0014-migration-pipeline.md)                 | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
-| [015](adr/0015-locale-through-an-internal-rewrite.md) | Locale chosen in the proxy and rewritten to a hidden `[locale]` segment               | Proposed |
-| [016](adr/0016-session-only-in-httponly-cookies.md)   | Session only in HttpOnly cookies; no Supabase browser client                          | Proposed |
-| [017](adr/0017-active-household-in-a-cookie.md)       | Active household in an HttpOnly cookie, checked against memberships on every request  | Proposed |
+| ADR                                                        | Decision                                                                              | Status   |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------- | -------- |
+| [001](adr/0001-modular-monolith.md)                        | One Next.js application in one GitHub repository (modular monolith)                   | Accepted |
+| [002](adr/0002-supabase-backend.md)                        | Supabase as the backend platform, hosted in the EU                                    | Accepted |
+| [003](adr/0003-drizzle-and-sql-migrations.md)              | Drizzle ORM for queries and schema; plain SQL migrations for policies                 | Accepted |
+| [004](adr/0004-two-layer-authorization.md)                 | Authorization in two layers: application services and PostgreSQL RLS                  | Accepted |
+| [005](adr/0005-server-actions-and-rest-api.md)             | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                | Accepted |
+| [006](adr/0006-visibility-at-write-time.md)                | Visibility of private records is decided when they are written                        | Accepted |
+| [007](adr/0007-money-as-integer-cents.md)                  | Money stored as integer cents, one currency per household                             | Accepted |
+| [008](adr/0008-reminders-icalendar-web-push.md)            | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push  | Accepted |
+| [009](adr/0009-delete-with-undo.md)                        | Deletes are immediate after a 5-second undo window; no soft delete                    | Accepted |
+| [010](adr/0010-testing-strategy.md)                        | Test pyramid: test-first for domain and services, end-to-end per story                | Accepted |
+| [011](adr/0011-demo-with-anonymous-sessions.md)            | Demo mode with anonymous sessions and per-visitor copies                              | Accepted |
+| [012](adr/0012-internationalisation.md)                    | Internationalisation with next-intl; locale from the profile, not the URL             | Accepted |
+| [013](adr/0013-production-supabase-in-ireland.md)          | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
+| [014](adr/0014-migration-pipeline.md)                      | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
+| [015](adr/0015-locale-through-an-internal-rewrite.md)      | Locale chosen in the proxy and rewritten to a hidden `[locale]` segment               | Proposed |
+| [016](adr/0016-session-only-in-httponly-cookies.md)        | Session only in HttpOnly cookies; no Supabase browser client                          | Proposed |
+| [017](adr/0017-active-household-in-a-cookie.md)            | Active household in an HttpOnly cookie, checked against memberships on every request  | Proposed |
+| [018](adr/0018-theme-in-a-cookie-with-an-inline-script.md) | Theme in a readable cookie, applied by an inline script before the first paint        |
 
 ## 4. Code organisation and conventions
 

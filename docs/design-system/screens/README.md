@@ -129,6 +129,18 @@ decision wins and the screen's spec says so.
 | Read aloud       | A visually hidden comma separates a row's label from its value ("Appearance, System").                                                             |
 | New token        | `avatar-lg` (56 px) for the account avatar.                                                                                                        |
 
+### Decisions taken building the profile forms (#22)
+
+| Topic              | Decision                                                                                                                                                                                                                                                                                                          |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Layout             | From 768 px, the cards with forms of the desktop frame (one column on tablets, two from `lg`). Phones keep the menu of rows, and each row opens its own page, which the screen did not define: `/settings/account`, `/settings/appearance` and `/settings/language` hold the same forms under "Back to settings". |
+| Email and password | The email is read-only and "Change password" is left out: the issue does not include them, #80 does.                                                                                                                                                                                                              |
+| Theme control      | Segments are 44 px tall, not the 36 px of `profile.html`, by the touch target rule.                                                                                                                                                                                                                               |
+| Avatar size        | 56 px (`avatar-lg`) on every width, not the 64 px of the desktop frame.                                                                                                                                                                                                                                           |
+| Notifications      | A row to "Coming soon" until M5, not the switches of the desktop frame.                                                                                                                                                                                                                                           |
+| Households         | The rows of #21, without the role or the "Switch" button of the desktop frame: the switcher is in the header.                                                                                                                                                                                                     |
+| Saved              | A message next to the form, as in household settings; the app has no Toast yet.                                                                                                                                                                                                                                   |
+
 ### Decisions taken building the household switcher (#20)
 
 | Topic           | Decision                                                                                                                                                                                                                  |
