@@ -50,8 +50,7 @@ async function analyzeWithoutStickyOverlap(page: Page) {
 }
 
 // Two animation frames: the theme change has been styled and painted, which is what a person
-// sees. WebKit on Linux can still report the old inherited text colour of freshly rendered
-// elements in the same frame as the change, which made axe report contrast that nobody sees.
+// sees.
 async function nextPaint(page: Page) {
   await page.evaluate(
     () =>

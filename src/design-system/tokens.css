@@ -157,8 +157,8 @@
   --scrim: rgba(0, 0, 0, 0.55);
 }
 
-/* NFR-A11Y-006: every transition becomes an instant change. 0.01ms rather than 0s, so
-   transitionend still fires for code that waits for it. */
+/* NFR-A11Y-006: every animation becomes an instant change. 0.01ms rather than 0s, so animationend
+   still fires for code that waits for it. globals.css sets every transition to 0s. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --duration-fast: 0.01ms;
