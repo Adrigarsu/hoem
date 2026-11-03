@@ -32,7 +32,7 @@ Card, Avatar, ListRow with value, SegmentedControl, Select, Switch, Field + Inpu
 ## States
 
 - **Sections not built yet** (M1): Notifications and Download my data open an EmptyState "Coming soon".
-- **Saved**: Toast "Changes saved".
+- **Saved**: "Changes saved" next to the form; the app has no Toast yet.
 - **Delete account**: typed confirmation dialog (type your e-mail); blocked if you are the last owner of a shared household (M1-10).
 - **Push blocked**: the push switch is disabled with "Blocked in your browser settings".
 

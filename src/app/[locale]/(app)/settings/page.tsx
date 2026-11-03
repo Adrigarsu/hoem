@@ -5,8 +5,8 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { SignOutButton } from "@/features/auth";
 import { currentHousehold } from "@/features/households";
-import { ownProfile } from "@/features/profile";
-import { SettingsMenu } from "@/features/settings";
+import { AccountForm, LanguageField, ownProfile, ThemeForm } from "@/features/profile";
+import { SettingsCards, SettingsMenu } from "@/features/settings";
 import { LaunchScreen, Page } from "@/features/shell";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
 import type { Locale } from "@/lib/i18n/locales";
@@ -56,7 +56,20 @@ async function Settings({ locale }: { locale: Locale }) {
         </div>
       }
     >
-      <SettingsMenu profile={profile} households={households} signOut={<SignOutButton />} />
+      {/* One or the other by width, never both: a hidden block is out of the accessibility tree. */}
+      <SettingsMenu
+        profile={profile}
+        households={households}
+        locale={locale}
+        signOut={<SignOutButton />}
+      />
+      <SettingsCards
+        households={households}
+        account={<AccountForm profile={profile} />}
+        theme={<ThemeForm theme={profile.theme} />}
+        language={<LanguageField locale={locale} />}
+        signOut={<SignOutButton />}
+      />
     </Page>
   );
 }

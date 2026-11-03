@@ -123,6 +123,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   jsdom joins the text of sibling spans without the spaces a browser adds, so a name built from
   several spans may need a looser match (`/^Appearance ?, ?System$/`) in unit tests.
 - Every RLS change needs a policy test that signs in as each affected role.
+- Next.js keeps a route announcer with `role="alert"`: in E2E, look for a page's alert inside `main`.
+  `/settings` holds one block per width, so filter what is on screen (`:visible`).
 - E2E specs import a feature's pure modules (`domain/`, `schemas.ts`) directly: its `index.ts` also
   brings `server-only` code, which Playwright cannot load.
 

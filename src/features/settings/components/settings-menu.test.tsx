@@ -1,13 +1,19 @@
 import { render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it } from "vitest";
+import type { Theme } from "@/lib/theme/theme";
 import messages from "../../../../messages/en.json";
 import { SettingsMenu } from "./settings-menu";
 
 const flat = { id: "0190a1b2-0000-7000-8000-000000000001", name: "Calle Mayor flat" };
 
 // jsdom and browsers space the hidden comma between a label and its value differently.
-const lucia = { displayName: "Lucía Fernández", email: "lucia@example.com" };
+const lucia = {
+  displayName: "Lucía Fernández",
+  email: "lucia@example.com",
+  avatarUrl: null,
+  theme: "system" as Theme,
+};
 
 function renderMenu({
   profile = lucia,
@@ -18,6 +24,7 @@ function renderMenu({
       <SettingsMenu
         profile={profile}
         households={households}
+        locale="en"
         signOut={<button type="submit">Sign out</button>}
       />
     </NextIntlClientProvider>,
@@ -53,6 +60,19 @@ describe("SettingsMenu", () => {
     expect(within(preferences).getByRole("link", { name: "Notifications" })).toHaveAttribute(
       "href",
       "/settings/notifications",
+    );
+  });
+
+  it("FR-ACC-007 shows the chosen theme next to Appearance", () => {
+    renderMenu({ profile: { ...lucia, theme: "dark" } });
+    expect(screen.getByRole("link", { name: /^Appearance ?, ?Dark$/ })).toBeInTheDocument();
+  });
+
+  it("FR-ACC-007 opens the language setting from Preferences, showing English", () => {
+    renderMenu();
+    expect(screen.getByRole("link", { name: /^Language ?, ?English$/ })).toHaveAttribute(
+      "href",
+      "/settings/language",
     );
   });
 

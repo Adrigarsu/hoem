@@ -14,9 +14,16 @@ async function expectEverySection(page: Page) {
   await expect(page.getByRole("region", { name: "Household" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Preferences" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Privacy and data" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Edit profile" })).toBeVisible();
-  // A hidden comma puts a pause between the label and the value when read aloud.
-  await expect(page.getByRole("link", { name: /^Appearance ?, ?System$/ })).toBeVisible();
+  if (isPhone(page)) {
+    await expect(page.getByRole("link", { name: "Edit profile" })).toBeVisible();
+    // A hidden comma puts a pause between the label and the value when read aloud.
+    await expect(page.getByRole("link", { name: /^Appearance ?, ?System$/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /^Language ?, ?English$/ })).toBeVisible();
+  } else {
+    await expect(page.getByRole("textbox", { name: "Name" })).toBeVisible();
+    await expect(page.getByRole("radiogroup", { name: "Theme" })).toBeVisible();
+    await expect(page.getByRole("combobox", { name: "Language" })).toBeVisible();
+  }
   await expect(page.getByRole("link", { name: "Notifications", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
 }

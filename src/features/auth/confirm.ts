@@ -1,7 +1,7 @@
 import "server-only";
 import { AuthFailedError } from "@/lib/errors";
 import { safeNextPath } from "./domain/next-path";
-import { rememberLocale } from "./locale-cookie";
+import { rememberPreferences } from "./locale-cookie";
 import { authGateway } from "./repository";
 import { verifyEmail, type VerificationType } from "./service";
 
@@ -15,8 +15,7 @@ export async function verifyEmailLink(params: URLSearchParams): Promise<string> 
   if (!tokenHash || !type) return "/sign-in?error=linkExpired";
 
   try {
-    const { locale } = await verifyEmail(await authGateway(), tokenHash, type);
-    await rememberLocale(locale);
+    await rememberPreferences(await verifyEmail(await authGateway(), tokenHash, type));
   } catch (error) {
     if (!(error instanceof AuthFailedError)) throw error;
     return `/sign-in?error=${error.reason === "linkExpired" ? "linkExpired" : "generic"}`;

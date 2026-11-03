@@ -7,7 +7,7 @@ import { AuthFailedError } from "@/lib/errors";
 import { requestOrigin } from "@/lib/request-origin";
 import type { AuthErrorKey } from "./domain/auth-errors";
 import { safeNextPath } from "./domain/next-path";
-import { rememberLocale } from "./locale-cookie";
+import { rememberPreferences } from "./locale-cookie";
 import { pendingSignUp, rememberPendingSignUp } from "./pending-sign-up-cookie";
 import { authGateway } from "./repository";
 import {
@@ -82,8 +82,7 @@ export async function signInAction(_: AuthFormState, formData: FormData): Promis
   }
 
   try {
-    const { locale } = await auth.signIn(await authGateway(), parsed.data);
-    await rememberLocale(locale);
+    await rememberPreferences(await auth.signIn(await authGateway(), parsed.data));
   } catch (error) {
     return failure(error, { email: parsed.data.email });
   }
@@ -162,12 +161,9 @@ export async function resetPasswordAction(
   }
 
   try {
-    const { locale } = await auth.resetPassword(
-      await authGateway(),
-      parsed.data.tokenHash,
-      parsed.data.password,
+    await rememberPreferences(
+      await auth.resetPassword(await authGateway(), parsed.data.tokenHash, parsed.data.password),
     );
-    await rememberLocale(locale);
   } catch (error) {
     return failure(error, undefined);
   }

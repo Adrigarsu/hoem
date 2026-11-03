@@ -11,6 +11,7 @@ import {
   verifyEmail,
 } from "./service";
 
+const preferences = { locale: "en", theme: "dark" as const };
 const signUpInput = {
   displayName: "Ana",
   email: "ana@example.com",
@@ -33,7 +34,7 @@ function gateway(overrides: Partial<AuthGateway> = {}): AuthGateway {
     resetPasswordForEmail: vi.fn(async () => ({ error: null })),
     updatePassword: vi.fn(async () => ({ error: null })),
     signOutOthers: vi.fn(async () => ({ error: null })),
-    profileLocale: vi.fn(async () => "en"),
+    profilePreferences: vi.fn(async () => preferences),
     ...overrides,
   };
 }
@@ -78,9 +79,9 @@ describe("signUp", () => {
 describe("signIn", () => {
   const credentials = { email: "ana@example.com", password: "correct horse" };
 
-  it("FR-ACC-001 signs in and returns the locale saved in the profile", async () => {
-    const auth = gateway({ profileLocale: async () => "en" });
-    await expect(signIn(auth, credentials)).resolves.toEqual({ locale: "en" });
+  it("FR-ACC-007 signs in and returns the locale and theme saved in the profile", async () => {
+    const auth = gateway({ profilePreferences: async () => preferences });
+    await expect(signIn(auth, credentials)).resolves.toEqual(preferences);
     expect(auth.signInWithPassword).toHaveBeenCalledWith(credentials);
   });
 
@@ -97,7 +98,7 @@ describe("signIn", () => {
   it("FR-ACC-001 does not read the profile when sign-in fails", async () => {
     const auth = gateway({ signInWithPassword: refused("invalid_credentials") });
     await signIn(auth, credentials).catch(() => undefined);
-    expect(auth.profileLocale).not.toHaveBeenCalled();
+    expect(auth.profilePreferences).not.toHaveBeenCalled();
   });
 });
 
@@ -121,9 +122,9 @@ describe("resendVerification", () => {
 });
 
 describe("verifyEmail", () => {
-  it("FR-ACC-001 verifies the token from the e-mail link and returns the profile locale", async () => {
+  it("FR-ACC-001 verifies the token from the e-mail link and returns the profile's preferences", async () => {
     const auth = gateway();
-    await expect(verifyEmail(auth, "hash", "email")).resolves.toEqual({ locale: "en" });
+    await expect(verifyEmail(auth, "hash", "email")).resolves.toEqual(preferences);
     expect(auth.verifyOtp).toHaveBeenCalledWith({ token_hash: "hash", type: "email" });
   });
 

@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { plusJakartaSans } from "@/lib/fonts";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
 import { supportedLocales } from "@/lib/i18n/locales";
+import { ThemeScript } from "@/lib/theme/theme-script";
 import "../globals.css";
 
 // One static shell per locale; src/proxy.ts rewrites every request to one of them.
@@ -20,7 +21,11 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const locale = await setLocaleFromParams(params);
   return (
-    <html lang={locale} className={plusJakartaSans.variable}>
+    // The script in <head> sets data-theme before React hydrates, on purpose.
+    <html lang={locale} className={plusJakartaSans.variable} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>

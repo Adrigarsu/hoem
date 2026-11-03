@@ -15,6 +15,7 @@ export { Note } from "./components/note";
 export { PasswordField } from "./components/password-field";
 export { ProgressBar } from "./components/progress-bar";
 export { RadioCard } from "./components/radio-card";
+export { SegmentedControl } from "./components/segmented-control";
 export { SelectField } from "./components/select-field";
 export { TextField } from "./components/text-field";
 export { Tile } from "./components/tile";
