@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(10);
+select plan(11);
 
 -- Two people sign up; the second without a name.
 insert into auth.users (id, email, raw_user_meta_data)
@@ -142,6 +142,25 @@ select is_empty(
     where id = (select household_id from personal where user_id = '00000000-0000-7000-8000-000000000401')
   $$,
   'FR-ACC-003 deleting all the accounts of a household at once deletes the household'
+);
+
+-- Google sign-up: the claims Supabase Auth stores as metadata, with no display_name.
+insert into auth.users (id, email, raw_user_meta_data)
+values (
+  '00000000-0000-7000-8000-000000000404',
+  'google@example.com',
+  '{"full_name": "Lucía García", "name": "Lucía García"}'
+);
+
+select results_eq(
+  $$
+    select h.name, h.type::text, m.role::text
+    from public.households as h
+    join public.memberships as m on m.household_id = h.id
+    where m.user_id = '00000000-0000-7000-8000-000000000404'
+  $$,
+  $$ values ('Lucía García''s home', 'single', 'owner') $$,
+  'FR-ACC-002 a Google sign-up gets a personal household with the user as owner'
 );
 
 select * from finish();
