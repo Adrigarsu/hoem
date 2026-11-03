@@ -64,6 +64,13 @@
       "when": 1793718453231,
       "tag": "20261103150733_delete-own-account",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793729940286,
+      "tag": "20261103181900_google-profile-name",
+      "breakpoints": true
     }
   ]
 }
