@@ -43,6 +43,20 @@
       "when": 1793214589566,
       "tag": "20261028190949_household-type",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793662533498,
+      "tag": "20261102233533_profiles-avatar-path",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793662534994,
+      "tag": "20261102233534_avatars-storage",
+      "breakpoints": true
     }
   ]
 }

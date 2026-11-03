@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ADD CONSTRAINT "profiles_avatar_path_own_folder" CHECK ("profiles"."avatar_path" is null or starts_with("profiles"."avatar_path", "profiles"."id"::text || '/'));
