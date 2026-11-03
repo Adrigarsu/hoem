@@ -103,7 +103,7 @@ jobs:
         run: pnpm exec playwright install-deps chromium webkit
 
       - name: Start a local Supabase
-        run: pnpm exec supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+        run: pnpm exec supabase start -x realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
 
       # next build inlines NEXT_PUBLIC_* values, so they must be set before the build.
       - name: Point the app at the local Supabase
