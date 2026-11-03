@@ -18,7 +18,8 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 ## Privacy rules
 
 - Photos live in the private `avatars` bucket under `{user_id}/{uuid v7}.webp`. Only the owner uploads
-  and deletes them; the owner and people who share a household with them can read them. Someone who
+  and deletes them, and uploading needs a profile, so a token that outlives a deleted account cannot
+  store a photo; the owner and people who share a household with them can read them. Someone who
   leaves the household loses access (`supabase/tests/database/avatars.test.sql`).
 - The server re-encodes every photo with `sharp` to a 256×256 WebP. The original is never stored, so
   the location in a phone photo's metadata never reaches other members.

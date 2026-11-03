@@ -57,6 +57,13 @@
       "when": 1793662534994,
       "tag": "20261102233534_avatars-storage",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793718453231,
+      "tag": "20261103150733_delete-own-account",
+      "breakpoints": true
     }
   ]
 }

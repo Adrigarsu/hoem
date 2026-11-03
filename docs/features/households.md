@@ -26,6 +26,10 @@ shopping lists and splitting (SRS §3.7).
     14 (ages stay private: only the database knows them).
   - The household takes the rules of its new type and keeps its meal slots. Leaving "family" clears
     the family roles.
+- **When an account is deleted** (FR-ACC-007, ADR-019): the households the user was alone in go with
+  it. Someone who is the last owner of a household with other members cannot delete their account,
+  or leave, until someone else is an owner (`last_owner`). The app does not offer this yet: the
+  database function comes first, and the screen with the rest of #23.
 
 ## Privacy rules
 

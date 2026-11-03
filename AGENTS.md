@@ -75,6 +75,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   cookie (ADR-017).
 - Visibility of private records is decided at write time (`visible_to_parents`, set by a
   trigger). Never use the current household type to decide visibility.
+- Deleting an account deletes the user's private records and files (ADR-019): a foreign key cannot
+  tell private from shared rows, so a table with private records handles it, with a pgTAP test.
 - Money is integer cents (`amountCents: number` in TS, `bigint` in SQL). Never floats.
   Format only in the UI with `Intl.NumberFormat`.
 - Instants are `timestamptz` in UTC; calendar days are `date`. Apply the user's time zone only
