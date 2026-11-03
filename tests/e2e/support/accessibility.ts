@@ -34,14 +34,58 @@ const colourSettleLimitMs = 5_000;
 
 async function analyzeUntilColoursSettle(page: Page) {
   const canHaveStaleColours = page.context().browser()?.browserType().name() === "webkit";
+  // TEMP #81: remove before /ship.
+  let pass = 1;
+  await logColourDiagnostics(page, "before", pass, []);
   let { violations } = await analyzeWithoutStickyOverlap(page);
+  await logColourDiagnostics(page, "after", pass, violations);
   // Counted from the end of the first pass, so a slow pass still gets its recheck.
   const deadline = Date.now() + colourSettleLimitMs;
   while (canHaveStaleColours && isOnlyContrast(violations) && Date.now() < deadline) {
     await nextPaint(page);
+    pass += 1;
     ({ violations } = await analyzeWithoutStickyOverlap(page));
+    await logColourDiagnostics(page, "after", pass, violations);
   }
   return violations;
+}
+
+// TEMP #81: remove before /ship. Only prints when something is running or has failed, or when a
+// recheck has just cleared a failure, to tell apart the possible causes of the stale colours.
+async function logColourDiagnostics(
+  page: Page,
+  moment: "before" | "after",
+  pass: number,
+  violations: { id: string; nodes: { target: unknown[] }[] }[],
+) {
+  const selectors = violations.flatMap(({ nodes }) => nodes.map(({ target }) => String(target[0])));
+  const snapshot = await page.evaluate((nodeSelectors) => {
+    const transitions = document
+      .getAnimations()
+      .map((animation) =>
+        animation instanceof CSSTransition ? animation.transitionProperty : "other",
+      );
+    return {
+      theme: document.documentElement.dataset.theme,
+      running: transitions.length,
+      properties: [...new Set(transitions)].slice(0, 10),
+      sticky: [...document.querySelectorAll("body *")].filter(
+        (element) => getComputedStyle(element).position === "sticky",
+      ).length,
+      nodes: nodeSelectors.map((selector) => {
+        const node = document.querySelector(selector);
+        return (
+          node && {
+            selector,
+            color: getComputedStyle(node).color,
+            own: node.getAnimations().length,
+          }
+        );
+      }),
+    };
+  }, selectors);
+  if (snapshot.running === 0 && violations.length === 0 && pass === 1) return;
+  console.log(`[#81] ${moment} pass ${pass} ${page.url()} ${JSON.stringify(snapshot)}`);
 }
 
 function isOnlyContrast(violations: { id: string }[]) {

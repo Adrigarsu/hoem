@@ -59,7 +59,8 @@ jobs:
   e2e:
     name: e2e
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # TEMP #81: back to 25 before /ship.
+    timeout-minutes: 60
     # The Supabase URL and key come from the local stack, set in a step below. Placeholder, not a
     # secret: nothing in the E2E tests sends real e-mail.
     env:
@@ -115,6 +116,14 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # TEMP #81: remove before /ship. Retries off, so a stale colour cannot pass by a second attempt.
+      - name: Repeat the WebKit contrast check
+        run: >-
+          pnpm test:e2e tests/e2e/household-switcher.spec.ts tests/e2e/household-type.spec.ts
+          -g "lists my households|the owner creates a shared flat"
+          --project=safari-360 --project=safari-768 --project=safari-1440
+          --repeat-each=5 --retries=0 --reporter=list
 
       - name: End-to-end tests
         run: pnpm test:e2e
