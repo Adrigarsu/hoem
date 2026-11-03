@@ -22,14 +22,17 @@
     }
   }
 
-  /* NFR-A11Y-006: also stops transitions and animations that do not use the motion tokens. */
+  /* NFR-A11Y-006: also stops transitions and animations that do not use the motion tokens.
+     Transitions take 0s, not a tiny duration: transition-property defaults to `all`, so any longer
+     value would start a transition on every element, and inherited colours would change one level
+     per frame (#81). */
   @media (prefers-reduced-motion: reduce) {
     *,
     ::before,
     ::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+      transition-duration: 0s !important;
       scroll-behavior: auto !important;
     }
   }

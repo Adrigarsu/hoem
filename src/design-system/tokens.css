@@ -127,7 +127,7 @@
   --border: #474541;
   --border-control: #8e8c88;
   --text: #f6f3ef;
-  --text-secondary: #4a4845;
+  --text-secondary: #c6c4c0;
   --text-muted: #adaaa7;
   --brand: #8fb1ff;
   --brand-hover: #b4d1ff;
@@ -157,8 +157,8 @@
   --scrim: rgba(0, 0, 0, 0.55);
 }
 
-/* NFR-A11Y-006: every transition becomes an instant change. 0.01ms rather than 0s, so
-   transitionend still fires for code that waits for it. */
+/* NFR-A11Y-006: every animation becomes an instant change. 0.01ms rather than 0s, so animationend
+   still fires for code that waits for it. globals.css sets every transition to 0s. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --duration-fast: 0.01ms;
