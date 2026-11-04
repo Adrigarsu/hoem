@@ -134,15 +134,19 @@ hoem/
 
 ### 4.2 Layers inside a feature
 
-Dependencies only point down. Today code review keeps them that way; an ESLint rule that fails the build when one points up is planned (`docs/roadmap.md`).
+Dependencies only point down. ESLint fails the build when one points up (`eslint-plugin-boundaries` and, for the domain, `no-restricted-imports`, in `eslint.config.mjs`); unit tests are exempt so they can reach the layer they test.
 
-| Layer        | Files                                 | Allowed to import | Responsibility                                           |
-| ------------ | ------------------------------------- | ----------------- | -------------------------------------------------------- |
-| Presentation | `components/`, `app/` pages           | Application       | Render, collect input, show errors                       |
-| Entry points | `actions.ts`, `app/api/v1/…/route.ts` | Application       | Auth session, input parsing, response mapping            |
-| Application  | `service.ts`                          | Domain, Data      | Use cases, membership and role checks                    |
-| Domain       | `domain/*.ts`                         | nothing           | Pure rules: splits, merging ingredients, next occurrence |
-| Data         | `repository.ts`                       | `src/db`          | Queries, always scoped by `household_id`                 |
+| Layer        | Files                                 | May import                                                   | Responsibility                                           |
+| ------------ | ------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
+| Presentation | `components/`, `app/` pages           | Server Actions, schemas, domain; service types only          | Render, collect input, show errors                       |
+| Entry points | `actions.ts`, `app/api/v1/…/route.ts` | Service, repository (to hand it to the service), schemas     | Auth session, input parsing, wiring, response mapping    |
+| Application  | `service.ts`                          | Domain, schemas; never the repository                        | Use cases, membership and role checks                    |
+| Domain       | `domain/*.ts`                         | Other domain files only: no React, Next.js, Supabase or `db` | Pure rules: splits, merging ingredients, next occurrence |
+| Data         | `repository.ts`                       | `src/db`, `src/lib`, the service's gateway type and errors   | Queries, always scoped by `household_id`                 |
+
+**Gateways (dependency inversion).** A service does not import its repository. It declares the data access it needs as a type, its gateway (`HouseholdGateway` in `households/service.ts`), and receives one as an argument. `repository.ts` implements that type (`householdGateway`), and the entry point, a Server Action or a route handler, passes it in: `activeHousehold(householdGateway)`. Business rules therefore depend on an interface they own, not on Supabase, and service tests pass a fake gateway instead of a database.
+
+Between features, only `index.ts` may be imported, from anywhere in `src/`. End-to-end specs are the exception: they import a feature's pure `domain/` and `schemas.ts` directly, because `index.ts` also brings `server-only` code.
 
 Shared contracts sit beside them: `schemas.ts` (Zod, used by forms, actions and the API) and `index.ts` (the only file other features may import).
 

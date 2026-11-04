@@ -53,6 +53,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   `src/features/<feature>/{components/, actions.ts, service.ts, domain/, repository.ts, schemas.ts, index.ts}`
 - Dependencies only point down: presentation → entry points (Server Actions, `src/app/api/v1`)
   → application (`service.ts`) → domain (`domain/`, pure) and data (`repository.ts`).
+  A service never imports its repository: it declares a gateway type and the entry point passes
+  the repository in (`architecture.md` §4.2). ESLint (`eslint-plugin-boundaries`) enforces both.
 - `domain/` is pure TypeScript: no React, no I/O, no Supabase.
 - A feature is imported by others only through its `index.ts`.
 - Business rules live once, in services. Server Actions and API routes stay thin:
