@@ -47,8 +47,10 @@ function PhotoForm({ name, photo }: { name: string; photo: string | null }) {
   const helpId = useId();
   const ownPhoto = useOwnPhoto();
   const shown = photo !== null && !ownPhoto.hidden;
-  // So "Photo updated" from an earlier change does not stay next to the initials.
+  // So "Photo updated" from an earlier change does not stay next to the initials; it comes back
+  // with the photo after Undo or a failed removal.
   const [removed, setRemoved] = useState(false);
+  const savedShown = state.status === "saved" && (shown || !removed);
 
   function remove() {
     ownPhoto.remove();
@@ -71,6 +73,7 @@ function PhotoForm({ name, photo }: { name: string; photo: string | null }) {
     }
     ownPhoto.undo();
     setRemoved(false);
+    await ownPhoto.settled();
     formRef.current?.requestSubmit();
   }
 
@@ -111,7 +114,7 @@ function PhotoForm({ name, photo }: { name: string; photo: string | null }) {
       </div>
       {/* In the page from the start, so a screen reader announces the change of text. */}
       <p role="status" className="text-small text-text-secondary">
-        {!pending && !failure && state.status === "saved" && !removed && t("saved")}
+        {!pending && !failure && savedShown && t("saved")}
       </p>
       {failure && !pending && <FormMessage tone="danger">{t(failure)}</FormMessage>}
     </form>

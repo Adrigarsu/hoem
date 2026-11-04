@@ -38,7 +38,11 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 - Members cannot read each other's names or `avatar_path` until #26 opens that policy; the storage
   policy that lets them read the photo is already in place.
 - Removing clears `avatar_path` before deleting the files, so the profile never points at a missing
-  file, and a second request (another tab, a repeated `pagehide`) does nothing.
+  file, and a second request (another tab, a repeated `pagehide`) does nothing. It reads the profile
+  again before deleting, so a photo another tab uploaded meanwhile is kept, and this tab waits for a
+  removal already sent before uploading a new photo.
+- Signing out within the 5 seconds sends the removal first: once the session ends, it would be
+  refused.
 - During the 5-second undo the file still exists and members can still load it, as ADR-009 intends.
   Closing the tab sends the removal on `pagehide`, best effort: a browser may cut that request off,
   and then the photo is still there on the next visit.

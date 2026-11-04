@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { undoDelayMs, useUndoTimer } from "./use-undo-timer";
+import { commitWaitingUndos, undoDelayMs, useUndoTimer } from "./use-undo-timer";
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -33,11 +33,21 @@ describe("useUndoTimer", () => {
     expect(commit).not.toHaveBeenCalled();
   });
 
-  it("NFR-UX-002 reports whether something is waiting", () => {
-    const { hook } = started();
-    expect(hook.result.current.pending).toBe(true);
+  it("NFR-UX-002 commits every waiting action on request, and waits for them to finish", async () => {
+    let finish = () => undefined as void;
+    const commit = vi.fn(() => new Promise<void>((resolve) => (finish = resolve)));
+    const hook = renderHook(() => useUndoTimer());
+    act(() => hook.result.current.start(commit));
+    let done = false;
+    const all = commitWaitingUndos().then(() => (done = true));
+    expect(commit).toHaveBeenCalledTimes(1);
+    await Promise.resolve();
+    expect(done).toBe(false);
+    finish();
+    await all;
+    expect(done).toBe(true);
     act(() => vi.advanceTimersByTime(undoDelayMs));
-    expect(hook.result.current.pending).toBe(false);
+    expect(commit).toHaveBeenCalledTimes(1);
   });
 
   it("NFR-A11Y-001 stops the countdown while paused and resumes with the time left", () => {

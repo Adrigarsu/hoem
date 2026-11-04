@@ -16,7 +16,7 @@ describe("Toast", () => {
   });
 
   it("NFR-A11Y-001 announces an error in the alert region", () => {
-    render(<Toast message="Could not remove the photo" tone="alert" />);
+    render(<Toast message="Could not remove the photo" tone="danger" />);
     expect(screen.getByRole("alert")).toHaveTextContent("Could not remove the photo");
     expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
@@ -47,5 +47,39 @@ describe("Toast", () => {
     expect(onPause).toHaveBeenCalled();
     await userEvent.tab();
     expect(onResume).toHaveBeenCalled();
+  });
+
+  it("NFR-A11Y-001 keeps the countdown paused while the focus stays after the pointer leaves", async () => {
+    const onPause = vi.fn();
+    const onResume = vi.fn();
+    render(
+      <Toast
+        message="Photo removed"
+        action={{ label: "Undo", onClick: vi.fn() }}
+        onPause={onPause}
+        onResume={onResume}
+      />,
+    );
+    await userEvent.tab();
+    await userEvent.hover(screen.getByText("Photo removed"));
+    await userEvent.unhover(screen.getByText("Photo removed"));
+    expect(onPause).toHaveBeenCalledTimes(1);
+    expect(onResume).not.toHaveBeenCalled();
+  });
+
+  it("NFR-A11Y-003 returns focus to where it was when the toast appeared, after its action", async () => {
+    function Page({ message }: { message: string | null }) {
+      return (
+        <>
+          <button type="button">Change photo</button>
+          <Toast message={message} action={{ label: "Undo", onClick: vi.fn() }} />
+        </>
+      );
+    }
+    const { rerender } = render(<Page message={null} />);
+    screen.getByRole("button", { name: "Change photo" }).focus();
+    rerender(<Page message="Photo removed" />);
+    await userEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(screen.getByRole("button", { name: "Change photo" })).toHaveFocus();
   });
 });

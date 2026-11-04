@@ -123,8 +123,10 @@ readers announce each message; confirmations use `status`, errors `alert`.
 
 A delete with undo (ADR-009) pairs it with `useUndoTimer`: hide the item, `start(commit)`, and
 `undo()` from the toast. The timer commits after 5 seconds, on `pagehide` and on unmount, and the
-toast pauses it while the pointer or the focus is on it (WCAG 2.2.1). Focus never falls to the page
-when the deleted item's button disappears: move it to the nearest control that stays.
+toast pauses it while the pointer or the focus is on it (WCAG 2.2.1). Signing out first awaits
+`commitWaitingUndos()`, since the server refuses a delete once the session is gone. Focus never falls
+to the page when the deleted item's button disappears: move it to the nearest control that stays;
+after its action, the toast returns focus to where it was when it appeared.
 
 ## Accessibility checklist
 

@@ -247,6 +247,12 @@ describe("changeAvatar", () => {
 
 describe("removePhoto", () => {
   const leftover = `${userId}/leftover.webp`;
+  // The profile as removePhoto reads it before and after clearing it.
+  const clearedPhoto = () =>
+    vi
+      .fn()
+      .mockResolvedValueOnce({ ...stored, avatarPath: oldPath })
+      .mockResolvedValue(stored);
 
   it("FR-ACC-007 clears the photo from the signed-in user's own profile", async () => {
     const profiles = gateway({ profileById: withPhoto() });
@@ -256,7 +262,7 @@ describe("removePhoto", () => {
 
   it("FR-ACC-007 deletes every file in the user's folder, after clearing the profile", async () => {
     const profiles = gateway({
-      profileById: withPhoto(),
+      profileById: clearedPhoto(),
       avatarFiles: vi.fn(async () => [oldPath, leftover]),
     });
     await removePhoto(profiles);
@@ -265,6 +271,20 @@ describe("removePhoto", () => {
     expect(vi.mocked(profiles.updateProfile).mock.invocationCallOrder[0]).toBeLessThan(
       vi.mocked(profiles.removeAvatar).mock.invocationCallOrder[0] ?? 0,
     );
+  });
+
+  it("FR-ACC-007 never deletes a photo uploaded while the removal was running", async () => {
+    const newPath = `${userId}/new.webp`;
+    const profiles = gateway({
+      profileById: vi
+        .fn()
+        .mockResolvedValueOnce({ ...stored, avatarPath: oldPath })
+        .mockResolvedValueOnce({ ...stored, avatarPath: newPath }),
+      avatarFiles: vi.fn(async () => [oldPath, newPath]),
+    });
+    await removePhoto(profiles);
+    expect(profiles.removeAvatar).toHaveBeenCalledWith(oldPath);
+    expect(profiles.removeAvatar).not.toHaveBeenCalledWith(newPath);
   });
 
   it("FR-ACC-007 does nothing when there is no photo, so a repeated request is harmless", async () => {
@@ -289,7 +309,7 @@ describe("removePhoto", () => {
   it("FR-ACC-007 succeeds even if a file cannot be deleted, and logs it", async () => {
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
     const profiles = gateway({
-      profileById: withPhoto(),
+      profileById: clearedPhoto(),
       avatarFiles: vi.fn(async () => [oldPath]),
       removeAvatar: vi.fn(async () => {
         throw new Error("storage down");

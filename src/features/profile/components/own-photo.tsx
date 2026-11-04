@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { createContext, startTransition, use, useState, type ReactNode } from "react";
+import { createContext, startTransition, use, useRef, useState, type ReactNode } from "react";
 import { Avatar, Toast, useUndoTimer } from "@/design-system";
 import { removePhotoAction } from "../actions";
 
@@ -13,6 +13,8 @@ type OwnPhoto = {
   remove: () => void;
   // Also when a new photo is chosen: the removal still waiting would otherwise delete it.
   undo: () => void;
+  // Resolves once a removal already sent has finished, so a new photo is not uploaded under it.
+  settled: () => Promise<void>;
   pause: () => void;
   resume: () => void;
 };
@@ -25,6 +27,7 @@ const OwnPhotoContext = createContext<OwnPhoto>({
   notice: null,
   remove: noop,
   undo: noop,
+  settled: async () => undefined,
   pause: noop,
   resume: noop,
 });
@@ -36,35 +39,51 @@ const OwnPhotoContext = createContext<OwnPhoto>({
 export function OwnPhotoProvider({ children }: { children: ReactNode }) {
   const [hidden, setHidden] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
-  const timer = useUndoTimer();
+  const removal = useUndoTimer();
+  // Separate from the removal, so dismissing a message is never mistaken for committing a delete.
+  const dismissal = useUndoTimer();
+  const sent = useRef<Promise<void>>(Promise.resolve());
 
   function commit() {
     setNotice(null);
-    startTransition(async () => {
-      const { removed } = await removePhotoAction();
-      // In the same transition as the refreshed layout, so the photo never flashes back.
-      startTransition(() => setHidden(false));
-      if (removed) return;
-      setNotice("removeFailed");
-      timer.start(() => setNotice(null));
+    sent.current = new Promise<void>((resolve) => {
+      startTransition(async () => {
+        const { removed } = await removePhotoAction();
+        // In the same transition as the refreshed layout, so the photo never flashes back.
+        startTransition(() => setHidden(false));
+        if (!removed) {
+          setNotice("removeFailed");
+          dismissal.start(() => setNotice(null));
+        }
+        resolve();
+      });
     });
+    return sent.current;
   }
 
   const value: OwnPhoto = {
     hidden,
     notice,
     remove() {
+      dismissal.undo();
       setHidden(true);
       setNotice("removed");
-      timer.start(commit);
+      removal.start(commit);
     },
     undo() {
-      timer.undo();
+      removal.undo();
       setHidden(false);
       setNotice(null);
     },
-    pause: timer.pause,
-    resume: timer.resume,
+    settled: () => sent.current,
+    pause() {
+      removal.pause();
+      dismissal.pause();
+    },
+    resume() {
+      removal.resume();
+      dismissal.resume();
+    },
   };
 
   return <OwnPhotoContext value={value}>{children}</OwnPhotoContext>;
@@ -89,7 +108,7 @@ export function OwnPhotoToast() {
   return (
     <Toast
       message={notice && t(notice)}
-      tone={notice === "removeFailed" ? "alert" : "status"}
+      tone={notice === "removeFailed" ? "danger" : "success"}
       action={notice === "removed" ? { label: t("undo"), onClick: undo } : undefined}
       onPause={pause}
       onResume={resume}

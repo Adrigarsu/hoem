@@ -91,6 +91,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   Never commit secrets and never read `.env` files.
 - Deleting hides the item at once with a 5-second undo, then deletes for real. No soft delete.
   Use `useUndoTimer` and `Toast` from `@/design-system` (see its README, "Toast and undo").
+- The signed-in user's own avatar is `OwnAvatar` (`@/features/profile`), never `Avatar` with
+  `avatarUrl`: it hides the photo during its undo window. A lint rule enforces it.
 - **Migrations are backward compatible (expand/contract, ADR-014):** a migration that adds a
   column, table or function merges in its own pull request, before the code that uses it, because
   Vercel deploys the app while `migrate.yml` is still running. Remove the old one in a later pull

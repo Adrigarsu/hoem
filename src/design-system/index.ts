@@ -22,4 +22,4 @@ export { Tile } from "./components/tile";
 export { Toast } from "./components/toast";
 export { Tooltip } from "./components/tooltip";
 export { useFormFocus } from "./use-form-focus";
-export { undoDelayMs, useUndoTimer } from "./use-undo-timer";
+export { commitWaitingUndos, undoDelayMs, useUndoTimer } from "./use-undo-timer";

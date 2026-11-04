@@ -81,6 +81,14 @@ describe("Remove my profile photo", () => {
     expect(removePhotoAction).not.toHaveBeenCalled();
   });
 
+  it("FR-ACC-007 Undo returns focus to Change photo instead of dropping it", () => {
+    removePhoto();
+    const undo = screen.getByRole("button", { name: "Undo" });
+    undo.focus();
+    fireEvent.click(undo);
+    expect(screen.getByLabelText("Change photo")).toHaveFocus();
+  });
+
   it("FR-ACC-007 deletes the photo for real once the 5 seconds have passed", async () => {
     removePhoto();
     await act(() => vi.advanceTimersByTimeAsync(undoDelayMs));
