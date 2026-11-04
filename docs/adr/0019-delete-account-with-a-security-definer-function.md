@@ -1,6 +1,6 @@
 # ADR-019 Delete an account through a security definer function
 
-Date: 2026-11-03 · Status: Proposed
+Date: 2026-11-03 · Status: Accepted
 
 ## Context
 

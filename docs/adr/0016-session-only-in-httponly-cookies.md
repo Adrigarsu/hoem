@@ -1,6 +1,6 @@
 # ADR-016 Session only in HttpOnly cookies
 
-Date: 2026-10-25 · Status: Proposed
+Date: 2026-10-25 · Status: Accepted
 
 ## Context
 

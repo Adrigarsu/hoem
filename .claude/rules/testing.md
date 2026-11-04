@@ -17,3 +17,5 @@ paths:
   `getByLabelText`, `getByText`. Avoid `getByTestId`; never query by class name.
 - Interact with `@testing-library/user-event`, not `fireEvent`.
 - Never weaken or delete a failing test to make it pass. Fix the code or ask.
+- Before writing an end-to-end test or a component test that matches an accessible name, read
+  `docs/guides/testing.md`: it lists what breaks in jsdom, Safari and Next.js navigations.

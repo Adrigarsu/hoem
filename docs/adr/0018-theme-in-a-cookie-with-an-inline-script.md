@@ -1,6 +1,6 @@
 # ADR-018 Theme in a readable cookie, applied by an inline script
 
-Date: 2026-11-03 · Status: Proposed
+Date: 2026-11-03 · Status: Accepted
 
 ## Context
 

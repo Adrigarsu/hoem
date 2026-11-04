@@ -1,6 +1,6 @@
 # ADR-020 Commit undoable deletes on pagehide with a keepalive request to the REST API
 
-Date: 2026-11-04 · Status: Proposed
+Date: 2026-11-04 · Status: Accepted · Amends ADR-005
 
 ## Context
 
