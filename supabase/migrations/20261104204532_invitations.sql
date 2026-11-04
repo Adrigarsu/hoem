@@ -44,8 +44,12 @@ create trigger invitations_set_updated_at
 -- goes through private.create_invitation, which checks what a policy cannot (the invitee is not
 -- already a member, the family role fits the household type). Accepting (#28) will go through its
 -- own security definer function, which checks the token, the expiry and the invitee's e-mail.
+-- Every column but token_hash: nothing in the app reads it, and it is the key the accept
+-- function (#28) looks the invitation up by.
 revoke all on public.invitations from anon, authenticated;
-grant select, delete on public.invitations to authenticated;
+grant select (id, household_id, email, family_role, invited_by, expires_at, accepted_at, created_at, updated_at)
+  on public.invitations to authenticated;
+grant delete on public.invitations to authenticated;
 
 -- Only who may invite sees and cancels invitations (FR-HH-006): in a family the parents, in the
 -- other types the owners. A child, a relative or a plain member sees none, so the invitees' e-mails
@@ -61,15 +65,20 @@ create policy invitations_delete on public.invitations
 -- Invites someone to the household, or renews their pending invitation with a new token and seven
 -- more days, so the earlier link stops working (FR-ACC-005, FR-HH-006). The app generates the token
 -- and sends only its SHA-256 here, so the token is never stored. Security definer to read the
--- members' e-mails in auth.users; it answers only whether the address belongs to a member of this
--- household, which the caller already sees in the member list, and nothing about anyone else.
+-- members' e-mails in auth.users.
+--
+-- Telling the inviter that an address already belongs to a member is what US-ACC-01 asks for, but it
+-- also confirms a member's e-mail, which the member list never shows. So that answer is a result,
+-- not an error, and every call counts against the invitations limit: a refusal would roll the count
+-- back, and a manager could guess addresses without limit. The limit lives here and not only in the
+-- REST routes because the Data API reaches this function directly (NFR-SEC-006, ADR-021).
 create function private.create_invitation(
   household_id uuid,
   email text,
   family_role public.family_role,
   token_hash bytea
 )
-returns table (id uuid, expires_at timestamptz, renewed boolean)
+returns table (id uuid, expires_at timestamptz, outcome text)
 language plpgsql
 security definer
 set search_path = ''
@@ -81,10 +90,18 @@ declare
   caller uuid := (select auth.uid());
   normalized text := lower(btrim(create_invitation.email));
   household_type public.household_type;
+  retry_after integer;
 begin
   if caller is null then
     raise exception 'not authenticated'
       using errcode = 'insufficient_privilege', hint = 'not_authenticated';
+  end if;
+  -- The same 60 a minute as the REST writes, in a bucket of its own so one request through the
+  -- REST route is not counted twice against the same allowance.
+  retry_after := private.consume_rate_limit('invitations', 60, 60);
+  if retry_after > 0 then
+    raise exception 'too many invitations'
+      using errcode = 'program_limit_exceeded', hint = 'rate_limited', detail = retry_after::text;
   end if;
   -- The same answer for a household that does not exist and one the caller may not manage
   -- (NFR-SEC-001).
@@ -93,9 +110,12 @@ begin
       using errcode = 'insufficient_privilege', hint = 'not_manager';
   end if;
 
+  -- Shared with the lock change_household_type takes, so the type cannot change between this check
+  -- and the insert; renaming the household is not held up.
   select h.type into household_type
   from public.households as h
-  where h.id = create_invitation.household_id;
+  where h.id = create_invitation.household_id
+  for share;
   -- "Just me" has nobody else (FR-ONB-007); the type changes first (FR-HH-007).
   if household_type = 'single' then
     raise exception 'a single-person household takes no invitations'
@@ -118,8 +138,8 @@ begin
     join auth.users as u on u.id = m.user_id
     where m.household_id = create_invitation.household_id and lower(u.email) = normalized
   ) then
-    raise exception 'this person is already a member of the household'
-      using errcode = 'unique_violation', hint = 'already_member';
+    return query select null::uuid, null::timestamptz, 'already_member';
+    return;
   end if;
 
   -- The unique index on pending invitations decides between inviting and renewing in one
@@ -140,7 +160,7 @@ begin
         family_role = excluded.family_role,
         invited_by = excluded.invited_by,
         expires_at = excluded.expires_at
-  returning i.id, i.expires_at, i.xmax <> 0;
+  returning i.id, i.expires_at, case when i.xmax <> 0 then 'renewed' else 'invited' end;
 end;
 $$;
 
@@ -156,7 +176,7 @@ create function public.create_invitation(
   family_role public.family_role,
   token_hash bytea
 )
-returns table (id uuid, expires_at timestamptz, renewed boolean)
+returns table (id uuid, expires_at timestamptz, outcome text)
 language sql
 volatile
 security invoker
@@ -169,3 +189,36 @@ revoke execute on function public.create_invitation(uuid, text, public.family_ro
   from public, anon;
 grant execute on function public.create_invitation(uuid, text, public.family_role, bytea)
   to authenticated;
+
+-- A type change keeps pending invitations in line with the new type, as change_household_type does
+-- with the members' family roles (FR-HH-007): leaving a family clears their family roles, becoming
+-- a family drops them (nobody chose a family role for the invitee), and "Just me" takes none
+-- (FR-ONB-007). Otherwise accepting one (#28) would add someone with a role the household refuses.
+-- The household row is already locked by the update, so a concurrent create_invitation waits.
+create function private.align_invitations_with_type()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if new.type = 'single' or new.type = 'family' then
+    delete from public.invitations as i
+    where i.household_id = new.id and i.accepted_at is null;
+  elsif old.type = 'family' then
+    update public.invitations as i
+    set family_role = null
+    where i.household_id = new.id and i.accepted_at is null;
+  end if;
+  return null;
+end;
+$$;
+
+-- Only the trigger calls it; Postgres checks the privilege when the trigger is created.
+revoke execute on function private.align_invitations_with_type() from public, anon, authenticated;
+
+create trigger households_align_invitations_with_type
+  after update of type on public.households
+  for each row
+  when (old.type is distinct from new.type)
+  execute function private.align_invitations_with_type();

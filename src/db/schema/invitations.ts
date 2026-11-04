@@ -4,7 +4,9 @@ import { authUsers } from "drizzle-orm/supabase";
 import { familyRole, households } from "./households";
 
 // Case-insensitive, so "Marcos@Example.com" and "marcos@example.com" are one invitation. The
-// extension lives in the extensions schema (created at the top of the migration).
+// extension lives in the extensions schema (created at the top of the migration). Drizzle quotes a
+// custom type as one identifier, "extensions.citext", which Postgres rejects: a generated migration
+// that touches this column needs the quotes removed by hand.
 const citext = customType<{ data: string }>({ dataType: () => "extensions.citext" });
 const bytea = customType<{ data: Uint8Array }>({ dataType: () => "bytea" });
 
