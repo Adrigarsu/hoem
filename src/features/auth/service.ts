@@ -1,7 +1,8 @@
-import { AuthFailedError } from "@/lib/errors";
+import { AuthFailedError, NotAuthenticatedError } from "@/lib/errors";
 import type { Theme } from "@/lib/theme/theme";
 import { authErrorKey } from "./domain/auth-errors";
-import type { SignInInput, SignUpInput } from "./schemas";
+import type { VerificationType } from "./domain/verification-link";
+import type { ChangePasswordInput, SignInInput, SignUpInput } from "./schemas";
 
 // The parts of Supabase Auth this feature uses, plus the profile lookup (repository.ts), so the
 // rules here are tested without a network. Passwords go straight to Supabase Auth: they are never
@@ -11,6 +12,10 @@ type AuthResult = Promise<{ error: { code?: string } | null }>;
 // What the browser keeps from the profile, for the proxy (locale) and the first paint (theme).
 // Null when the profile could not be read, so the cookies keep what they have.
 export type ProfilePreferences = { locale: string | null; theme: Theme | null };
+
+// The signed-in account as Supabase Auth has it now, not as the session token remembers it: the
+// e-mail may have changed since the token was issued (FR-ACC-007).
+export type Account = { email: string; pendingEmail: string | null; hasPassword: boolean };
 
 export type AuthGateway = {
   signUp(params: {
@@ -30,9 +35,9 @@ export type AuthGateway = {
   updatePassword(password: string): AuthResult;
   signOutOthers(): AuthResult;
   profilePreferences(): Promise<ProfilePreferences>;
+  account(): Promise<Account | null>;
+  updateEmail(email: string, options: { emailRedirectTo: string }): AuthResult;
 };
-
-export type VerificationType = "email" | "signup";
 
 type SignUpContext = { locale: string; timeZone: string; confirmUrl: string };
 
@@ -110,4 +115,44 @@ export async function resetPassword(auth: AuthGateway, tokenHash: string, passwo
   // already saved: a failure here must not tell the user that the reset failed.
   await auth.signOutOthers();
   return auth.profilePreferences();
+}
+
+export async function currentAccount(auth: AuthGateway): Promise<Account> {
+  const account = await auth.account();
+  if (!account) throw new NotAuthenticatedError();
+  return account;
+}
+
+// Supabase e-mails a link to the new address and changes nothing until it is opened. An address
+// that belongs to another account gets the same answer, so the form never reveals who has signed
+// up (as on sign-up); that account receives nothing.
+export async function changeEmail(auth: AuthGateway, email: string, confirmUrl: string) {
+  const account = await currentAccount(auth);
+  if (email === account.email.toLowerCase()) throw new AuthFailedError("sameEmail");
+  const { error } = await auth.updateEmail(email, { emailRedirectTo: confirmUrl });
+  if (error && error.code !== "email_exists") throw new AuthFailedError(authErrorKey(error.code));
+}
+
+// Someone at a computer left signed in must not be able to change the password, so an account
+// that has one proves it first (OWASP ASVS V6). Supabase only checks a password by signing in,
+// which renews this session; the other sessions go afterwards. An account created with Google has
+// no password yet and sets one.
+export async function changePassword(auth: AuthGateway, input: ChangePasswordInput) {
+  const account = await currentAccount(auth);
+  if (account.hasPassword) await verifyCurrentPassword(auth, account.email, input.currentPassword);
+
+  const { error } = await auth.updatePassword(input.password);
+  // Keeping the current password is allowed, as in the reset (decided in #24).
+  if (error && error.code !== "same_password") throw new AuthFailedError(authErrorKey(error.code));
+
+  // The new password is already saved: a failure here must not say that the change failed.
+  await auth.signOutOthers();
+}
+
+async function verifyCurrentPassword(auth: AuthGateway, email: string, password: string) {
+  if (!password) throw new AuthFailedError("wrongPassword");
+  const { error } = await auth.signInWithPassword({ email, password });
+  if (!error) return;
+  const rateLimited = error.code === "over_request_rate_limit";
+  throw new AuthFailedError(rateLimited ? "rateLimited" : "wrongPassword");
 }

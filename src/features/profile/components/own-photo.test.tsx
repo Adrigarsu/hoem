@@ -24,7 +24,7 @@ function renderPage(avatarUrl: string | null = photo) {
           <OwnAvatar name="Lucía" src={avatarUrl} />
         </nav>
         <main>
-          <AccountForm profile={{ displayName: "Lucía", email: "lucia@example.com", avatarUrl }} />
+          <AccountForm profile={{ displayName: "Lucía", avatarUrl }} email={null} />
         </main>
         <OwnPhotoToast />
       </OwnPhotoProvider>

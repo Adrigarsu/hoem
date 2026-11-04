@@ -5,6 +5,8 @@ export type AuthErrorKey =
   | "linkExpired"
   | "rateLimited"
   | "weakPassword"
+  | "wrongPassword"
+  | "sameEmail"
   | "generic";
 
 // Supabase Auth error codes → what we tell the user. "invalid_credentials" covers both a wrong

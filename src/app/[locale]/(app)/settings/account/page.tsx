@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { EmailForm, ownAccount } from "@/features/auth";
 import { AccountForm, ownProfile } from "@/features/profile";
+import { settingsPaths } from "@/features/settings";
 import { LaunchScreen, SettingsSubpage } from "@/features/shell";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
 import type { Locale } from "@/lib/i18n/locales";
@@ -26,10 +28,13 @@ export default async function AccountPage({ params }: PageProps<"/[locale]/setti
 
 async function Account({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "Settings" });
-  const profile = await ownProfile();
+  const [profile, account] = await Promise.all([ownProfile(), ownAccount()]);
   return (
     <SettingsSubpage title={t("account")}>
-      <AccountForm profile={profile} />
+      <AccountForm
+        profile={profile}
+        email={<EmailForm account={account} passwordHref={settingsPaths.password} />}
+      />
     </SettingsSubpage>
   );
 }

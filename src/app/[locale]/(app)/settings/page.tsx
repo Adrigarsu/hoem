@@ -3,10 +3,10 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { SignOutButton } from "@/features/auth";
+import { EmailForm, ownAccount, SignOutButton } from "@/features/auth";
 import { currentHousehold } from "@/features/households";
 import { AccountForm, LanguageField, ownProfile, ThemeForm } from "@/features/profile";
-import { SettingsCards, SettingsMenu } from "@/features/settings";
+import { SettingsCards, SettingsMenu, settingsPaths } from "@/features/settings";
 import { LaunchScreen, Page } from "@/features/shell";
 import { setLocaleFromParams } from "@/lib/i18n/locale-param";
 import type { Locale } from "@/lib/i18n/locales";
@@ -33,8 +33,9 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
 
 async function Settings({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "Settings" });
-  const [profile, households] = await Promise.all([
+  const [profile, account, households] = await Promise.all([
     ownProfile(),
+    ownAccount(),
     // The same read as the sidebar switcher, so the households are queried once per request.
     currentHousehold().then(({ households }) => households),
   ]);
@@ -65,7 +66,12 @@ async function Settings({ locale }: { locale: Locale }) {
       />
       <SettingsCards
         households={households}
-        account={<AccountForm profile={profile} />}
+        account={
+          <AccountForm
+            profile={profile}
+            email={<EmailForm account={account} passwordHref={settingsPaths.password} />}
+          />
+        }
         theme={<ThemeForm theme={profile.theme} />}
         language={<LanguageField locale={locale} />}
         signOut={<SignOutButton />}
