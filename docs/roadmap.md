@@ -4,8 +4,8 @@ How HØEM gets from today to the release and beyond. GitHub holds the milestones
 `docs/planning.md` holds the order of the open issues; this file holds the big picture: phases,
 gates, milestones and the work that still has to become issues.
 
-> **Draft.** The sections marked _To define_ are being worked out with the developer. Nothing in
-> "Work to turn into issues" exists on GitHub yet.
+> **Draft.** The phases and gates are a proposal, and the sections marked _To define_ are being
+> worked out with the developer. Nothing in "Work to turn into issues" exists on GitHub yet.
 
 ## How the work is organised
 
@@ -30,23 +30,58 @@ and track Mn …`) that lists every requirement it covers, and is split into sto
 
 ## Phases and gates
 
-_To define:_ the SRS roadmap had 4 phases and 3 gates in a diagram that was lost when the document
-was exported. What is still known:
+**Proposed** (November 2026), rebuilt after the original SRS diagram was lost: 4 phases and
+3 gates, keeping the phase numbers of SRS §4. A phase starts only when the gate before it is
+passed (SRS §8).
 
-| Phase | Goal                                        | Requirements                                                        | Ends at                 |
-| ----- | ------------------------------------------- | ------------------------------------------------------------------- | ----------------------- |
-| 1     | MVP: the core modules, released as `v1.0.0` | SRS §3 and §5 (Must, then Should)                                   | Gate B: portfolio-ready |
-| 2     | _To define_                                 | SRS §4, phase 2 (savings, subscriptions, shopping history, Spanish) | _To define_             |
-| 3     | _To define_                                 | SRS §4, phase 3 (chores, habits, offline, AI assistant, receipts)   | _To define_             |
-| 4     | _To define_                                 | _To define_                                                         | —                       |
+```mermaid
+flowchart LR
+  p0["Phase 0<br/>Walking skeleton<br/>M0"] --> gA{{"Gate A<br/>Skeleton live"}}
+  gA --> p1["Phase 1<br/>MVP<br/>M1a – M7"] --> gB{{"Gate B<br/>v1.0.0, portfolio-ready"}}
+  gB --> p2["Phase 2<br/>SRS §4 phase 2"] --> gC{{"Gate C<br/>v1.x complete"}}
+  gC --> p3["Phase 3<br/>SRS §4 phase 3"]
+```
 
-Questions to answer together:
+| Phase | Goal                                                                        | Milestones | Ends at |
+| ----- | --------------------------------------------------------------------------- | ---------- | ------- |
+| 0     | Prove the stack end to end: deploy, database, sign-in, tokens, CI           | M0         | Gate A  |
+| 1     | MVP: every Must of SRS §3 and §5, released as `v1.0.0`                      | M1a – M7   | Gate B  |
+| 2     | Savings goals, subscriptions, shopping history, Spanish (SRS §4, phase 2)   | M8 onwards | Gate C  |
+| 3     | Chores, habits, offline reading, meal assistant, receipts (SRS §4, phase 3) | To plan    | —       |
 
-1. What do Gate A and Gate C stand for, and where is Gate A (inside phase 1, for example after
-   M1b)?
-2. What are the exit criteria of each gate (for example: every Must closed, accessibility audit
-   passed, Lighthouse ≥ 90, no open bug with `priority:must`)?
-3. What is phase 4?
+Phase 2 and 3 milestones are planned at Gate B and Gate C, after their requirements are detailed in
+the SRS (SRS §4).
+
+### Gate A: skeleton live (passed)
+
+- [x] The app is deployed at https://hoemapp.com from `main`, with a preview per pull request.
+- [x] Supabase staging and production run in the EU, and migrations reach them through
+      `migrate.yml` (ADR-013, ADR-014).
+- [x] Sign-up and sign-in by e-mail work, with e-mails sent by Resend.
+- [x] CI runs lint, typecheck, unit tests, database tests and end-to-end tests with axe-core.
+- [x] Design tokens and next-intl are in place.
+
+### Gate B: v1.0.0, portfolio-ready
+
+- [ ] Every `Must` requirement of SRS §3 and §5 is closed and proved by a test named with its ID.
+      `Should` requirements left out are listed in the release notes.
+- [ ] No open bug with `priority:must`.
+- [ ] Accessibility: axe-core passes in both themes, and a manual keyboard and screen-reader pass
+      on every screen finds no WCAG 2.2 AA failure (NFR-A11Y).
+- [ ] Performance: Lighthouse ≥ 90 on the main screens on mobile (NFR-PERF-002).
+- [ ] Security: a review against the OWASP ASVS checklist, rate limits on, no high-severity
+      vulnerability in dependencies (NFR-SEC).
+- [ ] Legal: privacy policy and terms published (NFR-LEG-002), data export and deletion work
+      (NFR-LEG-003).
+- [ ] The demo opens without an account in under a minute (FR-DEMO).
+- [ ] Error tracking and logs are in place (architecture §9.3).
+- [ ] Every milestone's documentation review is closed, and `v1.0.0` is tagged.
+
+### Gate C: v1.x complete
+
+- [ ] Every `Must` of phase 2 is closed, with the same quality bar as Gate B (accessibility,
+      performance, security).
+- [ ] The interface is fully translated into Spanish (FR-I18N-001).
 
 ## Phase 1 milestones
 
@@ -81,6 +116,5 @@ we agree on its milestone and priority; then it is placed in `docs/planning.md`.
 | Lighthouse CI on the preview URL                                                                   | architecture §9.2 row 6       | M7                 | NFR-PERF-002                                |
 | Secret scanning and dependency audit in CI                                                         | architecture §9.2 row 7       | _To define_        | GitHub secret scanning may cover half of it |
 | Feature pages for `auth`, `home` and `shell`                                                       | `docs/features/`              | M1 docs review #71 | Could join #71 instead of a new issue       |
-| Move setup, deployment and runbooks into `docs/guides/`                                            | `docs/guides/README.md`       | M1 docs review #71 | Being done in this branch                   |
 | Release process: changelog and tags                                                                | Organisation review, point 8  | M7                 | Pending decision                            |
 | Documentation review issue for each of M2–M7                                                       | `AGENTS.md`, Planning         | M2–M7              | Created when each tracking issue is split   |
