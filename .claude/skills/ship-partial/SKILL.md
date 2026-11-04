@@ -25,7 +25,8 @@ For the last part of an issue, the one that completes it, use `/ship` instead: i
    line, stop and tell me: the part starts with `/start-partial`.
 2. Run `git fetch origin` and `git merge origin/main` (never rebase). If there are conflicts, stop
    and show them to me.
-3. Run `pnpm check`. If this part touches `supabase/`, also run `pnpm db:reset` (local database only)
+3. Run the `code-review` skill on the branch and fix what it finds (`CLAUDE.md`). Then run
+   `pnpm check`. If this part touches `supabase/`, also run `pnpm db:reset` (local database only)
    and `pnpm db:test`. If anything fails, fix the cause and run it again. Do not continue until it
    all passes.
 4. Check that this part can reach production alone, because Vercel deploys it as soon as it merges:
@@ -39,7 +40,8 @@ For the last part of an issue, the one that completes it, use `/ship` instead: i
    its docs and ADRs, and instruction files. The issue's acceptance criteria as a whole wait for
    `/ship`. List what is left for the later parts. If the part touches the UI, the collages from
    `pnpm app:capture` are required: take them if they are missing or out of date, and compare them
-   with the screen in `docs/design-system/screens/`. **Keep the issue's row in `docs/planning.md`.**
+   with the screen in `docs/design-system/screens/` (`docs/guides/screenshots.md`). **Keep the
+   issue's row in `docs/planning.md`.**
 6. Commit this part's changes with Conventional Commits that include the requirement ID, staging
    files by name. If there is a change that does not belong to this part, stop and ask. Never use
    `--no-verify`. No AI attribution in commits or the pull request (no `Co-Authored-By: Claude`, no
