@@ -85,6 +85,13 @@
       "when": 1793814618927,
       "tag": "20261104175018_household-members",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793818966888,
+      "tag": "20261104190246_api-rate-limits",
+      "breakpoints": true
     }
   ]
 }
