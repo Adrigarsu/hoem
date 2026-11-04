@@ -44,8 +44,8 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 - Signing out within the 5 seconds sends the removal first: once the session ends, it would be
   refused.
 - During the 5-second undo the file still exists and members can still load it, as ADR-009 intends.
-  Closing the tab sends the removal on `pagehide`, best effort: a browser may cut that request off,
-  and then the photo is still there on the next visit.
+  Closing the tab sends the removal on `pagehide` as a keepalive `DELETE /api/v1/profile/avatar`,
+  which outlives the page (ADR-020); only a killed browser sends nothing.
 - Files do not cascade with the account: deleting the account (#23) must remove them too.
 
 ## Where it lives
