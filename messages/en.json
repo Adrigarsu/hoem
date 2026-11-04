@@ -271,6 +271,31 @@
       "create": "Create a new household",
       "switching": "Switching…",
       "switchedTo": "{name} is now the active household."
+    },
+    "members": {
+      "title": "Members",
+      "you": "{name} (you)",
+      "noName": "Member without a name",
+      "options": "Options for {name}",
+      "optionsLede": "What can change for {name} in {household}.",
+      "makeOwner": "Make owner",
+      "makeMember": "Make member",
+      "stepDown": "Stop being an owner",
+      "saving": "Saving…",
+      "lastOwner": "Make someone else owner first.",
+      "familyRole": "Family role",
+      "saveFamilyRole": "Save role",
+      "lastParent": "Make someone else a parent first.",
+      "onlyParents": "Only parents change family roles.",
+      "remove": "Remove from household",
+      "close": "Close",
+      "savedOwner": "{name} is now an owner.",
+      "savedMember": "{name} is now a member.",
+      "savedFamilyRole": "{name} is now {role, select, parent {a parent} child {a child} other {a relative}}.",
+      "stale": "The household changed in the meantime. This is how it is now.",
+      "removed": "{name} removed from the household",
+      "undo": "Undo",
+      "removeFailed": "We could not remove {name}. Try again."
     }
   },
   "Profile": {

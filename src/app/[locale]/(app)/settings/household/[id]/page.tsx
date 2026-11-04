@@ -8,6 +8,7 @@ import { FormMessage } from "@/design-system";
 import {
   HouseholdDetails,
   householdGateway,
+  HouseholdMembers,
   householdSettings,
   type HouseholdSettingsView,
 } from "@/features/households";
@@ -35,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: t("title") };
 }
 
-// Household settings (household-settings.md): #19 builds Details; Members (#26) and the rules
-// (#30, #31) come later. The data loads inside <Suspense>, like Settings: opening it from Settings
+// Household settings (household-settings.md): Members (#26) and Details (#19); the rules (#30, #31)
+// come later. The data loads inside <Suspense>, like Settings: opening it from Settings
 // keeps the settings segment mounted, so the (app) loading screen does not cover that navigation.
 export default async function HouseholdSettingsPage({ params, searchParams }: Props) {
   const locale = await setLocaleFromParams(params);
@@ -79,6 +80,7 @@ async function HouseholdSettings({
         {created === "1" && (
           <FormMessage tone="success">{t("created", { name: household.name })}</FormMessage>
         )}
+        <HouseholdMembers household={household} />
         <HouseholdDetails household={household} />
       </div>
     </Page>

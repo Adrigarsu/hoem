@@ -20,6 +20,7 @@ export { SelectField } from "./components/select-field";
 export { TextField } from "./components/text-field";
 export { Tile } from "./components/tile";
 export { Toast } from "./components/toast";
+export { ToastPortal, ToastSlot, ToastSlotProvider } from "./components/toast-slot";
 export { Tooltip } from "./components/tooltip";
 export { useFormFocus } from "./use-form-focus";
 export { commitWaitingUndos, undoDelayMs, useUndoTimer } from "./use-undo-timer";

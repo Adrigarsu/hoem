@@ -7,10 +7,14 @@ import {
 } from "@/lib/errors";
 import {
   activeHousehold,
+  changeFamilyRole,
   changeHouseholdType,
   createHousehold,
   householdSettings,
+  MemberChangeRefusedError,
+  removeMember,
   renameHousehold,
+  setMemberRole,
   switchHousehold,
   TypeChangeRefusedError,
   type HouseholdGateway,
@@ -30,9 +34,34 @@ const home = {
 };
 const flatSummary = { ...flat, memberCount: 2 };
 const flatmates: Member[] = [
-  { userId: lucia, role: "owner", familyRole: null },
-  { userId: marcos, role: "member", familyRole: null },
+  { userId: lucia, role: "owner", familyRole: null, displayName: "Lucía", avatarPath: null },
+  {
+    userId: marcos,
+    role: "member",
+    familyRole: null,
+    displayName: "Marcos",
+    avatarPath: `${marcos}/photo.webp`,
+  },
 ];
+
+const pilar = "00000000-0000-7000-8000-000000000101";
+const pablo = "00000000-0000-7000-8000-000000000102";
+const carla = "00000000-0000-7000-8000-000000000103";
+const familyHousehold = { id: householdId, name: "García family", type: "family" as const };
+const garcias: Member[] = [
+  { userId: pilar, role: "owner", familyRole: "relative", displayName: "Pilar", avatarPath: null },
+  { userId: pablo, role: "member", familyRole: "parent", displayName: "Pablo", avatarPath: null },
+  { userId: carla, role: "member", familyRole: "child", displayName: "Carla", avatarPath: null },
+];
+
+function familyGateway(you: string, overrides: Partial<HouseholdGateway> = {}) {
+  return gateway({
+    signedInUserId: vi.fn(async () => you),
+    householdById: vi.fn(async () => familyHousehold),
+    membersOf: vi.fn(async () => garcias),
+    ...overrides,
+  });
+}
 
 function gateway(overrides: Partial<HouseholdGateway> = {}): HouseholdGateway {
   return {
@@ -43,6 +72,12 @@ function gateway(overrides: Partial<HouseholdGateway> = {}): HouseholdGateway {
     membersOf: vi.fn(async () => flatmates),
     renameHousehold: vi.fn(async () => {}),
     changeHouseholdType: vi.fn(async () => {}),
+    avatarUrls: vi.fn(async (paths: string[]) =>
+      Object.fromEntries(paths.map((path) => [path, `https://signed/${path}`])),
+    ),
+    setMemberRole: vi.fn(async () => {}),
+    setFamilyRole: vi.fn(async () => true),
+    removeMember: vi.fn(async () => {}),
     preferredHouseholdId: vi.fn(async () => null),
     rememberHousehold: vi.fn(async () => {}),
     ...overrides,
@@ -121,15 +156,37 @@ describe("switchHousehold", () => {
 });
 
 describe("householdSettings", () => {
-  it("FR-ACC-009 shows the household with the caller's role and the members in order", async () => {
+  it("FR-ACC-006 shows every member's name, photo and role, in joining order", async () => {
     expect(await householdSettings(gateway(), householdId)).toEqual({
       ...flat,
       isOwner: true,
       members: [
-        { userId: lucia, role: "owner", familyRole: null, isYou: true },
-        { userId: marcos, role: "member", familyRole: null, isYou: false },
+        {
+          userId: lucia,
+          role: "owner",
+          familyRole: null,
+          displayName: "Lucía",
+          avatarUrl: null,
+          isYou: true,
+          permissions: { stepDown: "lastOwner" },
+        },
+        {
+          userId: marcos,
+          role: "member",
+          familyRole: null,
+          displayName: "Marcos",
+          avatarUrl: `https://signed/${marcos}/photo.webp`,
+          isYou: false,
+          permissions: { makeOwner: "allowed", remove: "allowed" },
+        },
       ],
     });
+  });
+
+  it("FR-ACC-006 signs no photo URL when nobody has a photo", async () => {
+    const households = familyGateway(pilar);
+    await householdSettings(households, householdId);
+    expect(households.avatarUrls).not.toHaveBeenCalled();
   });
 
   it("FR-ACC-009 tells a member who is not an owner", async () => {
@@ -235,5 +292,122 @@ describe("changeHouseholdType", () => {
     expect((error as ValidationError).fieldErrors).toEqual([
       { field: "familyRoles", code: "noParent" },
     ]);
+  });
+});
+
+describe("setMemberRole", () => {
+  it("FR-ACC-006 lets a flat owner make a member an owner", async () => {
+    const households = gateway();
+    await setMemberRole(households, { householdId, userId: marcos, role: "owner" });
+    expect(households.setMemberRole).toHaveBeenCalledWith(householdId, marcos, "owner");
+  });
+
+  it("FR-ACC-006 lets an owner who is not a parent hand over ownership of a family", async () => {
+    const households = familyGateway(pilar);
+    await setMemberRole(households, { householdId, userId: pablo, role: "owner" });
+    expect(households.setMemberRole).toHaveBeenCalledWith(householdId, pablo, "owner");
+  });
+
+  it("FR-ACC-006 does not let a member who is not an owner make anyone an owner", async () => {
+    const households = gateway(asMarcos);
+    await expect(
+      setMemberRole(households, { householdId, userId: marcos, role: "owner" }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    expect(households.setMemberRole).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-006 asks the only owner to make someone else owner before stepping down", async () => {
+    const households = gateway();
+    await expect(
+      setMemberRole(households, { householdId, userId: lucia, role: "member" }),
+    ).rejects.toEqual(new MemberChangeRefusedError("lastOwner"));
+    expect(households.setMemberRole).not.toHaveBeenCalled();
+  });
+
+  it("NFR-SEC-001 refuses someone who is not a member of the household", async () => {
+    await expect(
+      setMemberRole(gateway(), { householdId, userId: pilar, role: "owner" }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("NFR-SEC-001 hides a household the caller does not belong to", async () => {
+    await expect(
+      setMemberRole(gateway({ householdById: vi.fn(async () => null) }), {
+        householdId,
+        userId: marcos,
+        role: "owner",
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+  });
+});
+
+describe("changeFamilyRole", () => {
+  it("FR-HH-006 lets a parent set a member's family role", async () => {
+    const households = familyGateway(pablo);
+    await changeFamilyRole(households, { householdId, userId: carla, familyRole: "relative" });
+    expect(households.setFamilyRole).toHaveBeenCalledWith(householdId, carla, "relative");
+  });
+
+  it("FR-HH-008 does not let an owner who is a relative change family roles", async () => {
+    const households = familyGateway(pilar);
+    await expect(
+      changeFamilyRole(households, { householdId, userId: carla, familyRole: "parent" }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    expect(households.setFamilyRole).not.toHaveBeenCalled();
+  });
+
+  it("FR-HH-006 asks the last parent to make someone else a parent first", async () => {
+    const households = familyGateway(pablo);
+    await expect(
+      changeFamilyRole(households, { householdId, userId: pablo, familyRole: "relative" }),
+    ).rejects.toEqual(new MemberChangeRefusedError("lastParent"));
+    expect(households.setFamilyRole).not.toHaveBeenCalled();
+  });
+
+  it("FR-HH-006 changes nothing when the role is the current one", async () => {
+    const households = familyGateway(pablo);
+    await changeFamilyRole(households, { householdId, userId: carla, familyRole: "child" });
+    expect(households.setFamilyRole).not.toHaveBeenCalled();
+  });
+
+  it("FR-HH-006 refuses family roles outside a family household", async () => {
+    await expect(
+      changeFamilyRole(gateway(), { householdId, userId: marcos, familyRole: "parent" }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
+  it("NFR-SEC-001 reports a change the database refused as forbidden", async () => {
+    const households = familyGateway(pablo, { setFamilyRole: vi.fn(async () => false) });
+    await expect(
+      changeFamilyRole(households, { householdId, userId: carla, familyRole: "relative" }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+  });
+});
+
+describe("removeMember", () => {
+  it("FR-ACC-006 lets a flat owner remove a member", async () => {
+    const households = gateway();
+    await removeMember(households, { householdId, userId: marcos });
+    expect(households.removeMember).toHaveBeenCalledWith(householdId, marcos);
+  });
+
+  it("FR-ACC-006 does not let a member who is not an owner remove anyone", async () => {
+    const households = gateway(asMarcos);
+    await expect(removeMember(households, { householdId, userId: lucia })).rejects.toBeInstanceOf(
+      ForbiddenError,
+    );
+    expect(households.removeMember).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-006 does not remove the caller, which is leaving the household", async () => {
+    await expect(removeMember(gateway(), { householdId, userId: lucia })).rejects.toBeInstanceOf(
+      ForbiddenError,
+    );
+  });
+
+  it("NFR-UX-002 does nothing for a member already removed, so a repeated request is harmless", async () => {
+    const households = gateway();
+    await removeMember(households, { householdId, userId: pilar });
+    expect(households.removeMember).not.toHaveBeenCalled();
   });
 });

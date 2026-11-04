@@ -3,8 +3,14 @@ import Link from "next/link";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 import { Tooltip } from "./tooltip";
 
-const className =
-  "relative inline-grid size-control-height place-items-center rounded-md border border-border-control bg-surface text-text transition-colors duration-fast hover:bg-surface-subtle";
+const base =
+  "relative inline-grid size-control-height place-items-center rounded-md border text-text transition-colors duration-fast hover:bg-surface-subtle";
+
+// Ghost for a button inside a row that is already a target, such as a member's options.
+const variants = {
+  outline: "border-border-control bg-surface",
+  ghost: "border-transparent bg-transparent",
+};
 
 type CommonProps = {
   icon: LucideIcon;
@@ -13,6 +19,7 @@ type CommonProps = {
   // A small brand dot, such as "new notifications". Never the only signal: say it in the label.
   dot?: boolean;
   tooltipAlign?: "center" | "end";
+  variant?: keyof typeof variants;
 };
 
 // With href it is a link, such as the bell that opens Notifications, and takes link attributes;
@@ -32,8 +39,10 @@ export function IconButton({
   label,
   dot = false,
   tooltipAlign,
+  variant = "outline",
   ...props
 }: IconButtonProps) {
+  const className = `${base} ${variants[variant]}`;
   const content = (
     <>
       <Icon aria-hidden="true" className="size-icon-md" strokeWidth={1.5} />

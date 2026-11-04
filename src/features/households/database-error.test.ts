@@ -1,9 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { ForbiddenError } from "@/lib/errors";
+import { ForbiddenError, NotFoundError } from "@/lib/errors";
 import { databaseError } from "./database-error";
-import { MinorCannotCreateError, TypeChangeRefusedError } from "./service";
+import {
+  MemberChangeRefusedError,
+  MinorCannotCreateError,
+  TypeChangeRefusedError,
+} from "./service";
 
 describe("databaseError", () => {
+  it("FR-ACC-006 recognises the last owner by its code", () => {
+    expect(databaseError({ code: "23514", message: "reworded", hint: "last_owner" })).toEqual(
+      new MemberChangeRefusedError("lastOwner"),
+    );
+  });
+
+  it("FR-HH-006 recognises the last parent of a family by its code", () => {
+    expect(databaseError({ code: "23514", message: "reworded", hint: "last_parent" })).toEqual(
+      new MemberChangeRefusedError("lastParent"),
+    );
+  });
+
+  it("NFR-SEC-001 turns someone outside the household into not found", () => {
+    expect(
+      databaseError({ code: "P0002", message: "reworded", hint: "not_member" }),
+    ).toBeInstanceOf(NotFoundError);
+  });
+
   it("FR-ACC-009 recognises 'single' with other members by its code, whatever the message says", () => {
     expect(databaseError({ code: "23514", message: "reworded", hint: "other_members" })).toEqual(
       new TypeChangeRefusedError("otherMembers"),

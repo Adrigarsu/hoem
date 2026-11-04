@@ -70,7 +70,28 @@ export const changeHouseholdTypeSchema = z.object({
 // The household chosen in the switcher (FR-ACC-004).
 export const switchHouseholdSchema = z.object({ householdId });
 
+// Member management (FR-ACC-006, FR-HH-006). The member is named by their user id; who may change
+// them is decided by the service and the database, which know the roles.
+const memberId = z.uuid();
+
+export const setMemberRoleSchema = z.object({
+  householdId,
+  userId: memberId,
+  role: z.enum(["owner", "member"]),
+});
+
+export const changeFamilyRoleSchema = z.object({
+  householdId,
+  userId: memberId,
+  familyRole: z.enum(familyRoles, { error: "required" }),
+});
+
+export const removeMemberSchema = z.object({ householdId, userId: memberId });
+
 export type CreateHouseholdInput = z.infer<typeof createHouseholdSchema>;
 export type RenameHouseholdInput = z.infer<typeof renameHouseholdSchema>;
 export type ChangeHouseholdTypeInput = z.infer<typeof changeHouseholdTypeSchema>;
 export type SwitchHouseholdInput = z.infer<typeof switchHouseholdSchema>;
+export type SetMemberRoleInput = z.infer<typeof setMemberRoleSchema>;
+export type ChangeFamilyRoleInput = z.infer<typeof changeFamilyRoleSchema>;
+export type RemoveMemberInput = z.infer<typeof removeMemberSchema>;

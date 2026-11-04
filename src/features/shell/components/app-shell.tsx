@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Suspense, type ReactNode } from "react";
+import { ToastSlot, ToastSlotProvider } from "@/design-system";
 import { OwnPhotoProvider, OwnPhotoToast } from "@/features/profile";
 import { AvatarFab, ProfileTheme } from "./profile-entries";
 import { Sidebar } from "./sidebar";
@@ -12,26 +13,30 @@ export function AppShell({ children }: { children: ReactNode }) {
   const t = useTranslations("Shell");
   return (
     <OwnPhotoProvider>
-      <div className="flex min-h-dvh flex-col md:pl-sidebar-width">
-        <a
-          href="#main"
-          className="sr-only z-30 rounded-md bg-surface px-4 py-3 text-label text-text focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
-        >
-          {t("skipToContent")}
-        </a>
-        <Sidebar />
-        <Suspense>
-          <AvatarFab />
-          <ProfileTheme />
-        </Suspense>
-        <main id="main" tabIndex={-1} className="flex flex-1 flex-col">
-          {children}
-        </main>
-        <div className="sticky bottom-0 z-10">
-          <OwnPhotoToast />
-          <TabBar />
+      <ToastSlotProvider>
+        <div className="flex min-h-dvh flex-col md:pl-sidebar-width">
+          <a
+            href="#main"
+            className="sr-only z-30 rounded-md bg-surface px-4 py-3 text-label text-text focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
+          >
+            {t("skipToContent")}
+          </a>
+          <Sidebar />
+          <Suspense>
+            <AvatarFab />
+            <ProfileTheme />
+          </Suspense>
+          <main id="main" tabIndex={-1} className="flex flex-1 flex-col">
+            {children}
+          </main>
+          <div className="sticky bottom-0 z-10">
+            <OwnPhotoToast />
+            {/* The toasts of the page, such as a removal's undo. */}
+            <ToastSlot />
+            <TabBar />
+          </div>
         </div>
-      </div>
+      </ToastSlotProvider>
     </OwnPhotoProvider>
   );
 }
