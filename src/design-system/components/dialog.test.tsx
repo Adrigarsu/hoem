@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Activity } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Dialog } from "./dialog";
 
@@ -34,6 +35,72 @@ describe("Dialog", () => {
     renderDialog(true, onClose);
     await userEvent.click(screen.getByRole("button", { name: "Keep Shared flat" }));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("NFR-A11Y-003 closes when its route is kept hidden, so the next page is not left inert", () => {
+    const dialog = (mode: "visible" | "hidden") => (
+      <Activity mode={mode}>
+        <Dialog open onClose={vi.fn()} title="Title" description="Text" actions={null} />
+      </Activity>
+    );
+    const { rerender } = render(dialog("visible"));
+    const element = screen.getByRole<HTMLDialogElement>("dialog", { name: "Title" });
+    rerender(dialog("hidden"));
+    expect(element.open).toBe(false);
+  });
+
+  it("NFR-A11Y-003 Escape can be held back while something irreversible is under way", () => {
+    render(
+      <Dialog
+        open
+        dismissible={false}
+        onClose={vi.fn()}
+        title="Title"
+        description="Text"
+        actions={null}
+      />,
+    );
+    const cancel = new Event("cancel", { cancelable: true });
+    screen.getByRole("dialog", { name: "Title" }).dispatchEvent(cancel);
+    expect(cancel.defaultPrevented).toBe(true);
+  });
+
+  it("NFR-A11Y-003 reopens when the browser closes it while it cannot be dismissed", () => {
+    // Chromium lets a second Escape close a dialog without a cancelable cancel event.
+    const onClose = vi.fn();
+    render(
+      <Dialog
+        open
+        dismissible={false}
+        onClose={onClose}
+        title="Title"
+        description="Text"
+        actions={null}
+      />,
+    );
+    const element = screen.getByRole<HTMLDialogElement>("dialog", { name: "Title" });
+    element.close();
+    expect(element.open).toBe(true);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("NFR-A11Y-003 still closes with its hidden route while it cannot be dismissed", () => {
+    const dialog = (mode: "visible" | "hidden") => (
+      <Activity mode={mode}>
+        <Dialog
+          open
+          dismissible={false}
+          onClose={vi.fn()}
+          title="Title"
+          description="Text"
+          actions={null}
+        />
+      </Activity>
+    );
+    const { rerender } = render(dialog("visible"));
+    const element = screen.getByRole<HTMLDialogElement>("dialog", { name: "Title" });
+    rerender(dialog("hidden"));
+    expect(element.open).toBe(false);
   });
 
   it("NFR-A11Y-003 can interrupt as an alert dialog", () => {

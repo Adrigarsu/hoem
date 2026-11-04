@@ -422,7 +422,7 @@ Every pull request gets its own preview deployment and must pass the same checks
 
 ### 9.2 Pipeline
 
-GitHub Actions runs these jobs on every pull request; all must pass before merging into `main`. Today rows 1–2 are the `checks` job, 3 is `database`, and 4–5 are `e2e`; the OpenAPI check, Lighthouse and the secret and dependency scans are added with the features that need them.
+GitHub Actions runs these jobs on every pull request; all must pass before merging into `main`. Today rows 1–2 are the `checks` job, 3 is `database`, and 4–5 are `e2e`, split across two runners (`e2e (1/2)`, `e2e (2/2)`) with Playwright's `--shard`; the OpenAPI check, Lighthouse and the secret and dependency scans are added with the features that need them.
 
 | Order | Job                                         | Fails when                                                                                                                                                                           |
 | ----- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

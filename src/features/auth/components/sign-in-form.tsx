@@ -38,9 +38,13 @@ export function SignInForm() {
   const errors = clientErrors ?? state.fieldErrors;
 
   const linkError = linkErrors.find((key) => key === searchParams.get("error"));
+  // A fixed text: nothing from the address reaches the page (FR-ACC-007). A link error wins, so
+  // only one message holds the focus.
+  const accountDeleted =
+    searchParams.get("deleted") === "1" && state.status === "idle" && !linkError;
   const formError =
     state.status === "failed" ? state.error : state.status === "idle" ? linkError : undefined;
-  const { formRef, messageRef } = useFormFocus(errors, Boolean(formError));
+  const { formRef, messageRef } = useFormFocus(errors, Boolean(formError) || accountDeleted);
   const unverifiedEmail = formError === "emailNotConfirmed" ? state.values?.email : undefined;
 
   function validate(event: FormEvent<HTMLFormElement>) {
@@ -72,6 +76,11 @@ export function SignInForm() {
         </p>
       </div>
       <div className="flex flex-col gap-4">
+        {accountDeleted && (
+          <FormMessage ref={messageRef} tone="success">
+            {t("signIn.deleted")}
+          </FormMessage>
+        )}
         {unverifiedEmail ? (
           <FormMessage ref={messageRef} tone="warning">
             {t("signIn.unverified", { email: unverifiedEmail })}{" "}

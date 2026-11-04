@@ -1,4 +1,4 @@
-import { ChevronRight, Download, Plus, Trash2, type LucideIcon } from "lucide-react";
+import { ChevronRight, Download, Plus, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
@@ -61,16 +61,14 @@ export function HouseholdSection({
   );
 }
 
-export function PrivacyRows() {
+export function PrivacyRows({ deleteAccount }: { deleteAccount: ReactNode }) {
   const t = useTranslations("Settings");
   return (
     <ul className="flex flex-col">
       <li>
         <Row href={settingsPaths.downloadData} label={t("download")} icon={Download} />
       </li>
-      <li>
-        <Row href={settingsPaths.deleteAccount} label={t("delete")} icon={Trash2} danger />
-      </li>
+      <li>{deleteAccount}</li>
     </ul>
   );
 }
@@ -83,19 +81,13 @@ type RowProps = {
   // The current setting, on the right.
   value?: string;
   icon?: LucideIcon;
-  // Destructive: the icon and the label say it, the colour only repeats it.
-  danger?: boolean;
 };
 
-export function Row({ href, label, detail, value, icon: Icon, danger = false }: RowProps) {
-  // Each tone keeps an approved colour pair on hover too: danger-ink on danger-tint.
-  const tone = danger
-    ? "text-danger hover:bg-danger-tint hover:text-danger-ink"
-    : "text-text hover:bg-surface-subtle";
+export function Row({ href, label, detail, value, icon: Icon }: RowProps) {
   return (
     <Link
       href={href}
-      className={`-mx-3 flex min-h-control-height items-center gap-3 rounded-md px-3 py-2 ${tone}`}
+      className="-mx-3 flex min-h-control-height items-center gap-3 rounded-md px-3 py-2 text-text hover:bg-surface-subtle"
     >
       {Icon && <Icon aria-hidden="true" className="size-icon-md" strokeWidth={1.5} />}
       <span className="flex min-w-0 flex-1 flex-col">
