@@ -16,7 +16,8 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 - **Email**: an editable field with "Change email". Supabase e-mails a link to the new address only
   (`double_confirm_changes = false`, decided in #80); the account keeps the current address, and the
   card says which one is waiting, until the link is opened. The link (`email_change.html`) goes to
-  `/auth/confirm`, which signs the user in and opens Account settings with the new address. The card
+  `/auth/confirm`, which signs the user in and opens Account settings with the new address; an
+  expired or used link opens Account settings with the reason (`?error=`), not sign-in. The card
   reads the account from Supabase Auth (`getUser`), not from the session token, so an address
   confirmed on another device shows without signing in again.
 - **Password**: "Change password", or "Set a password" for an account created with Google, opens
@@ -59,7 +60,9 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 - A wrong current password changes nothing. Supabase checks a password only by signing in, so the
   check renews this session; the other sessions are deleted after the change. A device that is
   signed out keeps a valid token until it expires (at most 1 hour): Supabase refuses its next
-  refresh and every `getUser`.
+  refresh and every `getUser`. The settings pages ask Supabase, so on that device they go to
+  `/auth/session-ended`, which clears its cookies and opens sign-in. That route signs out only a
+  session Supabase no longer knows, so a link to it cannot sign anyone out.
 - One confirmation only: someone using a session left open could move the account to an address of
   theirs. Accepted in #80; "Set a password" carries the same risk for a Google account, and the
   Supabase "password changed" notification e-mail is left for a later issue.

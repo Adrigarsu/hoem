@@ -16,10 +16,14 @@ vi.mock("../actions", () => ({
 
 const account: Account = { email: "lucia@example.com", pendingEmail: null, hasPassword: true };
 
-function renderForm(overrides: Partial<Account> = {}) {
+function renderForm(overrides: Partial<Account> = {}, linkError?: "linkExpired" | "generic") {
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      <EmailForm account={{ ...account, ...overrides }} passwordHref="/settings/password" />
+      <EmailForm
+        account={{ ...account, ...overrides }}
+        passwordHref="/settings/password"
+        linkError={linkError}
+      />
     </NextIntlClientProvider>,
   );
 }
@@ -64,6 +68,20 @@ describe("EmailForm", () => {
     renderForm({ pendingEmail: "lucia.new@example.com" });
     expect(screen.getByRole("status")).toHaveTextContent(
       "Waiting for you to confirm lucia.new@example.com. Open the link we sent there.",
+    );
+  });
+
+  it("FR-ACC-007 explains that a confirmation link expired", () => {
+    renderForm({}, "linkExpired");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "That confirmation link has expired or was already used. Enter your new email again to get a new one.",
+    );
+  });
+
+  it("FR-ACC-007 explains that a confirmation link did not work", () => {
+    renderForm({}, "generic");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "We could not confirm your new email. Enter it again to get a new link.",
     );
   });
 

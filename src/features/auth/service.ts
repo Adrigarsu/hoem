@@ -37,6 +37,8 @@ export type AuthGateway = {
   profilePreferences(): Promise<ProfilePreferences>;
   account(): Promise<Account | null>;
   updateEmail(email: string, options: { emailRedirectTo: string }): AuthResult;
+  // Clears this browser's cookies only: the session is already gone on the server.
+  signOutHere(): AuthResult;
 };
 
 type SignUpContext = { locale: string; timeZone: string; confirmUrl: string };
@@ -155,4 +157,13 @@ async function verifyCurrentPassword(auth: AuthGateway, email: string, password:
   if (!error) return;
   const rateLimited = error.code === "over_request_rate_limit";
   throw new AuthFailedError(rateLimited ? "rateLimited" : "wrongPassword");
+}
+
+// A device signed out by a password change keeps a valid token until it expires, so the proxy
+// still lets it in, but Supabase no longer knows its session. Its cookies are cleared here and it
+// signs in again. A session that still works is left alone: this is a GET anyone can link to.
+export async function endSession(auth: AuthGateway): Promise<string> {
+  if (await auth.account()) return "/";
+  await auth.signOutHere();
+  return "/sign-in";
 }

@@ -131,7 +131,9 @@
       "sent": "We sent a link to {email}. Your email changes once you open it.",
       "pending": "Waiting for you to confirm {email}. Open the link we sent there.",
       "changePassword": "Change password",
-      "setPassword": "Set a password"
+      "setPassword": "Set a password",
+      "linkExpired": "That confirmation link has expired or was already used. Enter your new email again to get a new one.",
+      "linkFailed": "We could not confirm your new email. Enter it again to get a new link."
     },
     "changePassword": {
       "changeTitle": "Change password",

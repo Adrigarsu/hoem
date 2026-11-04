@@ -1,6 +1,7 @@
 import "server-only";
+import { settingsPaths } from "@/features/settings";
 import { AuthFailedError } from "@/lib/errors";
-import { linkTarget, verificationType } from "./domain/verification-link";
+import { failedLinkTarget, linkTarget, verificationType } from "./domain/verification-link";
 import { rememberPreferences } from "./locale-cookie";
 import { authGateway } from "./repository";
 import { verifyEmail } from "./service";
@@ -17,7 +18,8 @@ export async function verifyEmailLink(params: URLSearchParams): Promise<string> 
     await rememberPreferences(await verifyEmail(await authGateway(), tokenHash, type));
   } catch (error) {
     if (!(error instanceof AuthFailedError)) throw error;
-    return `/sign-in?error=${error.reason === "linkExpired" ? "linkExpired" : "generic"}`;
+    const reason = error.reason === "linkExpired" ? "linkExpired" : "generic";
+    return failedLinkTarget(type, reason, settingsPaths.account);
   }
-  return linkTarget(type, params.get("next"));
+  return linkTarget(type, params.get("next"), settingsPaths.account);
 }

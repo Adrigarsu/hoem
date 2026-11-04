@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useActionState, useState, type FormEvent } from "react";
 import { Button, buttonClassName, FormMessage, TextField, useFormFocus } from "@/design-system";
 import { changeEmailAction, type AuthFormState } from "../actions";
+import type { LinkFailure } from "../domain/verification-link";
 import { changeEmailSchema, fieldErrors, type ValidationKey } from "../schemas";
 import type { Account } from "../service";
 
@@ -12,13 +13,15 @@ type EmailFormProps = {
   account: Account;
   // Where "Change password" goes: the settings feature owns the paths.
   passwordHref: string;
+  // Set when the confirmation link failed and sent the user back here (?error=).
+  linkError?: LinkFailure;
 };
 
 const initialState: AuthFormState = { status: "idle" };
 
 // The Email field of Account settings (FR-ACC-007, profile.md). The address only changes once the
 // link sent to the new one is opened, so until then the field keeps the current one.
-export function EmailForm({ account, passwordHref }: EmailFormProps) {
+export function EmailForm({ account, passwordHref, linkError }: EmailFormProps) {
   const t = useTranslations("Auth");
   const [state, action, pending] = useActionState(changeEmailAction, initialState);
   const [clientErrors, setClientErrors] = useState<Record<string, ValidationKey>>();
@@ -58,6 +61,14 @@ export function EmailForm({ account, passwordHref }: EmailFormProps) {
         {formError && (
           <FormMessage ref={messageRef} tone="danger">
             {t(`errors.${formError}`)}
+          </FormMessage>
+        )}
+        {/* Until the next attempt, which replaces it with its own answer. */}
+        {linkError && state.status === "idle" && (
+          <FormMessage tone="danger">
+            {linkError === "linkExpired"
+              ? t("changeEmail.linkExpired")
+              : t("changeEmail.linkFailed")}
           </FormMessage>
         )}
         <TextField

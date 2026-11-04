@@ -45,6 +45,13 @@ test.describe("FR-ACC-007 change my e-mail and password", () => {
     await page.goto(pathOf(link));
     await expect(page).toHaveURL(/\/settings\/account$/);
     await expect(emailField(page)).toHaveValue(newEmail);
+
+    // A link works once: opened again, Account settings explains it rather than sign-in.
+    await page.goto(pathOf(link));
+    await expect(page).toHaveURL(/\/settings\/account\?error=/);
+    await expect(
+      page.getByRole("main").getByRole("alert").filter({ hasText: "was already used" }),
+    ).toBeVisible();
   });
 
   test("FR-ACC-007 an e-mail confirmed on another device shows without signing in again", async ({
@@ -71,10 +78,15 @@ test.describe("FR-ACC-007 change my e-mail and password", () => {
 
   test("FR-ACC-007 changing my password asks for the current one and signs out my other devices", async ({
     page,
+    browser,
     visit,
   }) => {
     test.slow();
     const laptop = await otherDevice(email, password);
+    const tablet = await browser.newPage();
+    await tablet.goto(new URL("/sign-in", page.url()).toString());
+    await signIn(tablet, email, password);
+    await expect(tablet).toHaveURL(/\/$/);
     await visit(accountPage(page));
     await page.getByRole("link", { name: "Change password" }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Change password" })).toBeVisible();
@@ -98,6 +110,10 @@ test.describe("FR-ACC-007 change my e-mail and password", () => {
       { timeout: 15_000 },
     );
     expect(await laptop.signedIn()).toBe(false);
+    // Its token is still valid, but settings ask Supabase, which sends it to sign in again.
+    await tablet.goto(new URL("/settings", page.url()).toString());
+    await expect(tablet).toHaveURL(/\/sign-in$/);
+    await tablet.close();
 
     await signOut(page);
     await expect(page).toHaveURL(/\/sign-in$/);

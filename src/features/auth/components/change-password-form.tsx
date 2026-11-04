@@ -15,17 +15,18 @@ import type { Account } from "../service";
 
 const initialState: AuthFormState = { status: "idle" };
 
+// A wrong current password belongs next to that field, not at the top of the form. Listing it as a
+// field error moves focus there; one object for every render, so focus moves only when it changes.
+const wrongPasswordErrors: Record<string, ValidationKey> = { currentPassword: "required" };
+
 // Change password, or Set a password for an account created with Google (FR-ACC-007). Signed in,
 // unlike the reset form: an account with a password proves it first (see the service).
 export function ChangePasswordForm({ account }: { account: Account }) {
   const t = useTranslations("Auth");
   const [state, action, pending] = useActionState(changePasswordAction, initialState);
   const [clientErrors, setClientErrors] = useState<Record<string, ValidationKey>>();
-  // A wrong current password belongs next to that field, not at the top of the form; listing it
-  // as a field error also moves focus there.
   const wrongPassword = state.status === "failed" && state.error === "wrongPassword";
-  const errors =
-    clientErrors ?? (wrongPassword ? { currentPassword: "required" as const } : state.fieldErrors);
+  const errors = clientErrors ?? (wrongPassword ? wrongPasswordErrors : state.fieldErrors);
   const formError = state.status === "failed" && !wrongPassword ? state.error : undefined;
   const { formRef, messageRef } = useFormFocus(errors, Boolean(formError));
   const schema = account.hasPassword ? requireCurrentPassword : changePasswordSchema;

@@ -10,4 +10,5 @@ export { SignInForm } from "./components/sign-in-form";
 export { SignUp } from "./components/sign-up";
 export { SignOutButton } from "./components/sign-out-button";
 export { verifyEmailLink } from "./confirm";
+export { endSessionHere } from "./end-session";
 export { ownAccount } from "./own-account";

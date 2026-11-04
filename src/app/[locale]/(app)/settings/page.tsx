@@ -59,7 +59,8 @@ async function Settings({ locale }: { locale: Locale }) {
     >
       {/* One or the other by width, never both: a hidden block is out of the accessibility tree. */}
       <SettingsMenu
-        profile={profile}
+        // The address from Supabase Auth, as in the Account card: the token may still have the old one.
+        profile={{ ...profile, email: account.email }}
         households={households}
         locale={locale}
         signOut={<SignOutButton />}

@@ -1,4 +1,5 @@
 import "server-only";
+import { isAuthApiError, isAuthSessionMissingError } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { toTheme } from "@/lib/theme/theme";
 import type { AuthGateway } from "./service";
@@ -17,19 +18,31 @@ export async function authGateway(): Promise<AuthGateway> {
     resetPasswordForEmail: (email, options) => auth.resetPasswordForEmail(email, options),
     updatePassword: (password) => auth.updateUser({ password }),
     signOutOthers: () => auth.signOut({ scope: "others" }),
+    signOutHere: () => auth.signOut({ scope: "local" }),
     updateEmail: (email, options) => auth.updateUser({ email }, options),
     // getUser asks Supabase Auth, unlike getClaims, which reads the token: an e-mail confirmed in
     // another browser shows without signing in again (FR-ACC-007). Auth gives no sign of a
     // password, so a database function reads it (own_account_has_password, #98).
     async account() {
-      const { data, error } = await auth.getUser();
-      if (error || !data.user) return null;
-      const { data: hasPassword, error: rpcError } = await supabase.rpc("own_account_has_password");
-      if (rpcError) throw rpcError;
+      // Independent requests with the same token, so they go together.
+      const [{ data, error }, password] = await Promise.all([
+        auth.getUser(),
+        supabase.rpc("own_account_has_password"),
+      ]);
+      if (error) {
+        // No session, or one Supabase no longer knows (signed out elsewhere, deleted account), is
+        // "signed out"; anything else, such as Auth being unreachable, is a failure to report.
+        if (isAuthSessionMissingError(error) || (isAuthApiError(error) && error.status < 500)) {
+          return null;
+        }
+        throw error;
+      }
+      // The function refuses a caller without an account, which getUser has just ruled out.
+      if (password.error) throw password.error;
       return {
         email: data.user.email ?? "",
         pendingEmail: data.user.new_email ?? null,
-        hasPassword: hasPassword === true,
+        hasPassword: password.data === true,
       };
     },
     // Names the user's own row although row-level security limits it today: #26 lets members read

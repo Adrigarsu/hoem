@@ -5,6 +5,7 @@ import {
   changeEmail,
   changePassword,
   currentAccount,
+  endSession,
   requestPasswordReset,
   resendVerification,
   resetPassword,
@@ -40,6 +41,7 @@ function gateway(overrides: Partial<AuthGateway> = {}): AuthGateway {
     profilePreferences: vi.fn(async () => preferences),
     account: vi.fn(async () => account),
     updateEmail: vi.fn(async () => ({ error: null })),
+    signOutHere: vi.fn(async () => ({ error: null })),
     ...overrides,
   };
 }
@@ -385,5 +387,19 @@ describe("changePassword", () => {
     const auth = gateway({ account: signedOut });
     await expect(changePassword(auth, input)).rejects.toBeInstanceOf(NotAuthenticatedError);
     expect(auth.updatePassword).not.toHaveBeenCalled();
+  });
+});
+
+describe("endSession", () => {
+  it("FR-ACC-007 clears this browser's session once Supabase no longer knows it", async () => {
+    const auth = gateway({ account: signedOut });
+    await expect(endSession(auth)).resolves.toBe("/sign-in");
+    expect(auth.signOutHere).toHaveBeenCalledOnce();
+  });
+
+  it("FR-ACC-007 keeps a session that is still valid, so a crafted link cannot sign anyone out", async () => {
+    const auth = gateway();
+    await expect(endSession(auth)).resolves.toBe("/");
+    expect(auth.signOutHere).not.toHaveBeenCalled();
   });
 });

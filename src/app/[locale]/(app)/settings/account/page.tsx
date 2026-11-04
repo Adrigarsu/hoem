@@ -17,23 +17,46 @@ export async function generateMetadata({
 }
 
 // Editing the profile on phones (FR-ACC-007); wider screens do it in the cards of /settings.
-export default async function AccountPage({ params }: PageProps<"/[locale]/settings/account">) {
+export default async function AccountPage({
+  params,
+  searchParams,
+}: PageProps<"/[locale]/settings/account">) {
   const locale = await setLocaleFromParams(params);
   return (
     <Suspense fallback={<LaunchScreen />}>
-      <Account locale={locale} />
+      <Account locale={locale} searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function Account({ locale }: { locale: Locale }) {
+// ?error= comes from a confirmation link that failed (/auth/confirm).
+const linkFailures = ["linkExpired", "generic"] as const;
+
+async function Account({
+  locale,
+  searchParams,
+}: {
+  locale: Locale;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const t = await getTranslations({ locale, namespace: "Settings" });
-  const [profile, account] = await Promise.all([ownProfile(), ownAccount()]);
+  const [profile, account, { error }] = await Promise.all([
+    ownProfile(),
+    ownAccount(),
+    searchParams,
+  ]);
+  const linkError = linkFailures.find((failure) => failure === error);
   return (
     <SettingsSubpage title={t("account")}>
       <AccountForm
         profile={profile}
-        email={<EmailForm account={account} passwordHref={settingsPaths.password} />}
+        email={
+          <EmailForm
+            account={account}
+            passwordHref={settingsPaths.password}
+            linkError={linkError}
+          />
+        }
       />
     </SettingsSubpage>
   );
