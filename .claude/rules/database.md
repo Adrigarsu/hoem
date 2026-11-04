@@ -17,6 +17,8 @@ paths:
   last (the Supabase CLI refuses a migration older than the last one applied): take `main`'s
   `_journal.json`, `git rm` your file and snapshot, run `pnpm db:generate --custom` again and copy
   the SQL into the new file.
+- Extensions live in the `extensions` schema. Drizzle writes a schema-qualified custom type as one
+  quoted identifier (`"extensions.citext"`): remove the quotes in the generated SQL by hand.
 - Every new table enables row-level security and gets its policies **in the same migration**.
 - Policies use the helpers `is_member`, `is_owner`, `is_parent`, `can_manage_members`
   (docs/architecture.md §7.1) instead of repeating subqueries.
