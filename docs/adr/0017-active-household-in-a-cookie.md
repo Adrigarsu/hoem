@@ -1,6 +1,6 @@
 # ADR-017 Active household in an HttpOnly cookie, checked on every request
 
-Date: 2026-11-02 · Status: Proposed
+Date: 2026-11-02 · Status: Accepted
 
 ## Context
 

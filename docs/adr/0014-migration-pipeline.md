@@ -1,6 +1,6 @@
 # ADR-014 Migration pipeline with expand/contract
 
-Date: 2026-10-24 · Status: Proposed
+Date: 2026-10-24 · Status: Accepted · Amends ADR-003
 
 ## Context
 

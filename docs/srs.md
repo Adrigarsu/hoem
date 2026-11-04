@@ -357,7 +357,25 @@ Each requirement has a measurable criterion so it can be verified, not just inte
 
 Every record belongs to a household, never directly to a user. Using HØEM alone is simply a household of one, so sharing later only means adding a membership.
 
-&#91;embedded content: conceptual data model · MVP entities\]
+```mermaid
+erDiagram
+  USER ||--o{ MEMBERSHIP : has
+  HOUSEHOLD ||--o{ MEMBERSHIP : has
+  HOUSEHOLD ||--o{ INVITATION : sends
+  HOUSEHOLD ||--o{ RECIPE : owns
+  HOUSEHOLD ||--o{ MEAL_PLAN_ENTRY : plans
+  RECIPE |o--o{ MEAL_PLAN_ENTRY : "used in"
+  HOUSEHOLD ||--o{ SHOPPING_LIST : keeps
+  SHOPPING_LIST ||--o{ SHOPPING_ITEM : holds
+  HOUSEHOLD ||--o{ EXPENSE : records
+  EXPENSE ||--|{ EXPENSE_SHARE : "split into"
+  HOUSEHOLD ||--o{ BUDGET : sets
+  HOUSEHOLD ||--o{ NOTE : writes
+  NOTE ||--o| REMINDER : schedules
+  USER ||--o{ NOTIFICATION : receives
+```
+
+The physical model, with every table and column, is in `docs/architecture.md` §6.
 
 Model rules:
 
@@ -419,7 +437,7 @@ Row-level security in PostgreSQL is the second line of defence: even a bug in th
 
 The project is portfolio-ready at Gate B: everything after it adds value but is optional. Each phase only starts when the previous gate's criteria are met.
 
-&#91;embedded content: release roadmap · 4 phases, 3 gates\]
+Phases, gates and milestones are described in [`docs/roadmap.md`](roadmap.md).
 
 ### Glossary
 

@@ -40,7 +40,36 @@ The five goals below drive every trade-off, in this order of priority.
 
 HØEM is one web app on Vercel and one Supabase project, both in the EU; the browser talks to the app over HTTPS and to Supabase Realtime directly for live list updates.
 
-&#91;embedded content: C4 container view · 1 app, 5 Supabase services, 2 external services\]
+```mermaid
+flowchart LR
+  user(["Household member<br/>browser or installed PWA"])
+  subgraph vercel["Vercel · fra1"]
+    app["Web app<br/>Next.js"]
+  end
+  subgraph supabase["Supabase · EU"]
+    auth["Auth"]
+    db[("PostgreSQL<br/>RLS policies")]
+    realtime["Realtime"]
+    storage["Storage"]
+    jobs["Jobs<br/>Edge Functions + pg_cron"]
+  end
+  resend["Resend<br/>e-mail"]
+  push["Push services<br/>Apple, Google, Mozilla"]
+
+  user -- HTTPS --> app
+  user -- live list updates --> realtime
+  app -- user's JWT --> db
+  app --> auth
+  app --> storage
+  app --> resend
+  realtime --> db
+  jobs --> db
+  jobs --> push
+  push --> user
+  auth -- SMTP --> resend
+
+  style db stroke-width:3px
+```
 
 PostgreSQL, highlighted, is where privacy is decided: the app and the browser reach data only with the user's own token, so the row-level security policies in section 7 apply to every query and every live update.
 
@@ -57,30 +86,7 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 ## 3. Architecture decisions
 
-Nineteen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
-
-| ADR                                                                   | Decision                                                                                | Status   |
-| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------- |
-| [001](adr/0001-modular-monolith.md)                                   | One Next.js application in one GitHub repository (modular monolith)                     | Accepted |
-| [002](adr/0002-supabase-backend.md)                                   | Supabase as the backend platform, hosted in the EU                                      | Accepted |
-| [003](adr/0003-drizzle-and-sql-migrations.md)                         | Drizzle ORM for queries and schema; plain SQL migrations for policies                   | Accepted |
-| [004](adr/0004-two-layer-authorization.md)                            | Authorization in two layers: application services and PostgreSQL RLS                    | Accepted |
-| [005](adr/0005-server-actions-and-rest-api.md)                        | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                  | Accepted |
-| [006](adr/0006-visibility-at-write-time.md)                           | Visibility of private records is decided when they are written                          | Accepted |
-| [007](adr/0007-money-as-integer-cents.md)                             | Money stored as integer cents, one currency per household                               | Accepted |
-| [008](adr/0008-reminders-icalendar-web-push.md)                       | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push    | Accepted |
-| [009](adr/0009-delete-with-undo.md)                                   | Deletes are immediate after a 5-second undo window; no soft delete                      | Accepted |
-| [010](adr/0010-testing-strategy.md)                                   | Test pyramid: test-first for domain and services, end-to-end per story                  | Accepted |
-| [011](adr/0011-demo-with-anonymous-sessions.md)                       | Demo mode with anonymous sessions and per-visitor copies                                | Accepted |
-| [012](adr/0012-internationalisation.md)                               | Internationalisation with next-intl; locale from the profile, not the URL               | Accepted |
-| [013](adr/0013-production-supabase-in-ireland.md)                     | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt        | Proposed |
-| [014](adr/0014-migration-pipeline.md)                                 | Migrations tested in CI, applied on merge to staging then production; expand/contract   | Proposed |
-| [015](adr/0015-locale-through-an-internal-rewrite.md)                 | Locale chosen in the proxy and rewritten to a hidden `[locale]` segment                 | Proposed |
-| [016](adr/0016-session-only-in-httponly-cookies.md)                   | Session only in HttpOnly cookies; no Supabase browser client                            | Proposed |
-| [017](adr/0017-active-household-in-a-cookie.md)                       | Active household in an HttpOnly cookie, checked against memberships on every request    | Proposed |
-| [018](adr/0018-theme-in-a-cookie-with-an-inline-script.md)            | Theme in a readable cookie, applied by an inline script before the first paint          | Proposed |
-| [019](adr/0019-delete-account-with-a-security-definer-function.md)    | Delete an account through a security definer function, without the service-role key     | Proposed |
-| [020](adr/0020-commit-undoable-deletes-on-pagehide-with-keepalive.md) | A delete waiting for its undo is sent on pagehide with a keepalive request to `/api/v1` | Proposed |
+Each significant decision lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index, grouped by topic and with each decision's status, is [`docs/adr/README.md`](adr/README.md); it is the only list, so this document links to single ADRs where they matter instead of repeating it.
 
 ## 4. Code organisation and conventions
 
@@ -88,39 +94,47 @@ Code is grouped by feature first and by layer second, so everything about shoppi
 
 ### 4.1 Repository layout
 
+Folders marked _(planned)_ come with the milestone that needs them (`docs/roadmap.md`).
+
 ```
 hoem/
 ├── src/
 │   ├── app/                     Next.js routes only: pages, layouts, route handlers
 │   │   ├── [locale]/            hidden locale segment filled in by proxy.ts (ADR-015)
-│   │   │   ├── (auth)/          sign-in, sign-up, password reset
-│   │   │   └── (app)/           signed-in area: home, meals, shopping, expenses, planner, settings
+│   │   │   ├── (auth)/          sign-in, sign-up, password reset, e-mail confirmation
+│   │   │   ├── (app)/           signed-in area with the app shell: home, meals, shopping,
+│   │   │   │                    expenses, planner, notifications, settings
+│   │   │   └── (focus)/         signed-in flows without the shell, such as a new household
 │   │   └── api/v1/              REST route handlers (thin: parse, call service, respond)
-│   ├── features/
-│   │   ├── households/          one folder per bounded context
-│   │   ├── meals/
-│   │   ├── shopping/
-│   │   ├── expenses/
-│   │   ├── planner/             notes and reminders
-│   │   └── notifications/
-│   ├── design-system/           tokens and components
+│   ├── features/                one folder per bounded context, each with its own docs/features/ page
+│   │   ├── auth/                sign-up, sign-in, sessions, password reset
+│   │   ├── account/             change e-mail and password, delete the account
+│   │   ├── profile/             name, photo, theme and language
+│   │   ├── households/          households, types, members, roles, the active household
+│   │   ├── settings/            the settings menu
+│   │   ├── shell/               tab bar, sidebar and header
+│   │   ├── home/                the Home hub (the dashboard grows here in M6)
+│   │   └── meals/, shopping/, expenses/, planner/, notifications/   (planned)
+│   ├── design-system/           tokens, contrast checks and components
 │   ├── db/
 │   │   ├── schema/              Drizzle table definitions
-│   │   └── seed/                demo template and local test data
-│   └── lib/                     Supabase clients, errors, env, i18n, logging
+│   │   └── seed/                local test data (the demo template comes in M6)
+│   ├── lib/                     Supabase clients, errors, Problem Details, env, i18n, theme
+│   └── proxy.ts                 locale rewrite and session refresh (ADR-015, ADR-016)
 ├── supabase/
 │   ├── migrations/              generated + hand-written SQL (policies, triggers), ADR-014
-│   ├── tests/                   pgTAP database and policy tests
-│   └── functions/               Edge Functions: dispatch-reminders, cleanup-demo
-├── messages/                    en.json, es.json
-├── tests/e2e/                   Playwright specs, one per user story
-├── docs/adr/                    Architecture Decision Records
-└── docs/design-system/          tokens, component rules and the screen designs (screens/)
+│   ├── tests/database/          pgTAP database and policy tests
+│   ├── templates/               Auth e-mail templates
+│   └── functions/               Edge Functions: dispatch-reminders, cleanup-demo (planned)
+├── messages/                    en.json (es.json comes with FR-I18N-001)
+├── tests/e2e/                   Playwright specs, one per user story, and their support/ helpers
+├── scripts/                     screenshot tools (pnpm app:capture, pnpm screens:capture)
+└── docs/                        see docs/README.md
 ```
 
 ### 4.2 Layers inside a feature
 
-Dependencies only point down; an ESLint rule (`eslint-plugin-boundaries`) fails the build when one points up.
+Dependencies only point down. Today code review keeps them that way; an ESLint rule that fails the build when one points up is planned (`docs/roadmap.md`).
 
 | Layer        | Files                                 | Allowed to import | Responsibility                                           |
 | ------------ | ------------------------------------- | ----------------- | -------------------------------------------------------- |
@@ -230,7 +244,27 @@ Rate limits: 60 write requests per minute per user and 10 demo sessions per hour
 
 Eighteen tables in the `public` schema hold the MVP. Every row of household content reaches a `household_id`, either in its own column or through its parent (an ingredient through its recipe), and that column is what row-level security checks; only profiles, push subscriptions and notifications belong to a user instead.
 
-&#91;embedded content: table relationships · 18 tables in 6 groups\]
+```mermaid
+erDiagram
+  profiles ||--o{ memberships : "belongs to"
+  households ||--o{ memberships : has
+  households ||--o{ invitations : sends
+  households ||--o{ recipes : owns
+  recipes ||--o{ recipe_ingredients : lists
+  households ||--o{ meal_plan_entries : plans
+  recipes |o--o{ meal_plan_entries : "cooked in"
+  households ||--o{ shopping_lists : keeps
+  shopping_lists ||--o{ shopping_items : holds
+  households ||--o{ expenses : records
+  expenses ||--|{ expense_shares : "split into"
+  households ||--o{ budgets : sets
+  households ||--o{ notes : writes
+  notes ||--o| reminders : schedules
+  reminders ||--o{ reminder_recipients : notifies
+  profiles ||--o{ notifications : receives
+  profiles ||--o{ push_subscriptions : registers
+  households ||--o{ activity_events : logs
+```
 
 Households, highlighted, own every module's tables; memberships join users to households and carry the role used by every policy.
 
@@ -439,9 +473,11 @@ A scheduled workflow (`keep-alive.yml`, every three days and on demand) calls th
 
 ### 9.3 Observability
 
-- Errors from the browser and server go to Sentry, with the request ID and no personal data in the payload.
-- Logs are structured JSON (`pino`), one line per request, with user and household IDs but never note text or amounts.
-- Vercel Analytics records Core Web Vitals from real visits.
+None of this is installed yet; it is planned before the release (`docs/roadmap.md`). Until then, errors reach the Vercel function logs with their request ID.
+
+- Errors from the browser and server will go to Sentry, with the request ID and no personal data in the payload.
+- Logs will be structured JSON (`pino`), one line per request, with user and household IDs but never note text or amounts.
+- Vercel Analytics will record Core Web Vitals from real visits.
 
 ### 9.4 Traceability
 
@@ -454,7 +490,7 @@ Every requirement ID in the SRS appears in the branch name, the commit messages 
 | Expenses and splits (FR-EXP)              | `features/expenses/domain`                  | TDD on splits and balances                        |
 | Planner and reminders (FR-NOTE, FR-NOTIF) | `features/planner`, `dispatch-reminders`    | Unit tests for next occurrence across DST changes |
 | Demo (FR-DEMO)                            | Clone function, `cleanup-demo`              | E2E: two visitors never see each other's changes  |
-| Accessibility (NFR-A11Y)                  | Design system                               | axe-core in Storybook and E2E                     |
+| Accessibility (NFR-A11Y)                  | Design system                               | axe-core in E2E, contrast pairs in unit tests     |
 
 ### 9.5 Resolved questions
 

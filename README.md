@@ -77,9 +77,11 @@ Open http://localhost:3000. Stop Supabase with `pnpm db:stop`.
 
 ## Project docs
 
+- [`docs/README.md`](docs/README.md): index of every document
 - [`docs/srs.md`](docs/srs.md): requirements, each with a stable ID
-- [`docs/architecture.md`](docs/architecture.md): architecture, data model and decisions
-- [`docs/adr/`](docs/adr/): architecture decision records
+- [`docs/roadmap.md`](docs/roadmap.md): phases, gates and milestones
+- [`docs/architecture.md`](docs/architecture.md): architecture, data model and pipeline
+- [`docs/adr/`](docs/adr/README.md): architecture decision records
 - [`AGENTS.md`](AGENTS.md): conventions for AI coding agents (and a good summary for humans)
 
 ## Development workflow
