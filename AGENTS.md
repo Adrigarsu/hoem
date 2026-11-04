@@ -93,8 +93,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   Use `useUndoTimer` and `Toast` from `@/design-system` (see its README, "Toast and undo"), with
   an `onUnload` keepalive `fetch` to the REST `DELETE` route of the same use case (ADR-020).
 - A REST route gets its credentials from `apiCredentials(request.headers)` (Bearer, or the cookie
-  from the app's own origin) and answers errors with `problemResponse`; see
-  `src/app/api/v1/profile/avatar/route.ts`.
+  from the app's own origin) and answers errors with `problemResponse`; a write route calls
+  `limitWrites(credentials)` (`@/lib/rate-limit`, 60 per minute per user, ADR-021) before the
+  service; see `src/app/api/v1/profile/avatar/route.ts`.
 - The signed-in user's own avatar is `OwnAvatar` (`@/features/profile`), never `Avatar` with
   `avatarUrl`: it hides the photo during its undo window. A lint rule enforces it. A client
   component cannot import `@/features/profile` (its index holds `server-only` code): the page passes

@@ -1,4 +1,10 @@
-import { AppError, ValidationError, type ErrorCode, type FieldError } from "./errors";
+import {
+  AppError,
+  RateLimitedError,
+  ValidationError,
+  type ErrorCode,
+  type FieldError,
+} from "./errors";
 
 // RFC 9457 Problem Details for the REST API (docs/architecture.md §5.3). The body carries the
 // stable code (in `type`), a fixed title and the request ID; never the error's message or stack,
@@ -58,5 +64,9 @@ export function problemResponse(error: unknown, context: ProblemContext): Respon
   const headers = new Headers({ "content-type": "application/problem+json" });
   // RFC 9110 §15.5.2: every 401 names the scheme to authenticate with (ADR-016: Bearer tokens).
   if (body.status === 401) headers.set("www-authenticate", "Bearer");
+  // RFC 9110 §10.2.3: the client waits that many seconds before trying again (NFR-SEC-006).
+  if (error instanceof RateLimitedError) {
+    headers.set("retry-after", String(error.retryAfterSeconds));
+  }
   return Response.json(body, { status: body.status, headers });
 }

@@ -5,6 +5,7 @@ import {
   ForbiddenError,
   NotAuthenticatedError,
   NotFoundError,
+  RateLimitedError,
   ValidationError,
 } from "./errors";
 import { problemResponse, toProblemDetails } from "./problem-details";
@@ -71,6 +72,12 @@ describe("problemResponse", () => {
   it("NFR-SEC-002 tells a 401 client which scheme to authenticate with", () => {
     const response = problemResponse(new NotAuthenticatedError(), context);
     expect(response.headers.get("www-authenticate")).toBe("Bearer");
+  });
+
+  it("NFR-SEC-006 tells a 429 client when to retry with Retry-After", () => {
+    const response = problemResponse(new RateLimitedError(42), context);
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("42");
   });
 
   it("NFR-SEC-002 leaves out the errors list when no field is at fault", () => {
