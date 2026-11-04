@@ -81,6 +81,7 @@ Nineteen decisions shape the system. Each lives as its own file in `docs/adr/`, 
 | [018](adr/0018-theme-in-a-cookie-with-an-inline-script.md)            | Theme in a readable cookie, applied by an inline script before the first paint          | Proposed |
 | [019](adr/0019-delete-account-with-a-security-definer-function.md)    | Delete an account through a security definer function, without the service-role key     | Proposed |
 | [020](adr/0020-commit-undoable-deletes-on-pagehide-with-keepalive.md) | A delete waiting for its undo is sent on pagehide with a keepalive request to `/api/v1` | Proposed |
+| [021](adr/0021-rate-limits-in-postgres.md)                            | REST API rate limits counted in Postgres by a security definer function                 | Proposed |
 
 ## 4. Code organisation and conventions
 
@@ -225,7 +226,7 @@ The OpenAPI 3.1 document is generated at build time from the Zod schemas (`@aste
 | Notes         | `GET/POST …/notes`, `PATCH/DELETE …/notes/{noteId}`, `POST …/notes/{noteId}/reminder/done`                                                    | FR-NOTE-001 to 006                    |
 | Notifications | `GET /notifications`, `POST /notifications/read`, `POST/DELETE /push-subscriptions`                                                           | FR-NOTIF-001 to 003                   |
 
-Rate limits: 60 write requests per minute per user and 10 demo sessions per hour per IP address, returning 429 with a `Retry-After` header.
+Rate limits: 60 write requests per minute per user and 10 demo sessions per hour per IP address, returning 429 with a `Retry-After` header. The counters live in Postgres, in `private.api_rate_limits`, counted by `public.consume_rate_limit` with the user's own JWT in a fixed window shared by every serverless instance (ADR-021).
 
 ## 6. Physical data model
 
