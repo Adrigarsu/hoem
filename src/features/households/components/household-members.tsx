@@ -28,7 +28,7 @@ import type { HouseholdSettingsView, MemberView } from "../service";
 const idle: MemberFormState = { status: "idle" };
 const noop = () => undefined;
 
-type Notice = { kind: "removed" | "removeFailed"; name: string };
+type Notice = { kind: "removed" | "removeFailed"; name: string; userId: string };
 
 // What a member's row and dialog call them: "Marcos", or a placeholder for a member without a name.
 function useMemberName() {
@@ -60,16 +60,20 @@ export function HouseholdMembers({
   // Separate from the removal, so dismissing a message is never mistaken for committing a removal.
   const dismissal = useUndoTimer();
   const headingRef = useRef<HTMLHeadingElement>(null);
+  // The member whose removal Undo would cancel. An earlier removal is already sent when a new one
+  // starts (useUndoTimer commits it), so Undo must not bring that member back.
+  const waiting = useRef<string | null>(null);
   const isFamily = household.type === "family";
 
   function commit(member: MemberView) {
-    setNotice(null);
+    // Only this removal's toast: a newer removal starting is what commits this one.
+    setNotice((current) => (current?.userId === member.userId ? null : current));
     return new Promise<void>((resolve) => {
       startTransition(async () => {
         const removed = await removeMemberAction(household.id, member.userId);
         if (!removed) {
           setHidden((ids) => ids.filter((id) => id !== member.userId));
-          setNotice({ kind: "removeFailed", name: nameOf(member) });
+          setNotice({ kind: "removeFailed", name: nameOf(member), userId: member.userId });
           dismissal.start(() => setNotice(null));
         }
         resolve();
@@ -82,7 +86,8 @@ export function HouseholdMembers({
     setAnnouncement(null);
     dismissal.undo();
     setHidden((ids) => [...ids, member.userId]);
-    setNotice({ kind: "removed", name: nameOf(member) });
+    waiting.current = member.userId;
+    setNotice({ kind: "removed", name: nameOf(member), userId: member.userId });
     // The row and its button go away: focus moves to the section, the nearest place that stays.
     headingRef.current?.focus();
     removal.start(() => commit(member), {
@@ -100,7 +105,9 @@ export function HouseholdMembers({
 
   function undo() {
     removal.undo();
-    setHidden([]);
+    const undone = waiting.current;
+    waiting.current = null;
+    setHidden((ids) => ids.filter((id) => id !== undone));
     setNotice(null);
   }
 

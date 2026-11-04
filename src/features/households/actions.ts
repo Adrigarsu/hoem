@@ -199,7 +199,12 @@ export async function removeMemberAction(householdId: string, userId: string): P
     await removeHouseholdMember({ householdId, userId });
     return true;
   } catch (error) {
-    if (error instanceof ValidationError || error instanceof ForbiddenError) {
+    // A tampered request, a member the user may no longer remove, or a household they have left.
+    if (
+      error instanceof ValidationError ||
+      error instanceof ForbiddenError ||
+      error instanceof NotFoundError
+    ) {
       revalidatePath(settingsRoute, "page");
       return false;
     }

@@ -208,6 +208,28 @@ describe("HouseholdMembers removal", () => {
     expect(actions.removeMemberAction).not.toHaveBeenCalled();
   });
 
+  it("NFR-UX-002 Undo brings back only the member still waiting, not one already removed", async () => {
+    // Never resolves: the first removal is still on its way when the second one is undone.
+    actions.removeMemberAction.mockImplementationOnce(() => new Promise(() => undefined));
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderMembers({
+      ...flat,
+      members: [
+        ...flat.members,
+        { ...flatmate, userId: "00000000-0000-7000-8000-000000000003", displayName: "Ana" },
+      ],
+    });
+    await user.click(
+      (await openOptions(user, "Marcos")).getByRole("button", { name: "Remove from household" }),
+    );
+    await user.click(
+      (await openOptions(user, "Ana")).getByRole("button", { name: "Remove from household" }),
+    );
+    await user.click(screen.getByRole("button", { name: "Undo" }));
+    expect(members().getByText("Ana")).toBeInTheDocument();
+    expect(members().queryByText("Marcos")).toBeNull();
+  });
+
   it("FR-ACC-006 brings the member back with a message when the removal fails", async () => {
     actions.removeMemberAction.mockResolvedValueOnce(false);
     await removeMarcos();
