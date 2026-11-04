@@ -14,9 +14,7 @@ paths:
   column, table or function waits for a later pull request, once nothing reads it.
 - A merged migration is never edited. Every change is a new migration file.
 - If `main` merges a migration newer than this branch's unmerged one, regenerate yours so it sorts
-  last (the Supabase CLI refuses a migration older than the last one applied): take `main`'s
-  `_journal.json`, `git rm` your file and snapshot, run `pnpm db:generate --custom` again and copy
-  the SQL into the new file.
+  last: steps in `docs/guides/migrations.md`.
 - Every new table enables row-level security and gets its policies **in the same migration**.
 - Policies use the helpers `is_member`, `is_owner`, `is_parent`, `can_manage_members`
   (docs/architecture.md §7.1) instead of repeating subqueries.

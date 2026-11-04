@@ -455,7 +455,7 @@ Every pull request gets its own preview deployment and must pass the same checks
 | Preview (per pull request) | `*.vercel.app` preview URL                    | Vercel preview             | Supabase staging project, migrations from `main` | Seed data, reset weekly                    |
 | Production                 | `https://hoemapp.com` (`www` redirects to it) | Vercel, `fra1` (Frankfurt) | Supabase production project, Ireland (ADR-013)   | Real users and the demo template           |
 
-**Domain and e-mail.** The domain `hoemapp.com` is registered at Cloudflare, which also hosts its DNS. Vercel serves the app on it with an automatic TLS certificate. Resend sends from `no-reply@hoemapp.com` (region eu-west-1) on a verified domain. Its records are added through Resend's Cloudflare integration (MX and SPF on send, DKIM on resend.\_domainkey), plus a DMARC record on \_dmarc that we add ourselves, so invitations are not marked as spam. Every record for Vercel and Resend is "DNS only" (Cloudflare proxy off), so TLS and caching stay with Vercel and e-mail authentication is not altered. Supabase Auth uses the same Resend account as its SMTP server, so password-reset and confirmation e-mails come from the same address. The VAPID contact for Web Push is `mailto:hello@hoemapp.com`.
+**Domain and e-mail.** `hoemapp.com` is registered at Cloudflare and served by Vercel; Resend (eu-west-1) sends from `no-reply@hoemapp.com`, also as the SMTP server of Supabase Auth. The records and settings are in `docs/guides/deployment.md`.
 
 ### 9.2 Pipeline
 

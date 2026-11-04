@@ -3,16 +3,15 @@
 Step-by-step instructions for doing things in this repository: setting it up, deploying, writing a
 migration, testing. They say _how_; the reasons live in `docs/architecture.md` and `docs/adr/`.
 
-> **Proposed structure.** Nothing has been moved here yet: the table below is the plan being
-> agreed with the developer.
+| Guide                                | How to…                                                        |
+| ------------------------------------ | -------------------------------------------------------------- |
+| [`local-setup.md`](local-setup.md)   | Run the app and its Supabase locally, and the end-to-end tests |
+| [`workflow.md`](workflow.md)         | Take an issue from the queue to production                     |
+| [`migrations.md`](migrations.md)     | Change the database without breaking the deployed app          |
+| [`testing.md`](testing.md)           | Write tests that pass in jsdom and in every browser            |
+| [`screenshots.md`](screenshots.md)   | Capture pages and reference screens for a pull request         |
+| [`deployment.md`](deployment.md)     | Understand where the app runs and how a change reaches it      |
+| [`dependencies.md`](dependencies.md) | Add a dependency and handle Dependabot pull requests           |
 
-| Guide             | Status   | Comes from                                                                                                |
-| ----------------- | -------- | --------------------------------------------------------------------------------------------------------- |
-| `local-setup.md`  | Proposed | `README.md` "Getting started" (the README keeps a five-line quick start and links here)                   |
-| `deployment.md`   | Proposed | `README.md` "Deployment" and the "Domain and e-mail" paragraph of `architecture.md` §9.1                  |
-| `migrations.md`   | Proposed | `.claude/rules/database.md` (how to regenerate a migration when `main` has a newer one) and ADR-014 steps |
-| `testing.md`      | Proposed | `AGENTS.md` "Testing" gotchas (route announcer, `<Activity>`, `getByLabel`, Safari) and E2E how-to        |
-| `screenshots.md`  | Proposed | `AGENTS.md` "Screenshots for every UI change" (`pnpm app:capture`, `pnpm screens:capture`)                |
-| `workflow.md`     | Proposed | New: the life of an issue for a human (start, partial pull requests, ship), which the skills automate     |
-| `dependencies.md` | Proposed | New: how to handle Dependabot pull requests and security alerts                                           |
-| `release.md`      | Proposed | New, for M7: changelog, version tags, what to check after a deploy                                        |
+A guide changes in the same pull request as the commands or steps it describes (Definition of
+done, item 4). `release.md` comes with the release process (`docs/roadmap.md`).
