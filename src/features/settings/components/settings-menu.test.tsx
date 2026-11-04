@@ -26,6 +26,7 @@ function renderMenu({
         households={households}
         locale="en"
         signOut={<button type="submit">Sign out</button>}
+        deleteAccount={<button type="button">Delete account</button>}
       />
     </NextIntlClientProvider>,
   );
@@ -95,10 +96,7 @@ describe("SettingsMenu", () => {
       "href",
       "/settings/download-data",
     );
-    expect(within(privacy).getByRole("link", { name: "Delete account" })).toHaveAttribute(
-      "href",
-      "/settings/delete-account",
-    );
+    expect(within(privacy).getByRole("button", { name: "Delete account" })).toBeInTheDocument();
   });
 
   it("FR-NAV-003 ends with Sign out", () => {

@@ -94,6 +94,7 @@
     },
     "signIn": {
       "title": "Sign in",
+      "deleted": "Your account has been deleted.",
       "tagline": "Your home, organised together.",
       "lede": "Meals, shopping and money, shared with the people you live with.",
       "email": "Email",
@@ -191,6 +192,34 @@
     "download": "Download my data",
     "delete": "Delete account",
     "language": "Language"
+  },
+  "Account": {
+    "title": "Delete your account?",
+    "lede": "This deletes your account, your private records and any household where you are the only member. Records you shared stay in their households. This cannot be undone.",
+    "prompt": "To confirm, type {email}.",
+    "field": "Your email",
+    "cancel": "Cancel",
+    "confirm": "Delete my account",
+    "deleting": "Deleting…",
+    "failed": "We could not delete your account. Try again.",
+    "blocked": {
+      "title": {
+        "owner": "Make someone else owner first",
+        "parent": "Make someone else a parent first",
+        "both": "Hand over your place first"
+      },
+      "lede": {
+        "owner": "You are the last owner of a household other people belong to. Your account has not been deleted.",
+        "parent": "You are the last parent of a family other people belong to. Your account has not been deleted.",
+        "both": "You are the last owner or the last parent of a household other people belong to. Your account has not been deleted."
+      },
+      "close": "Close"
+    },
+    "validation": {
+      "required": "Type your email to confirm.",
+      "tooLong": "That is too long to be an email.",
+      "wrongEmail": "That does not match the email of your account."
+    }
   },
   "Households": {
     "types": {

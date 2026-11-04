@@ -12,7 +12,7 @@ async function verifiedAccount(page: Page, visit: (path: string) => Promise<void
   const email = uniqueEmail("reset");
   await visit("/sign-up");
   await page.getByLabel("Your name").fill("Ana");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(oldPassword);
   await page.getByLabel("Repeat the password").fill(oldPassword);
   await page.getByRole("button", { name: "Create account" }).click();
@@ -28,7 +28,7 @@ async function requestReset(page: Page, email: string) {
   await expect(page).toHaveURL(/\/forgot-password$/);
   // Scoped to the form: during the client-side navigation the sign-in form is briefly still there.
   const form = page.getByRole("form", { name: "Reset your password" });
-  await form.getByLabel("Email").fill(email);
+  await form.getByLabel("Email", { exact: true }).fill(email);
   await form.getByRole("button", { name: "Send link" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Check your inbox" })).toBeFocused();
 }
@@ -116,7 +116,7 @@ test.describe("FR-ACC-008 password reset", () => {
 
     await page.getByRole("button", { name: "Try a different email" }).click();
     const form = page.getByRole("form", { name: "Reset your password" });
-    await form.getByLabel("Email").fill(second);
+    await form.getByLabel("Email", { exact: true }).fill(second);
     await form.getByRole("button", { name: "Send link" }).click();
 
     await expect(page.getByText(`If an account exists for ${second}`)).toBeVisible();
