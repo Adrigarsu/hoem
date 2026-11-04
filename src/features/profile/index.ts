@@ -4,4 +4,5 @@ export { OwnAvatar, OwnPhotoProvider, OwnPhotoToast } from "./components/own-pho
 export { ThemeForm } from "./components/theme-form";
 export { ThemeSync } from "./components/theme-sync";
 export { ownProfile } from "./own-profile";
+export { removeOwnPhoto } from "./remove-own-photo";
 export type { OwnProfile } from "./service";

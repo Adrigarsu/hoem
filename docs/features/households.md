@@ -63,7 +63,7 @@ shopping lists and splitting (SRS §3.7).
 - Database: `households`, `memberships` and the functions `create_household` and
   `change_household_type` (`supabase/migrations/20261028190949_household-type.sql`),
   `household_members`, `set_member_role` and the last-parent trigger
-  (`supabase/migrations/20261104165902_household-members.sql`); policies in
+  (`supabase/migrations/20261104175018_household-members.sql`); policies in
   `docs/architecture.md` §7.
 - Tests: `supabase/tests/database/household-type.test.sql`,
   `supabase/tests/database/household-members.test.sql`, `tests/e2e/household-type.spec.ts`,
