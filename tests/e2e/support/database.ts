@@ -79,3 +79,19 @@ export async function deleteHouseholdAs(email: string, password: string, name: s
   const { error } = await supabase.from("households").delete().eq("name", name);
   if (error) throw error;
 }
+
+// The account's access token, as an API client sends it in `Authorization: Bearer`.
+export async function accessTokenOf(email: string, password: string) {
+  const supabase = await signedInAs(email, password);
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) throw new Error("No session after signing in");
+  return data.session.access_token;
+}
+
+// The photo path the account's profile points at, or null.
+export async function avatarPathOf(email: string, password: string) {
+  const supabase = await signedInAs(email, password);
+  const { data, error } = await supabase.from("profiles").select("avatar_path").single();
+  if (error) throw error;
+  return data.avatar_path;
+}

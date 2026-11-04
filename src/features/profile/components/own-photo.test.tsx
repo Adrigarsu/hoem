@@ -89,6 +89,21 @@ describe("Remove my profile photo", () => {
     expect(screen.getByLabelText("Change photo")).toHaveFocus();
   });
 
+  it("NFR-UX-002 sends a keepalive DELETE when the page unloads during the undo", () => {
+    const sent = vi.fn(async () => new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", sent);
+    removePhoto();
+    act(() => {
+      window.dispatchEvent(new Event("pagehide"));
+    });
+    expect(sent).toHaveBeenCalledWith("/api/v1/profile/avatar", {
+      method: "DELETE",
+      keepalive: true,
+    });
+    expect(removePhotoAction).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
   it("FR-ACC-007 deletes the photo for real once the 5 seconds have passed", async () => {
     removePhoto();
     await act(() => vi.advanceTimersByTimeAsync(undoDelayMs));

@@ -8,8 +8,13 @@ export const undoDelayMs = 5000;
 
 type Commit = () => void | Promise<void>;
 
+// Sent instead of the commit when the page unloads (pagehide): it must be synchronous and survive
+// the unload, such as fetch with keepalive. A Server Action is cancelled with the page (ADR-020).
+type Options = { onUnload?: () => void };
+
 type Waiting = {
   commit: Commit;
+  onUnload?: () => void;
   timer?: ReturnType<typeof setTimeout>;
   remaining: number;
   startedAt: number;
@@ -46,9 +51,9 @@ export function useUndoTimer() {
     current.timer = setTimeout(() => void flush(), current.remaining);
   }
 
-  function start(commit: Commit) {
+  function start(commit: Commit, { onUnload }: Options = {}) {
     void flush();
-    const current: Waiting = { commit, remaining: undoDelayMs, startedAt: 0 };
+    const current: Waiting = { commit, onUnload, remaining: undoDelayMs, startedAt: 0 };
     waiting.current = current;
     schedule(current);
   }
@@ -73,13 +78,21 @@ export function useUndoTimer() {
 
   // Reads the ref, not state, so the latest action is the one committed.
   useEffect(() => {
-    const commitNow = async () => {
+    const takeWaiting = () => {
       const current = waiting.current;
       if (current?.timer) clearTimeout(current.timer);
       waiting.current = null;
-      await current?.commit();
+      return current;
     };
-    const onPageHide = () => void commitNow();
+    const commitNow = async () => {
+      await takeWaiting()?.commit();
+    };
+    const onPageHide = () => {
+      const current = takeWaiting();
+      if (!current) return;
+      if (current.onUnload) current.onUnload();
+      else void current.commit();
+    };
     flushers.add(commitNow);
     window.addEventListener("pagehide", onPageHide);
     return () => {

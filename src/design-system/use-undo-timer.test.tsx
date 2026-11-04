@@ -81,6 +81,30 @@ describe("useUndoTimer", () => {
     expect(commit).toHaveBeenCalledTimes(1);
   });
 
+  it("NFR-UX-002 sends the unload request on pagehide instead of the commit", () => {
+    const commit = vi.fn();
+    const onUnload = vi.fn();
+    const hook = renderHook(() => useUndoTimer());
+    act(() => hook.result.current.start(commit, { onUnload }));
+    act(() => {
+      window.dispatchEvent(new Event("pagehide"));
+    });
+    expect(onUnload).toHaveBeenCalledTimes(1);
+    expect(commit).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(undoDelayMs));
+    expect(commit).not.toHaveBeenCalled();
+  });
+
+  it("NFR-UX-002 still commits on unmount when it has an unload request, as the page stays", () => {
+    const commit = vi.fn();
+    const onUnload = vi.fn();
+    const hook = renderHook(() => useUndoTimer());
+    act(() => hook.result.current.start(commit, { onUnload }));
+    hook.unmount();
+    expect(commit).toHaveBeenCalledTimes(1);
+    expect(onUnload).not.toHaveBeenCalled();
+  });
+
   it("NFR-UX-002 commits on unmount", () => {
     const { commit, hook } = started();
     hook.unmount();

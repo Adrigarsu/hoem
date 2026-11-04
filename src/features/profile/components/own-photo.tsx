@@ -21,6 +21,11 @@ type OwnPhoto = {
 
 const noop = () => undefined;
 
+// A Server Action is cancelled with the page; a keepalive request outlives it (ADR-020).
+function sendOnUnload() {
+  void fetch("/api/v1/profile/avatar", { method: "DELETE", keepalive: true }).catch(noop);
+}
+
 // Outside the provider nothing can be removed, so the photo is simply shown.
 const OwnPhotoContext = createContext<OwnPhoto>({
   hidden: false,
@@ -68,7 +73,7 @@ export function OwnPhotoProvider({ children }: { children: ReactNode }) {
       dismissal.undo();
       setHidden(true);
       setNotice("removed");
-      removal.start(commit);
+      removal.start(commit, { onUnload: sendOnUnload });
     },
     undo() {
       removal.undo();
