@@ -30,6 +30,13 @@ shopping lists and splitting (SRS §3.7).
   it. Someone who is the last owner of a household with other members cannot delete their account,
   or leave, until someone else is an owner (`last_owner`). The app does not offer this yet: the
   database function comes first, and the screen with the rest of #23.
+- **Members and roles** (FR-ACC-006, FR-HH-006, FR-HH-008): the database side is in place (#26,
+  part 1). Every member reads the member list with names and photos. Owners manage members outside a
+  family; in a family, parents set parent, child or relative and remove members. In every type, an
+  owner makes someone an owner or stops being one (`set_member_role`), whether or not they are a
+  parent, so an owner who is a relative can always hand over ownership. A family always keeps a
+  parent: the last one cannot stop being a parent, leave, be removed or delete their account while
+  others belong (`last_parent`). The screen comes in part 2 of #26.
 
 ## Privacy rules
 
@@ -43,8 +50,9 @@ shopping lists and splitting (SRS §3.7).
   written (ADR-006). Expense policy tests in M4 prove it again.
 - The database chooses each type's rules (`private.default_household_settings`); the client never
   sends them.
-- Members do not see each other's profiles yet, so the family-roles dialog shows "You" and
-  "Member 2, 3…" in the order they joined; names come with the member list (#26).
+- Members see each other's name and photo only, through `household_members`: the rest of a profile
+  (age, language, time zone) stays readable only by its owner. Until the screen of #26 uses it, the
+  family-roles dialog still shows "You" and "Member 2, 3…" in the order they joined.
 
 ## Where it lives
 
@@ -53,14 +61,18 @@ shopping lists and splitting (SRS §3.7).
   `household-switcher.tsx` and `household-menu.tsx`). Other features read the active household
   with `currentHousehold()`.
 - Database: `households`, `memberships` and the functions `create_household` and
-  `change_household_type` (`supabase/migrations/20261028190949_household-type.sql`; policies in
-  `docs/architecture.md` §7).
-- Tests: `supabase/tests/database/household-type.test.sql`, `tests/e2e/household-type.spec.ts`,
+  `change_household_type` (`supabase/migrations/20261028190949_household-type.sql`),
+  `household_members`, `set_member_role` and the last-parent trigger
+  (`supabase/migrations/20261104175018_household-members.sql`); policies in
+  `docs/architecture.md` §7.
+- Tests: `supabase/tests/database/household-type.test.sql`,
+  `supabase/tests/database/household-members.test.sql`, `tests/e2e/household-type.spec.ts`,
   `tests/e2e/household-switcher.spec.ts`.
 
 ## Requirements
 
-FR-ACC-003, FR-ACC-004, FR-ACC-009, FR-HH-001, FR-HH-006, FR-HH-007, NFR-LEG-001.
+FR-ACC-003, FR-ACC-004, FR-ACC-006, FR-ACC-009, FR-HH-001, FR-HH-006, FR-HH-007, FR-HH-008,
+NFR-LEG-001.
 
 ## Screens
 
