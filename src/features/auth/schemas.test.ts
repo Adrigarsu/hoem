@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  changeEmailSchema,
+  changePasswordSchema,
   fieldErrors,
   forgotPasswordSchema,
   readPendingSignUp,
+  requireCurrentPassword,
   resetPasswordSchema,
   signInSchema,
   signUpSchema,
@@ -184,5 +187,56 @@ describe("resetPasswordSchema", () => {
   it("FR-ACC-008 rejects a reset without the link token", () => {
     const result = resetPasswordSchema.safeParse({ ...validReset, tokenHash: "" });
     expect(issues(result)).toEqual([["tokenHash", "required"]]);
+  });
+});
+
+describe("changeEmailSchema", () => {
+  it("FR-ACC-007 trims and lowercases the new e-mail", () => {
+    expect(changeEmailSchema.parse({ email: " Ana@Example.COM " })).toEqual({
+      email: "ana@example.com",
+    });
+  });
+
+  it("FR-ACC-007 refuses something that is not an e-mail", () => {
+    expect(issues(changeEmailSchema.safeParse({ email: "ana" }))).toEqual([
+      ["email", "invalidEmail"],
+    ]);
+  });
+});
+
+describe("changePasswordSchema", () => {
+  const validChange = {
+    currentPassword: "the old passphrase",
+    password: "a new passphrase",
+    confirmPassword: "a new passphrase",
+  };
+
+  it("FR-ACC-007 accepts the current password and a new one typed twice", () => {
+    expect(changePasswordSchema.safeParse(validChange).success).toBe(true);
+  });
+
+  it("FR-ACC-007 accepts no current password, for an account that has none", () => {
+    expect(changePasswordSchema.safeParse({ ...validChange, currentPassword: "" }).success).toBe(
+      true,
+    );
+  });
+
+  it("FR-ACC-007 applies the password policy to the new password", () => {
+    const result = changePasswordSchema.safeParse({
+      ...validChange,
+      password: "short",
+      confirmPassword: "short",
+    });
+    expect(issues(result)).toEqual([["password", "passwordTooShort"]]);
+  });
+
+  it("FR-ACC-007 refuses a new password typed differently the second time", () => {
+    const result = changePasswordSchema.safeParse({ ...validChange, confirmPassword: "another" });
+    expect(issues(result)).toEqual([["confirmPassword", "passwordsDoNotMatch"]]);
+  });
+
+  it("FR-ACC-007 asks for the current password when the account has one", () => {
+    const result = requireCurrentPassword.safeParse({ ...validChange, currentPassword: "" });
+    expect(issues(result)).toEqual([["currentPassword", "required"]]);
   });
 });

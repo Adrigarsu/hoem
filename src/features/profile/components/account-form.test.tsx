@@ -17,7 +17,8 @@ function renderForm() {
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
       <AccountForm
-        profile={{ displayName: "Lucía", email: "lucia@example.com", avatarUrl: null }}
+        profile={{ displayName: "Lucía", avatarUrl: null }}
+        email={<p>The email form</p>}
       />
     </NextIntlClientProvider>,
   );
@@ -28,11 +29,10 @@ const photoInput = () => screen.getByLabelText("Change photo");
 describe("AccountForm", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("FR-ACC-007 shows the current name and the email, which cannot be edited", () => {
+  it("FR-ACC-007 shows the current name and the email form it is given", () => {
     renderForm();
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Lucía");
-    expect(screen.getByText("lucia@example.com")).toBeInTheDocument();
-    expect(screen.queryByRole("textbox", { name: "Email" })).not.toBeInTheDocument();
+    expect(screen.getByText("The email form")).toBeInTheDocument();
   });
 
   it("FR-ACC-007 saves a new name", async () => {

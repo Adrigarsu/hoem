@@ -54,6 +54,27 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export const changeEmailSchema = z.object({ email });
+
+// The server cannot trust the form to say whether the account has a password, so it accepts an
+// empty current password here and the service decides (FR-ACC-007).
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().default(""),
+    password: newPassword,
+    confirmPassword: z.string(),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    error: "passwordsDoNotMatch",
+    path: ["confirmPassword"],
+  });
+
+// What the form checks before sending when the account has a password.
+export const requireCurrentPassword = changePasswordSchema.refine(
+  (values) => values.currentPassword.length > 0,
+  { error: "required", path: ["currentPassword"] },
+);
+
 // What Check your inbox shows and "Use a different email" puts back in the sign-up form. It
 // travels in an HttpOnly cookie (screens README, "Decisions on the hand-off"), so it is parsed
 // like any other input.
@@ -76,6 +97,7 @@ export function readPendingSignUp(value: string | undefined): PendingSignUp | nu
 
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
 export type ValidationKey =
   | "required"

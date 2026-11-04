@@ -111,7 +111,9 @@
       "linkExpired": "That link has expired or was already used. Sign in to get a new one.",
       "rateLimited": "Too many attempts. Wait a few minutes and try again.",
       "weakPassword": "Choose a longer password, one that is harder to guess.",
-      "generic": "Something went wrong. Try again in a moment."
+      "generic": "Something went wrong. Try again in a moment.",
+      "wrongPassword": "Your current password is incorrect.",
+      "sameEmail": "That is already your email. Enter a different one."
     },
     "validation": {
       "required": "Fill in this field.",
@@ -121,7 +123,31 @@
       "passwordTooLong": "This password is too long. Use 72 characters or fewer.",
       "passwordsDoNotMatch": "The passwords do not match."
     },
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "changeEmail": {
+      "label": "Email",
+      "submit": "Change email",
+      "submitting": "Sending…",
+      "sent": "We sent a link to {email}. Your email changes once you open it.",
+      "pending": "Waiting for you to confirm {email}. Open the link we sent there.",
+      "changePassword": "Change password",
+      "setPassword": "Set a password",
+      "linkExpired": "That confirmation link has expired or was already used. Enter your new email again to get a new one.",
+      "linkFailed": "We could not confirm your new email. Enter it again to get a new link."
+    },
+    "changePassword": {
+      "changeTitle": "Change password",
+      "setTitle": "Set a password",
+      "lede": "You'll stay signed in here, and be signed out on your other devices.",
+      "setLede": "You signed up with Google. With a password you can also sign in with your email.",
+      "currentPassword": "Current password",
+      "password": "New password",
+      "passwordHelp": "At least {min} characters.",
+      "confirmPassword": "Repeat the password",
+      "submit": "Save password",
+      "submitting": "Saving…",
+      "changed": "Password saved. Your other devices were signed out."
+    }
   },
   "Splash": {
     "loading": "Opening your home…"

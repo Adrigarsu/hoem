@@ -23,7 +23,6 @@ their milestone starts.
 | --- | -------------------------------------------------------- | --------- | -------- | ---------- | ----------------------------------------------------------- |
 | 23  | FR-ACC-007: delete my account                            | M1a       | must     | —          | Entry point is the profile menu                             |
 | 25  | FR-ACC-002: sign in with Google                          | M1a       | should   | —          | Should; independent                                         |
-| 80  | FR-ACC-007: change my e-mail and password                | M1a       | should   | —          | Follows #22; touches auth                                   |
 | 55  | ci: cache Playwright system libraries, time out installs | M1a       | should   | —          | Move up if CI installs keep stalling                        |
 | 50  | chore: run end-to-end tests in Firefox and Edge          | M1a       | should   | —          | Widens browser coverage; no feature depends                 |
 | 99  | chore: rate-limit REST API write routes                  | M1a       | should   | —          | Chore, end of milestone (rule 5); only one API route so far |

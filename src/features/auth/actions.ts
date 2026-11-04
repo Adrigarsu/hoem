@@ -1,6 +1,7 @@
 "use server";
 
 import { getLocale } from "next-intl/server";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthFailedError } from "@/lib/errors";
@@ -11,6 +12,8 @@ import { rememberPreferences } from "./locale-cookie";
 import { pendingSignUp, rememberPendingSignUp } from "./pending-sign-up-cookie";
 import { authGateway } from "./repository";
 import {
+  changeEmailSchema,
+  changePasswordSchema,
   fieldErrors,
   forgotPasswordSchema,
   resendSchema,
@@ -24,7 +27,7 @@ import * as auth from "./service";
 // Thin entry points: parse with the shared schema, call the service, map the result to form
 // state. Passwords are never echoed back to the form.
 export type AuthFormState = {
-  status: "idle" | "invalid" | "failed" | "resent" | "sent";
+  status: "idle" | "invalid" | "failed" | "resent" | "sent" | "changed";
   fieldErrors?: Record<string, ValidationKey>;
   error?: AuthErrorKey;
   values?: { displayName?: string; email?: string };
@@ -32,6 +35,9 @@ export type AuthFormState = {
 
 const confirmPath = "/auth/confirm";
 const resetPasswordPath = "/auth/reset-password";
+// The route as the file system names it: Account settings shows the e-mail waiting for
+// confirmation and whether the account has a password.
+const appLayout = "/[locale]/(app)";
 
 function text(formData: FormData, name: string): string {
   const value = formData.get(name);
@@ -173,4 +179,44 @@ export async function resetPasswordAction(
 export async function signOutAction() {
   await auth.signOut(await authGateway());
   redirect("/sign-in");
+}
+
+// FR-ACC-007: nothing changes until the link in the e-mail is opened (see the service).
+export async function changeEmailAction(
+  _: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const values = { email: text(formData, "email") };
+  const parsed = changeEmailSchema.safeParse(values);
+  if (!parsed.success) {
+    return { status: "invalid", fieldErrors: fieldErrors(parsed.error), values };
+  }
+
+  try {
+    await auth.changeEmail(await authGateway(), parsed.data.email, await confirmUrl());
+  } catch (error) {
+    return failure(error, { email: parsed.data.email });
+  }
+  revalidatePath(appLayout, "layout");
+  return { status: "sent", values: { email: parsed.data.email } };
+}
+
+export async function changePasswordAction(
+  _: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const parsed = changePasswordSchema.safeParse({
+    currentPassword: text(formData, "currentPassword"),
+    password: text(formData, "password"),
+    confirmPassword: text(formData, "confirmPassword"),
+  });
+  if (!parsed.success) return { status: "invalid", fieldErrors: fieldErrors(parsed.error) };
+
+  try {
+    await auth.changePassword(await authGateway(), parsed.data);
+  } catch (error) {
+    return failure(error, undefined);
+  }
+  revalidatePath(appLayout, "layout");
+  return { status: "changed" };
 }

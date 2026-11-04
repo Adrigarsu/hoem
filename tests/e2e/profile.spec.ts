@@ -83,12 +83,6 @@ test.describe("FR-ACC-007 edit my profile", () => {
     await expect(page.getByText("Enter your name")).toBeVisible();
   });
 
-  test("FR-ACC-007 the email is shown and cannot be edited", async ({ page, visit }) => {
-    await visit(accountPage(page));
-    await expect(page.getByRole("main").getByText(email).locator("visible=true")).toBeVisible();
-    await expect(page.getByRole("textbox", { name: "Email" })).toHaveCount(0);
-  });
-
   test("FR-ACC-007 an uploaded photo becomes my avatar, as a re-encoded WebP", async ({
     page,
     visit,
