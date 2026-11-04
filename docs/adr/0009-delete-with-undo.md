@@ -11,7 +11,7 @@ add a `deleted_at` filter to every query and every policy.
 
 The interface hides the item at once and shows a toast with Undo for 5 seconds; only then does it
 call the delete. If the page is closed during those 5 seconds, the pending delete is sent on
-`pagehide`. Deleting a whole household or account still asks for typed confirmation.
+`pagehide`, with a keepalive request to the REST API (ADR-020). Deleting a whole household or account still asks for typed confirmation.
 
 ## Consequences
 
