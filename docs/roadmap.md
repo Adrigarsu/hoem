@@ -73,16 +73,14 @@ proves, and a rough size, so a milestone fits the 6–8 weeks per phase of SRS �
 Found while reviewing the repository organisation (November 2026). Each line becomes an issue once
 we agree on its milestone and priority; then it is placed in `docs/planning.md`.
 
-| Work                                                                                               | Source                        | Proposed milestone | Notes                                                    |
-| -------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------ | -------------------------------------------------------- |
-| Close the M0 milestone on GitHub                                                                   | GitHub                        | M0                 | A click, not an issue                                    |
-| ESLint rule that fails when a layer imports upwards                                                | architecture §4.2             | _To define_        | Depends on the decision about `eslint-plugin-boundaries` |
-| Observability: Sentry, structured logs, Vercel Analytics                                           | architecture §9.3             | M7                 | Before real users                                        |
-| OpenAPI document generated from the Zod schemas, served at `/api/v1/openapi.json`, with a CI check | architecture §5.4, §9.2 row 4 | _To define_        | Cheaper while the API is small                           |
-| Lighthouse CI on the preview URL                                                                   | architecture §9.2 row 6       | M7                 | NFR-PERF-002                                             |
-| Secret scanning and dependency audit in CI                                                         | architecture §9.2 row 7       | _To define_        | GitHub secret scanning may cover half of it              |
-| Decide on Radix UI / shadcn, Framer Motion and Storybook, listed in the SRS stack but not used     | SRS §7.1                      | _To define_        | Update SRS §7.1 with the decision                        |
-| Feature pages for `auth`, `home` and `shell`                                                       | `docs/features/`              | M1 docs review #71 | Could join #71 instead of a new issue                    |
-| Move setup, deployment and runbooks into `docs/guides/`                                            | `docs/guides/README.md`       | M1 docs review #71 | Being done in this branch                                |
-| Release process: changelog and tags                                                                | Organisation review, point 8  | M7                 | Pending decision                                         |
-| Documentation review issue for each of M2–M7                                                       | `AGENTS.md`, Planning         | M2–M7              | Created when each tracking issue is split                |
+| Work                                                                                               | Source                        | Proposed milestone | Notes                                       |
+| -------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------ | ------------------------------------------- |
+| Close the M0 milestone on GitHub                                                                   | GitHub                        | M0                 | A click, not an issue                       |
+| Observability: Sentry, structured logs, Vercel Analytics                                           | architecture §9.3             | M7                 | Before real users                           |
+| OpenAPI document generated from the Zod schemas, served at `/api/v1/openapi.json`, with a CI check | architecture §5.4, §9.2 row 4 | _To define_        | Cheaper while the API is small              |
+| Lighthouse CI on the preview URL                                                                   | architecture §9.2 row 6       | M7                 | NFR-PERF-002                                |
+| Secret scanning and dependency audit in CI                                                         | architecture §9.2 row 7       | _To define_        | GitHub secret scanning may cover half of it |
+| Feature pages for `auth`, `home` and `shell`                                                       | `docs/features/`              | M1 docs review #71 | Could join #71 instead of a new issue       |
+| Move setup, deployment and runbooks into `docs/guides/`                                            | `docs/guides/README.md`       | M1 docs review #71 | Being done in this branch                   |
+| Release process: changelog and tags                                                                | Organisation review, point 8  | M7                 | Pending decision                            |
+| Documentation review issue for each of M2–M7                                                       | `AGENTS.md`, Planning         | M2–M7              | Created when each tracking issue is split   |
