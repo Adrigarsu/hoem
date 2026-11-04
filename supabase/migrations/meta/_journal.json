@@ -78,6 +78,13 @@
       "when": 1793811717276,
       "tag": "20261104170157_own-account-has-password",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793814618927,
+      "tag": "20261104175018_household-members",
+      "breakpoints": true
     }
   ]
 }
