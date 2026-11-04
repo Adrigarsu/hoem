@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import messages from "../../../../messages/en.json";
 import { deleteAccountAction } from "../actions";
-import { DeleteAccount } from "./delete-account";
+import { DeleteAccountButton, DeleteAccountProvider } from "./delete-account";
 
 vi.mock("../actions", () => ({
   deleteAccountAction: vi.fn(async () => ({ status: "idle" })),
@@ -16,7 +16,9 @@ const flat = { name: "Calle Mayor 5", href: "/settings/household/1" };
 function renderIt(blockers: (typeof flat)[] = []) {
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      <DeleteAccount email={email} blockers={blockers} />
+      <DeleteAccountProvider email={email} blockers={blockers}>
+        <DeleteAccountButton />
+      </DeleteAccountProvider>
     </NextIntlClientProvider>,
   );
 }
@@ -117,6 +119,23 @@ describe("DeleteAccount", () => {
     renderIt([flat]);
     await openDialog();
     expect(screen.getByRole("alertdialog")).toHaveTextContent("Your account has not been deleted.");
+  });
+
+  it("FR-ACC-007 the buttons of every width open the same single dialog", async () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <DeleteAccountProvider email={email} blockers={[]}>
+          <DeleteAccountButton />
+          <DeleteAccountButton />
+        </DeleteAccountProvider>
+      </NextIntlClientProvider>,
+    );
+    const user = userEvent.setup();
+    const [, second] = screen.getAllByRole("button", { name: "Delete account" });
+    if (!second) throw new Error("Expected two buttons");
+    await user.click(second);
+    expect(screen.getByRole("dialog", { name: "Delete your account?" })).toBeInTheDocument();
+    expect(screen.getAllByRole("textbox", { name: "Your email" })).toHaveLength(1);
   });
 
   it("FR-ACC-007 cancelling forgets what was typed", async () => {

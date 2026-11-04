@@ -55,19 +55,19 @@ test.describe("FR-ACC-007 delete my account", () => {
     await expect(page).toHaveURL(/\/sign-in/);
   });
 
-  test("FR-ACC-007 turning a phone closes the dialog instead of leaving the page inert", async ({
-    page,
-    visit,
-  }) => {
+  test("FR-ACC-007 turning a phone keeps the dialog open and usable", async ({ page, visit }) => {
     test.skip((page.viewportSize()?.width ?? 0) >= 768, "Only phones change layout by turning");
     await visit("/settings");
     await openDialog(page);
+    await field(page).fill("someone@example.com");
 
+    // The block that opened it is hidden now; the dialog lives outside both blocks.
     await page.setViewportSize({ width: 800, height: 360 });
 
-    await expect(page.locator("dialog[open]")).toHaveCount(0);
-    await deleteButton(page).click();
     await expect(dialog(page)).toBeVisible();
+    await expect(field(page)).toHaveValue("someone@example.com");
+    await page.keyboard.press("Escape");
+    await expect(dialog(page)).toBeHidden();
   });
 
   test("FR-ACC-007 a wrong e-mail deletes nothing", async ({ page, visit }) => {

@@ -37,9 +37,11 @@ export function SignInForm() {
   const [clientErrors, setClientErrors] = useState<Record<string, ValidationKey>>();
   const errors = clientErrors ?? state.fieldErrors;
 
-  // A fixed text: nothing from the address reaches the page (FR-ACC-007).
-  const accountDeleted = searchParams.get("deleted") === "1" && state.status === "idle";
   const linkError = linkErrors.find((key) => key === searchParams.get("error"));
+  // A fixed text: nothing from the address reaches the page (FR-ACC-007). A link error wins, so
+  // only one message holds the focus.
+  const accountDeleted =
+    searchParams.get("deleted") === "1" && state.status === "idle" && !linkError;
   const formError =
     state.status === "failed" ? state.error : state.status === "idle" ? linkError : undefined;
   const { formRef, messageRef } = useFormFocus(errors, Boolean(formError) || accountDeleted);

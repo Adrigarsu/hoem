@@ -15,7 +15,8 @@ Deleting your own account (FR-ACC-007, NFR-LEG-003). Editing the profile is in
 - **Last owner of a household with other members**: the dialog shows only "Make someone else owner
   first" with links to those households, and nothing is deleted. Choosing a new owner comes with #26.
 - **While deleting**: Cancel and Escape do nothing, because the server is already deleting the account.
-  Turning a phone with the dialog open closes it and forgets what was typed.
+  Turning a phone with the dialog open keeps it open with what was typed: there is one dialog for the
+  whole page, outside the blocks of each width.
 - **If it fails**: the dialog says so, keeps what was typed and the user can retry. The photo may
   already be gone: the avatar then shows the initials.
 
@@ -40,8 +41,8 @@ Deleting your own account (FR-ACC-007, NFR-LEG-003). Editing the profile is in
 ## Where it lives
 
 - Code: `src/features/account/` (`domain/account-deletion.ts`, `service.ts`, `repository.ts`,
-  `actions.ts`, `components/delete-account.tsx`). The settings page passes the dialog to the menu and
-  the cards. The notice is in `src/features/auth/components/sign-in-form.tsx`.
+  `actions.ts`, `components/delete-account.tsx`). The settings page wraps the menu and the cards in
+  `DeleteAccountProvider`, which holds the one dialog, and each block gets a `DeleteAccountButton`. The notice is in `src/features/auth/components/sign-in-form.tsx`.
 - Database: `supabase/migrations/20261103150733_delete-own-account.sql`.
 - Tests: `src/features/account/**/*.test.ts(x)`, `supabase/tests/database/delete-own-account.test.sql`,
   `tests/e2e/delete-account.spec.ts`. The last-owner dialog has no E2E test yet: the app cannot create a

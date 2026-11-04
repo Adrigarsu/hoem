@@ -3,7 +3,11 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { DeleteAccount, ownDeletionBlockers } from "@/features/account";
+import {
+  DeleteAccountButton,
+  DeleteAccountProvider,
+  ownDeletionBlockers,
+} from "@/features/account";
 import { SignOutButton } from "@/features/auth";
 import { currentHousehold } from "@/features/households";
 import { AccountForm, LanguageField, ownProfile, ThemeForm } from "@/features/profile";
@@ -58,22 +62,25 @@ async function Settings({ locale }: { locale: Locale }) {
         </div>
       }
     >
-      {/* One or the other by width, never both: a hidden block is out of the accessibility tree. */}
-      <SettingsMenu
-        profile={profile}
-        households={households}
-        locale={locale}
-        signOut={<SignOutButton />}
-        deleteAccount={<DeleteAccount email={profile.email} blockers={blockers} />}
-      />
-      <SettingsCards
-        households={households}
-        account={<AccountForm profile={profile} />}
-        theme={<ThemeForm theme={profile.theme} />}
-        language={<LanguageField locale={locale} />}
-        signOut={<SignOutButton />}
-        deleteAccount={<DeleteAccount email={profile.email} blockers={blockers} />}
-      />
+      {/* One or the other by width, never both: a hidden block is out of the accessibility tree.
+          Both share the one delete dialog, which lives outside them. */}
+      <DeleteAccountProvider email={profile.email} blockers={blockers}>
+        <SettingsMenu
+          profile={profile}
+          households={households}
+          locale={locale}
+          signOut={<SignOutButton />}
+          deleteAccount={<DeleteAccountButton />}
+        />
+        <SettingsCards
+          households={households}
+          account={<AccountForm profile={profile} />}
+          theme={<ThemeForm theme={profile.theme} />}
+          language={<LanguageField locale={locale} />}
+          signOut={<SignOutButton />}
+          deleteAccount={<DeleteAccountButton />}
+        />
+      </DeleteAccountProvider>
     </Page>
   );
 }

@@ -1,2 +1,2 @@
-export { DeleteAccount } from "./components/delete-account";
+export { DeleteAccountButton, DeleteAccountProvider } from "./components/delete-account";
 export { ownDeletionBlockers } from "./own-deletion-blockers";

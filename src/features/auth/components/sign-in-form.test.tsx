@@ -44,4 +44,10 @@ describe("SignInForm", () => {
     renderForm("deleted=you");
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
+
+  it("FR-ACC-007 shows only the link error when the address carries both", () => {
+    renderForm("deleted=1&error=linkExpired");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveFocus();
+  });
 });
