@@ -137,6 +137,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   several spans may need a looser match (`/^Appearance ?, ?System$/`) in unit tests.
 - Every RLS change needs a policy test that signs in as each affected role.
 - Next.js keeps a route announcer with `role="alert"`: in E2E, look for a page's alert inside `main`.
+  Look for texts there too (`page.getByRole("main").getByText(…)`): while a page streams in, React
+  keeps a hidden copy of a Suspense boundary outside `main` for an instant, and strict mode fails.
   `/settings` holds one block per width, so filter what is on screen (`:visible`). A modal shared by
   both blocks lives once, outside them (see `DeleteAccountProvider`), never once per block.
 - Next.js keeps the previous route in a hidden `<Activity>` after a client navigation: its fields stay
