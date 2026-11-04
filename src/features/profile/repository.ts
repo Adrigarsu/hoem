@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import type { ApiCredentials } from "@/lib/api-credentials";
+import { createClient, createTokenClient } from "@/lib/supabase/server";
 import { toTheme } from "@/lib/theme/theme";
 import type { ProfileGateway } from "./service";
 
@@ -22,13 +23,17 @@ const profileRow = z
     avatarPath: row.avatar_path,
   }));
 
-export async function profileGateway(): Promise<ProfileGateway> {
-  const supabase = await createClient();
+// The session cookie by default; a REST request with a Bearer token runs as that token's user.
+export async function profileGateway({
+  accessToken,
+}: ApiCredentials = {}): Promise<ProfileGateway> {
+  const supabase = accessToken ? createTokenClient(accessToken) : await createClient();
   return {
     // getClaims verifies the JWT signature, like the proxy does.
     async signedInUser() {
-      const { data } = await supabase.auth.getClaims();
-      if (!data) return null;
+      const { data } = await supabase.auth.getClaims(accessToken);
+      // A signed token without a subject (the anon key, a service token) is no user.
+      if (!data?.claims.sub) return null;
       // Every way to sign up asks for an email; without one the menu leaves out the email line.
       return { id: data.claims.sub, email: data.claims.email ?? "" };
     },
