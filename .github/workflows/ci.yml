@@ -86,26 +86,58 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # Google Chrome is preinstalled on GitHub's Ubuntu runners; Chromium and WebKit come from
-      # Playwright. The browsers are cached per Playwright version; their system libraries are not
-      # cacheable, so they are installed on every run.
-      - name: Read the Playwright version
-        id: playwright
-        run: echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+      # Playwright. Both the browsers and the ~70 apt packages they need (WebKit's GStreamer and
+      # codecs among them) are cached: GitHub's Ubuntu mirror has stalled for more than 20 minutes
+      # (#55). The image version is a runner variable, which the env context does not hold.
+      - name: Read the Playwright and runner image versions
+        id: versions
+        run: |
+          echo "playwright=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+          echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      # apt keeps the .deb files it downloads in a folder the cache can save. apt still installs
+      # them itself, running their post-install scripts (font cache, ldconfig), which actions that
+      # restore unpacked files skip; and no third-party action is needed. The sandbox user is root
+      # because apt's own download user cannot write to a folder in the runner's home.
+      - name: Keep apt downloads in a cacheable folder
+        run: |
+          mkdir -p ~/.cache/apt-archives/partial
+          printf '%s\n' \
+            "Dir::Cache::Archives \"$HOME/.cache/apt-archives\";" \
+            'APT::Keep-Downloaded-Packages "true";' \
+            'APT::Sandbox::User "root";' | sudo tee /etc/apt/apt.conf.d/99-hoem-ci
+
+      # The image fixes the package versions and Playwright the package list. Both shards share the
+      # key: when both miss, one saves and the other warns that the cache already exists.
+      - name: Cache browser system libraries
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/apt-archives
+          key: apt-${{ steps.versions.outputs.image }}-playwright-${{ steps.versions.outputs.playwright }}
+
+      # With every package cached only `apt-get update` reaches the mirror. Four minutes is several
+      # times a cold install; a stalled one is killed (timeout signals the whole process group,
+      # sudo and apt included) and tried once more instead of eating the job's 25 minutes.
+      - name: Install browser system libraries
+        timeout-minutes: 9
+        run: |
+          for attempt in 1 2; do
+            timeout --kill-after=15s 4m pnpm exec playwright install-deps chromium webkit && exit 0
+            echo "::warning::Installing the browser system libraries timed out or failed (attempt $attempt)"
+            sudo dpkg --configure -a
+          done
+          exit 1
 
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ steps.versions.outputs.playwright }}
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium webkit
-
-      - name: Install browser system libraries
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium webkit
+        run: pnpm exec playwright install chromium webkit
 
       - name: Start a local Supabase
         run: pnpm exec supabase start -x realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
