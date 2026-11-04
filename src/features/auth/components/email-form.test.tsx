@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -61,7 +61,7 @@ describe("EmailForm", () => {
     expect(emailField()).toHaveAccessibleDescription(
       /Enter an email address like name@example.com/,
     );
-    expect(emailField()).toHaveFocus();
+    await waitFor(() => expect(emailField()).toHaveFocus());
   });
 
   it("FR-ACC-007 reminds which new email is waiting for confirmation", () => {

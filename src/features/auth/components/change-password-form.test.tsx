@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -36,7 +36,7 @@ describe("ChangePasswordForm", () => {
     await fillNewPassword();
     await save();
     expect(changePasswordAction).not.toHaveBeenCalled();
-    expect(field("Current password")).toHaveFocus();
+    await waitFor(() => expect(field("Current password")).toHaveFocus());
   });
 
   it("FR-ACC-007 changes the password and says the other devices were signed out", async () => {
@@ -62,7 +62,8 @@ describe("ChangePasswordForm", () => {
     expect(field("Current password")).toHaveAccessibleDescription(
       /Your current password is incorrect/,
     );
-    expect(field("Current password")).toHaveFocus();
+    // Focus moves in an effect, after the server's answer is on screen.
+    await waitFor(() => expect(field("Current password")).toHaveFocus());
   });
 
   it("FR-ACC-007 refuses a new password typed differently the second time", async () => {
@@ -72,7 +73,7 @@ describe("ChangePasswordForm", () => {
     await userEvent.type(field("Repeat the password"), "another passphrase");
     await save();
     expect(changePasswordAction).not.toHaveBeenCalled();
-    expect(field("Repeat the password")).toHaveFocus();
+    await waitFor(() => expect(field("Repeat the password")).toHaveFocus());
   });
 
   it("FR-ACC-007 lets an account without a password set one", async () => {
