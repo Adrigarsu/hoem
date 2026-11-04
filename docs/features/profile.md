@@ -55,6 +55,8 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 - During the 5-second undo the file still exists and members can still load it, as ADR-009 intends.
   Closing the tab sends the removal on `pagehide` as a keepalive `DELETE /api/v1/profile/avatar`,
   which outlives the page (ADR-020); only a killed browser sends nothing.
+- `DELETE /api/v1/profile/avatar` counts against the 60 write requests per minute per user and
+  answers 429 with `Retry-After` over it (NFR-SEC-006, ADR-021).
 - Typing an address that belongs to another account gets the same "We sent a link" answer and
   e-mails nobody, so the form never reveals who has signed up.
 - A wrong current password changes nothing. Supabase checks a password only by signing in, so the

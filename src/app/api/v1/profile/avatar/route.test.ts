@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { removeOwnPhoto } from "@/features/profile";
-import { NotAuthenticatedError } from "@/lib/errors";
+import { NotAuthenticatedError, RateLimitedError } from "@/lib/errors";
+import { limitWrites } from "@/lib/rate-limit";
 import { DELETE } from "./route";
 
 vi.mock("@/features/profile", () => ({ removeOwnPhoto: vi.fn(async () => undefined) }));
+vi.mock("@/lib/rate-limit", () => ({ limitWrites: vi.fn(async () => undefined) }));
 
 const url = "https://hoemapp.com/api/v1/profile/avatar";
 const site = { host: "hoemapp.com", "x-forwarded-proto": "https" };
@@ -54,5 +56,22 @@ describe("DELETE /api/v1/profile/avatar", () => {
     expect(body).not.toContain("storage down");
     expect(body).toMatch(/"requestId":"[0-9a-f-]{36}"/);
     logged.mockRestore();
+  });
+
+  it("NFR-SEC-006 counts the request against the caller's write limit", async () => {
+    await DELETE(request({ authorization: "Bearer eyJ.token.sig" }));
+    expect(limitWrites).toHaveBeenCalledWith({ accessToken: "eyJ.token.sig" });
+  });
+
+  it("NFR-SEC-006 answers 429 with Retry-After once over the limit and removes nothing", async () => {
+    vi.mocked(limitWrites).mockRejectedValueOnce(new RateLimitedError(25));
+    const response = await DELETE(request({ origin: "https://hoemapp.com" }));
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("25");
+    expect(await response.json()).toMatchObject({
+      type: "https://hoemapp.com/problems/rate_limited",
+      instance: "/api/v1/profile/avatar",
+    });
+    expect(removeOwnPhoto).not.toHaveBeenCalled();
   });
 });

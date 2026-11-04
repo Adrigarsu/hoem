@@ -29,7 +29,24 @@ Requirements: Node.js 22, pnpm (`corepack enable`) and Docker Desktop.
 ```bash
 pnpm install
 pnpm db:start
-cp .env.example .env.local   # fill in the URL and key that db:start printed
+```
+
+`pnpm db:start` runs Supabase locally in Docker, applies the migrations in
+`supabase/migrations/` and prints the local URLs and keys. Copy `.env.example` to `.env.local`
+and fill it in with the API URL and the publishable key it printed (`pnpm exec supabase status`
+shows them again). The app refuses to start while a variable is missing.
+
+Sign-up e-mails from the local Supabase never leave your machine: open Mailpit at
+http://127.0.0.1:54324 to read them and click the verification link.
+
+The end-to-end tests run against the local Supabase (`pnpm db:start`), and need the Playwright
+browsers once (Google Chrome and Microsoft Edge themselves must be installed):
+
+```bash
+pnpm exec playwright install chromium firefox webkit
+```
+
+```bash
 pnpm dev
 ```
 
