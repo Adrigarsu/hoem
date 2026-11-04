@@ -65,6 +65,44 @@ describe("Dialog", () => {
     expect(cancel.defaultPrevented).toBe(true);
   });
 
+  it("NFR-A11Y-003 reopens when the browser closes it while it cannot be dismissed", () => {
+    // Chromium lets a second Escape close a dialog without a cancelable cancel event.
+    const onClose = vi.fn();
+    render(
+      <Dialog
+        open
+        dismissible={false}
+        onClose={onClose}
+        title="Title"
+        description="Text"
+        actions={null}
+      />,
+    );
+    const element = screen.getByRole<HTMLDialogElement>("dialog", { name: "Title" });
+    element.close();
+    expect(element.open).toBe(true);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("NFR-A11Y-003 still closes with its hidden route while it cannot be dismissed", () => {
+    const dialog = (mode: "visible" | "hidden") => (
+      <Activity mode={mode}>
+        <Dialog
+          open
+          dismissible={false}
+          onClose={vi.fn()}
+          title="Title"
+          description="Text"
+          actions={null}
+        />
+      </Activity>
+    );
+    const { rerender } = render(dialog("visible"));
+    const element = screen.getByRole<HTMLDialogElement>("dialog", { name: "Title" });
+    rerender(dialog("hidden"));
+    expect(element.open).toBe(false);
+  });
+
   it("NFR-A11Y-003 can interrupt as an alert dialog", () => {
     render(
       <Dialog
