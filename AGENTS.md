@@ -38,8 +38,10 @@ Not everything is installed yet. Add a dependency only when the task needs it, a
   `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_ci RESEND_API_KEY=re_ci_placeholder`.
 - `pnpm test` / `pnpm test:watch`: unit tests (Vitest)
 - `pnpm test:coverage`: unit tests with the 80 % threshold on domain, services and pure utilities
-- `pnpm test:e2e`: Playwright on a production build (`tests/e2e/`), in Chromium, Chrome and Safari at
-  360, 768 and 1440 px; open pages with the `visit` fixture so axe and the no-horizontal-scroll check
+- `pnpm test:e2e`: Playwright on a production build (`tests/e2e/`), in Chromium, Chrome, Firefox, Edge
+  and Safari at 360, 768 and 1440 px (one browser: `--project="firefox-*"`; CI runs one job per
+  browser, `e2e (<browser>)`; Firefox's 360 px project is a narrow window, since Playwright cannot
+  emulate a phone there); open pages with the `visit` fixture so axe and the no-horizontal-scroll check
   run on each one (`pnpm test:e2e:ui` to debug). Needs the local Supabase (`pnpm db:start`) and
   `.env.local` pointing at it; e-mails land in Mailpit, http://127.0.0.1:54324
 - `pnpm lint:fix`, `pnpm format`: autofix

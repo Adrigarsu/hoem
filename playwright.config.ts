@@ -3,13 +3,18 @@ import { defineConfig, devices } from "@playwright/test";
 const port = 3100;
 const isCI = Boolean(process.env.CI);
 
-// NFR-UX-001: every test runs at 360, 768 and 1440 px. SRS 2.3 targets Chrome, Firefox, Safari
-// and Edge; Firefox and Edge are not wired up yet. The 360 px projects emulate a phone (touch,
-// mobile viewport and user agent); the wider ones are desktop windows.
+// NFR-UX-001: every test runs at 360, 768 and 1440 px in the browsers SRS 2.3 targets: Chrome,
+// Firefox, Safari and Edge, plus Playwright's Chromium. The 360 px projects emulate a phone (touch,
+// mobile viewport and user agent); the wider ones are desktop windows. CI runs each browser in its
+// own job (`--project="<browser>-*"`).
 const chromePhone = { ...devices["Pixel 7"], viewport: { width: 360, height: 800 } };
 const chromeDesktop = devices["Desktop Chrome"];
 const safariPhone = { ...devices["iPhone 14"], viewport: { width: 360, height: 780 } };
 const safariDesktop = devices["Desktop Safari"];
+const firefoxDesktop = devices["Desktop Firefox"];
+// Playwright cannot emulate a mobile viewport in Firefox (`isMobile`), so its 360 px project is a
+// narrow window with touch.
+const firefoxPhone = { ...firefoxDesktop, viewport: { width: 360, height: 800 }, hasTouch: true };
 
 const tablet = { width: 768, height: 1024 };
 const desktop = { width: 1440, height: 900 };
@@ -21,6 +26,12 @@ const browsers = {
     desktop: { ...chromeDesktop, channel: "chrome" },
   },
   safari: { phone: safariPhone, desktop: safariDesktop },
+  firefox: { phone: firefoxPhone, desktop: firefoxDesktop },
+  edge: {
+    phone: { ...chromePhone, channel: "msedge" },
+    // The device only sets Edge's user agent; the channel runs the real Microsoft Edge.
+    desktop: { ...devices["Desktop Edge"], channel: "msedge" },
+  },
 };
 
 // WebKit runs these tests about three times slower than Chromium (axe in both themes on every
