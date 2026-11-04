@@ -28,8 +28,8 @@ shopping lists and splitting (SRS §3.7).
     the family roles.
 - **When an account is deleted** (FR-ACC-007, ADR-019): the households the user was alone in go with
   it. Someone who is the last owner of a household with other members cannot delete their account,
-  or leave, until someone else is an owner (`last_owner`). The app does not offer this yet: the
-  database function comes first, and the screen with the rest of #23.
+  or leave, until someone else is an owner (`last_owner`); nor can the last parent of such a family,
+  until someone else is a parent (`last_parent`). See `docs/features/account.md`.
 - **Members and roles** (FR-ACC-006, FR-HH-006, FR-HH-008): household settings, "Members"
   section. Every member sees every member's name, photo and role (plus parent, child or relative in
   a family), in joining order. "Options for {name}" opens a dialog with only what the user may do:

@@ -14,7 +14,7 @@ const household = (page: Page, name: string) =>
 
 async function signIn(page: Page, email: string) {
   await page.goto("/sign-in");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/$/);

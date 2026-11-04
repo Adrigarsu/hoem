@@ -15,6 +15,7 @@ function renderCards() {
         theme={<p>Theme form</p>}
         language={<p>Language field</p>}
         signOut={<button type="submit">Sign out</button>}
+        deleteAccount={<button type="button">Delete account</button>}
       />
     </NextIntlClientProvider>,
   );
