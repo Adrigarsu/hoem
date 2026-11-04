@@ -1,11 +1,22 @@
 import { ConflictError, NotAuthenticatedError, ValidationError } from "@/lib/errors";
-import { confirmsDeletion, householdsNeedingNewOwner } from "./domain/account-deletion";
+import {
+  confirmsDeletion,
+  householdsToHandOver,
+  type HandOverReason,
+} from "./domain/account-deletion";
 import type { DeleteAccountInput } from "./schemas";
 
-export type BlockingHousehold = { id: string; name: string };
+export type BlockingHousehold = { id: string; name: string; reasons: HandOverReason[] };
 
-type HouseholdWithMembers = BlockingHousehold & {
-  members: { userId: string; role: "owner" | "member" }[];
+type HouseholdWithMembers = {
+  id: string;
+  name: string;
+  type: string;
+  members: {
+    userId: string;
+    role: "owner" | "member";
+    familyRole: "parent" | "child" | "relative" | null;
+  }[];
 };
 
 export type AccountGateway = {
@@ -25,9 +36,10 @@ export class WrongConfirmationError extends ValidationError {
   }
 }
 
-export class LastOwnerError extends ConflictError {
+// The last owner of a household with other members, or the last parent of such a family.
+export class HandOverFirstError extends ConflictError {
   constructor(readonly households: BlockingHousehold[] = []) {
-    super("The last owner of a household with other members cannot delete the account");
+    super("A household with other members needs another owner or parent first");
   }
 }
 
@@ -38,8 +50,8 @@ async function requireUser(gateway: AccountGateway) {
 }
 
 async function blockersFor(gateway: AccountGateway, userId: string): Promise<BlockingHousehold[]> {
-  const households = householdsNeedingNewOwner(await gateway.myHouseholds(), userId);
-  return households.map(({ id, name }) => ({ id, name }));
+  const households = householdsToHandOver(await gateway.myHouseholds(), userId);
+  return households.map(({ id, name, reasons }) => ({ id, name, reasons }));
 }
 
 export async function accountDeletionBlockers(gateway: AccountGateway) {
@@ -62,7 +74,7 @@ export async function deleteAccount(gateway: AccountGateway, input: DeleteAccoun
   if (!confirmsDeletion(input.confirmation, user.email)) throw new WrongConfirmationError();
 
   const blockers = await blockersFor(gateway, user.id);
-  if (blockers.length > 0) throw new LastOwnerError(blockers);
+  if (blockers.length > 0) throw new HandOverFirstError(blockers);
 
   await removePhotos(gateway, user.id);
   await gateway.deleteOwnAccount(input.confirmation.trim());

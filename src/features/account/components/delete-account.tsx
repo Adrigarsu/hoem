@@ -21,6 +21,14 @@ const idle: DeleteAccountState = { status: "idle" };
 
 const OpenDeleteAccount = createContext<(() => void) | null>(null);
 
+// Which texts the refusal uses. A refusal the page did not foresee comes without households, so it
+// names both reasons.
+function refusalKind(households: readonly BlockingLink[]): "owner" | "parent" | "both" {
+  const reasons = new Set(households.flatMap((household) => household.reasons));
+  if (reasons.size === 1) return reasons.has("owner") ? "owner" : "parent";
+  return "both";
+}
+
 type DeleteAccountProps = {
   email: string;
   // The households that need a new owner first, known when the page loads.
@@ -112,6 +120,7 @@ function DeleteAccountDialog({ open, email, blockers, onCancel, onClosed }: Dial
 
   const blocked = state.status === "blocked" || blockers.length > 0;
   const households = state.households?.length ? state.households : blockers;
+  const kind = refusalKind(households);
   const error = errors?.confirmation ? t(`validation.${errors.confirmation}`) : undefined;
 
   return (
@@ -123,11 +132,11 @@ function DeleteAccountDialog({ open, email, blockers, onCancel, onClosed }: Dial
         role={blocked ? "alertdialog" : "dialog"}
         // Closing would look like cancelling, but the server is already deleting the account.
         dismissible={!pending}
-        title={blocked ? t("blocked.title") : t("title")}
+        title={blocked ? t(`blocked.title.${kind}`) : t("title")}
         description={
           blocked ? (
             <div ref={messageRef} tabIndex={-1} className="flex flex-col gap-3">
-              <p>{t("blocked.lede")}</p>
+              <p>{t(`blocked.lede.${kind}`)}</p>
               {households.length > 0 && (
                 <ul className="flex flex-col gap-1">
                   {households.map((household) => (

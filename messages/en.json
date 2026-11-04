@@ -177,8 +177,16 @@
     "deleting": "Deleting…",
     "failed": "We could not delete your account. Try again.",
     "blocked": {
-      "title": "Make someone else owner first",
-      "lede": "You are the last owner of a household other people belong to. Your account has not been deleted.",
+      "title": {
+        "owner": "Make someone else owner first",
+        "parent": "Make someone else a parent first",
+        "both": "Hand over your place first"
+      },
+      "lede": {
+        "owner": "You are the last owner of a household other people belong to. Your account has not been deleted.",
+        "parent": "You are the last parent of a family other people belong to. Your account has not been deleted.",
+        "both": "You are the last owner or the last parent of a household other people belong to. Your account has not been deleted."
+      },
       "close": "Close"
     },
     "validation": {

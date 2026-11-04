@@ -11,9 +11,16 @@ vi.mock("../actions", () => ({
 }));
 
 const email = "lucia@example.com";
-const flat = { name: "Calle Mayor 5", href: "/settings/household/1" };
+const flat = {
+  name: "Calle Mayor 5",
+  href: "/settings/household/1",
+  reasons: ["owner" as const],
+};
+const family = { name: "Casa", href: "/settings/household/2", reasons: ["parent" as const] };
 
-function renderIt(blockers: (typeof flat)[] = []) {
+function renderIt(
+  blockers: { name: string; href: string; reasons: ("owner" | "parent")[] }[] = [],
+) {
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
       <DeleteAccountProvider email={email} blockers={blockers}>
@@ -93,6 +100,21 @@ describe("DeleteAccount", () => {
     );
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Delete my account" })).not.toBeInTheDocument();
+  });
+
+  it("FR-ACC-007 the last parent of a family is asked to make someone else a parent", async () => {
+    renderIt([family]);
+    await openDialog();
+    const dialog = screen.getByRole("alertdialog", { name: "Make someone else a parent first" });
+    expect(dialog).toHaveTextContent("You are the last parent of a family");
+    expect(within(dialog).getByRole("link", { name: "Casa" })).toHaveAttribute("href", family.href);
+  });
+
+  it("FR-ACC-007 a last owner who is also a last parent is told both", async () => {
+    renderIt([flat, family]);
+    await openDialog();
+    const dialog = screen.getByRole("alertdialog", { name: "Hand over your place first" });
+    expect(within(dialog).getAllByRole("link")).toHaveLength(2);
   });
 
   it("FR-ACC-007 a household that gained a member meanwhile blocks it too", async () => {

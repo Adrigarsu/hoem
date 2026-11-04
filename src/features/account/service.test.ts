@@ -3,7 +3,7 @@ import { NotAuthenticatedError } from "@/lib/errors";
 import {
   accountDeletionBlockers,
   deleteAccount,
-  LastOwnerError,
+  HandOverFirstError,
   WrongConfirmationError,
   type AccountGateway,
 } from "./service";
@@ -11,12 +11,23 @@ import {
 const userId = "00000000-0000-7000-8000-000000000001";
 const email = "lucia@example.com";
 const photo = `${userId}/photo.webp`;
+const otherId = "00000000-0000-7000-8000-000000000002";
 const flat = {
   id: "00000000-0000-7000-8000-00000000a001",
   name: "Calle Mayor 5",
+  type: "shared_flat",
   members: [
-    { userId, role: "owner" as const },
-    { userId: "00000000-0000-7000-8000-000000000002", role: "member" as const },
+    { userId, role: "owner" as const, familyRole: null },
+    { userId: otherId, role: "member" as const, familyRole: null },
+  ],
+};
+const family = {
+  id: "00000000-0000-7000-8000-00000000a002",
+  name: "Casa",
+  type: "family",
+  members: [
+    { userId: otherId, role: "owner" as const, familyRole: "relative" as const },
+    { userId, role: "member" as const, familyRole: "parent" as const },
   ],
 };
 const input = { confirmation: email };
@@ -42,7 +53,16 @@ afterEach(() => {
 describe("accountDeletionBlockers", () => {
   it("FR-ACC-007 names the households that need a new owner first", async () => {
     const account = gateway({ myHouseholds: vi.fn(async () => [flat]) });
-    expect(await accountDeletionBlockers(account)).toEqual([{ id: flat.id, name: flat.name }]);
+    expect(await accountDeletionBlockers(account)).toEqual([
+      { id: flat.id, name: flat.name, reasons: ["owner"] },
+    ]);
+  });
+
+  it("FR-ACC-007 names the families that need another parent first", async () => {
+    const account = gateway({ myHouseholds: vi.fn(async () => [family]) });
+    expect(await accountDeletionBlockers(account)).toEqual([
+      { id: family.id, name: family.name, reasons: ["parent"] },
+    ]);
   });
 
   it("FR-ACC-007 refuses to look without a session", async () => {
@@ -69,8 +89,15 @@ describe("deleteAccount", () => {
 
   it("FR-ACC-007 the last owner of a shared household deletes nothing, not even the photo", async () => {
     const account = gateway({ myHouseholds: vi.fn(async () => [flat]) });
-    await expect(deleteAccount(account, input)).rejects.toBeInstanceOf(LastOwnerError);
+    await expect(deleteAccount(account, input)).rejects.toBeInstanceOf(HandOverFirstError);
     expect(account.clearAvatarPath).not.toHaveBeenCalled();
+    expect(account.removeAvatars).not.toHaveBeenCalled();
+    expect(account.deleteOwnAccount).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-007 the last parent of a family with others deletes nothing, not even the photo", async () => {
+    const account = gateway({ myHouseholds: vi.fn(async () => [family]) });
+    await expect(deleteAccount(account, input)).rejects.toBeInstanceOf(HandOverFirstError);
     expect(account.removeAvatars).not.toHaveBeenCalled();
     expect(account.deleteOwnAccount).not.toHaveBeenCalled();
   });
