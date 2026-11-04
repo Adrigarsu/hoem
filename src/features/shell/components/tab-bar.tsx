@@ -3,15 +3,15 @@ import { destinations, tabBarOrder } from "../domain/destinations";
 import { destinationIcons } from "./destination-icons";
 import { NavLink } from "./nav-link";
 
-// Phones and small tablets (below bp-md). Sticky, not fixed, so it takes its own space at the end
-// of the page and never covers the content above it. The current tab gets the pill and a bolder
+// Phones and small tablets (below bp-md). The shell makes it sticky, not fixed, so it takes its own
+// space at the end of the page and never covers the content above it. The current tab gets the pill and a bolder
 // label, so it is marked by more than colour.
 export function TabBar() {
   const t = useTranslations("Shell");
   return (
     <nav
       aria-label={t("mainNavigation")}
-      className="sticky bottom-0 z-10 grid grid-cols-5 border-t border-border bg-surface py-2 md:hidden"
+      className="grid grid-cols-5 border-t border-border bg-surface py-2 md:hidden"
     >
       {tabBarOrder.map((destination) => {
         const Icon = destinationIcons[destination];

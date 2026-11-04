@@ -69,6 +69,11 @@ const eslintConfig = defineConfig([
           selector: `TemplateElement[value.raw=${hardCodedColour}]`,
           message: "Hard-coded colour. Use a design token (NFR-UX-004).",
         },
+        {
+          // OwnAvatar hides the photo at once while its removal can still be undone (FR-ACC-007).
+          selector: `JSXOpeningElement[name.name="Avatar"] > JSXAttribute[name.name="src"] MemberExpression[property.name="avatarUrl"]`,
+          message: "The signed-in user's own photo goes through OwnAvatar from @/features/profile.",
+        },
       ],
     },
   },

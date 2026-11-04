@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies, headers } from "next/headers";
 
 import { env } from "@/lib/env";
@@ -32,6 +33,20 @@ export async function createClient() {
           }
         },
       },
+    },
+  );
+}
+
+// For REST requests that send `Authorization: Bearer` (docs/architecture.md §5.2). Every query
+// carries that token, so it runs as its user under RLS, as with cookies (ADR-004). Nothing is
+// stored or refreshed: the token is the caller's.
+export function createTokenClient(accessToken: string) {
+  return createSupabaseClient(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    {
+      global: { headers: { Authorization: `Bearer ${accessToken}` } },
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     },
   );
 }

@@ -2,14 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useActionState, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import {
-  Avatar,
-  Button,
-  buttonClassName,
-  FormMessage,
-  TextField,
-  useFormFocus,
-} from "@/design-system";
+import { Button, buttonClassName, FormMessage, TextField, useFormFocus } from "@/design-system";
 import {
   changePhotoAction,
   saveNameAction,
@@ -19,6 +12,7 @@ import {
 } from "../actions";
 import { avatarAccept, avatarHeadBytes, avatarRejection } from "../domain/avatar-rules";
 import { fieldErrors, nameSchema, type ValidationKey } from "../schemas";
+import { OwnAvatar, useOwnPhoto } from "./own-photo";
 
 type AccountFormProps = {
   profile: { displayName: string; email: string; avatarUrl: string | null };
@@ -49,7 +43,21 @@ function PhotoForm({ name, photo }: { name: string; photo: string | null }) {
   // Set when the browser already knows the file is wrong, so it is never sent.
   const [refused, setRefused] = useState<PhotoFailure>();
   const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const helpId = useId();
+  const ownPhoto = useOwnPhoto();
+  const shown = photo !== null && !ownPhoto.hidden;
+  // So "Photo updated" from an earlier change does not stay next to the initials; it comes back
+  // with the photo after Undo or a failed removal.
+  const [removed, setRemoved] = useState(false);
+  const savedShown = state.status === "saved" && (shown || !removed);
+
+  function remove() {
+    ownPhoto.remove();
+    setRemoved(true);
+    // The button disappears with the photo; without this, focus would fall back to the page.
+    inputRef.current?.focus();
+  }
 
   async function send(event: ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget;
@@ -63,6 +71,9 @@ function PhotoForm({ name, photo }: { name: string; photo: string | null }) {
       input.value = "";
       return;
     }
+    ownPhoto.undo();
+    setRemoved(false);
+    await ownPhoto.settled();
     formRef.current?.requestSubmit();
   }
 
@@ -71,23 +82,31 @@ function PhotoForm({ name, photo }: { name: string; photo: string | null }) {
   return (
     <form ref={formRef} action={action} className="flex flex-col gap-3">
       <div className="flex items-center gap-4">
-        <Avatar name={name} src={photo} size="lg" />
+        <OwnAvatar name={name} src={photo} size="lg" />
         <div className="flex min-w-0 flex-col gap-1">
-          {/* The real file input, hidden but focusable; its label is what people see and press. */}
-          <label
-            className={`${buttonClassName("secondary")} cursor-pointer self-start has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring`}
-            aria-busy={pending}
-          >
-            <input
-              type="file"
-              name="photo"
-              accept={avatarAccept}
-              aria-describedby={helpId}
-              onChange={send}
-              className="sr-only"
-            />
-            {pending ? t("uploading") : t("change")}
-          </label>
+          <div className="flex flex-wrap gap-2">
+            {/* The real file input, hidden but focusable; its label is what people see and press. */}
+            <label
+              className={`${buttonClassName("secondary")} cursor-pointer self-start has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring`}
+              aria-busy={pending}
+            >
+              <input
+                ref={inputRef}
+                type="file"
+                name="photo"
+                accept={avatarAccept}
+                aria-describedby={helpId}
+                onChange={send}
+                className="sr-only"
+              />
+              {pending ? t("uploading") : t("change")}
+            </label>
+            {shown && !pending && (
+              <Button variant="ghost" onClick={remove}>
+                {t("remove")}
+              </Button>
+            )}
+          </div>
           <p id={helpId} className="text-small text-text-secondary">
             {t("help")}
           </p>
@@ -95,7 +114,7 @@ function PhotoForm({ name, photo }: { name: string; photo: string | null }) {
       </div>
       {/* In the page from the start, so a screen reader announces the change of text. */}
       <p role="status" className="text-small text-text-secondary">
-        {!pending && !failure && state.status === "saved" && t("saved")}
+        {!pending && !failure && savedShown && t("saved")}
       </p>
       {failure && !pending && <FormMessage tone="danger">{t(failure)}</FormMessage>}
     </form>

@@ -1,18 +1,14 @@
-import { CircleAlert, CircleCheck, TriangleAlert, type LucideIcon } from "lucide-react";
 import type { ReactNode, Ref } from "react";
+import { messageTones, type MessageTone } from "./message-tones";
 
-const tones: Record<
-  "danger" | "warning" | "success",
-  { icon: LucideIcon; role: "alert" | "status"; classes: string }
-> = {
-  // Errors interrupt (role=alert); confirmations wait for a pause (role=status).
-  danger: { icon: CircleAlert, role: "alert", classes: "bg-danger-tint text-danger-ink" },
-  warning: { icon: TriangleAlert, role: "alert", classes: "bg-warning-tint text-warning-ink" },
-  success: { icon: CircleCheck, role: "status", classes: "bg-success-tint text-success-ink" },
+const toneClasses: Record<MessageTone, string> = {
+  danger: "bg-danger-tint text-danger-ink",
+  warning: "bg-warning-tint text-warning-ink",
+  success: "bg-success-tint text-success-ink",
 };
 
 type FormMessageProps = {
-  tone: keyof typeof tones;
+  tone: MessageTone;
   children: ReactNode;
   // An action that belongs to the message, such as "Resend the link".
   action?: ReactNode;
@@ -23,7 +19,8 @@ type FormMessageProps = {
 // A message about the whole form. Tint and ink are an approved colour pair; the icon and the text
 // carry the meaning, so colour is never the only signal (NFR-A11Y-005).
 export function FormMessage({ tone, children, action, ref }: FormMessageProps) {
-  const { icon: Icon, role, classes } = tones[tone];
+  const { icon: Icon, role } = messageTones[tone];
+  const classes = toneClasses[tone];
   return (
     <div
       ref={ref}

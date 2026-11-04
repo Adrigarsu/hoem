@@ -34,6 +34,8 @@ Not everything is installed yet. Add a dependency only when the task needs it, a
 
 - `pnpm dev`: dev server on http://localhost:3000
 - `pnpm check`: lint + typecheck + format check + unit tests with coverage. **Run it before saying a task is done.**
+  Without `.env.local` (a fresh cloud session), typecheck needs the placeholders CI uses:
+  `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_ci RESEND_API_KEY=re_ci_placeholder`.
 - `pnpm test` / `pnpm test:watch`: unit tests (Vitest)
 - `pnpm test:coverage`: unit tests with the 80 % threshold on domain, services and pure utilities
 - `pnpm test:e2e`: Playwright on a production build (`tests/e2e/`), in Chromium, Chrome and Safari at
@@ -88,6 +90,13 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   values in `src/lib/env.ts`, secrets in `src/lib/server-env.ts` (guarded by `server-only`).
   Never commit secrets and never read `.env` files.
 - Deleting hides the item at once with a 5-second undo, then deletes for real. No soft delete.
+  Use `useUndoTimer` and `Toast` from `@/design-system` (see its README, "Toast and undo"), with
+  an `onUnload` keepalive `fetch` to the REST `DELETE` route of the same use case (ADR-020).
+- A REST route gets its credentials from `apiCredentials(request.headers)` (Bearer, or the cookie
+  from the app's own origin) and answers errors with `problemResponse`; see
+  `src/app/api/v1/profile/avatar/route.ts`.
+- The signed-in user's own avatar is `OwnAvatar` (`@/features/profile`), never `Avatar` with
+  `avatarUrl`: it hides the photo during its undo window. A lint rule enforces it.
 - **Migrations are backward compatible (expand/contract, ADR-014):** a migration that adds a
   column, table or function merges in its own pull request, before the code that uses it, because
   Vercel deploys the app while `migrate.yml` is still running. Remove the old one in a later pull

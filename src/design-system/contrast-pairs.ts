@@ -26,4 +26,9 @@ export const approvedPairs: ColourPair[] = [
   ...["meals", "shopping", "expenses"].flatMap((module) => on(`${module}-ink`, ["surface"], TEXT)),
   ...on("border-control", pageBackgrounds, NON_TEXT),
   ...on("focus-ring", pageBackgrounds, NON_TEXT),
+  // Toast: an inverse surface (text colour) with the page background as text, the action in
+  // brand-tint, the check icon in success-tint and the page background as its focus ring.
+  ...on("bg", ["text"], TEXT),
+  ...on("brand-tint", ["text"], TEXT),
+  ...on("success-tint", ["text"], NON_TEXT),
 ];

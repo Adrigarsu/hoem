@@ -9,7 +9,11 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
   greeting on Home.
 - **Photo**: a JPEG or PNG of up to 2 MB, sent as soon as it is chosen. A wrong file is explained and
   the current photo stays. Without a photo, or if it fails to load, the avatar shows the initials.
-- **Email**: read-only. Changing the email and the password is #80; removing the photo is #79.
+- **Remove photo**: next to "Change photo" while there is one. The initials replace it at once in
+  every avatar of the user, with "Undo" for 5 seconds (paused while the pointer or focus is on the
+  message); then the profile's `avatar_path` is cleared and every file in the user's folder is
+  deleted (ADR-009). If that fails, the photo comes back and the message says so.
+- **Email**: read-only until #80, which adds changing the email and the password.
 - **Theme**: System (the default), Light or Dark. It applies at once and follows the user to every
   device; if saving fails, the previous theme comes back (ADR-018).
 - **Language**: English is selected and is the only option until Spanish in phase 2 (ADR-012), so
@@ -33,11 +37,26 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
   is 3 MB (`next.config.ts`).
 - Members cannot read each other's names or `avatar_path` until #26 opens that policy; the storage
   policy that lets them read the photo is already in place.
+- Removing clears `avatar_path` before deleting the files, so the profile never points at a missing
+  file, and a second request (another tab, a repeated `pagehide`) does nothing. It reads the profile
+  again before deleting, so a photo another tab uploaded meanwhile is kept, and this tab waits for a
+  removal already sent before uploading a new photo.
+- Signing out within the 5 seconds sends the removal first: once the session ends, it would be
+  refused.
+- During the 5-second undo the file still exists and members can still load it, as ADR-009 intends.
+  Closing the tab sends the removal on `pagehide` as a keepalive `DELETE /api/v1/profile/avatar`,
+  which outlives the page (ADR-020); only a killed browser sends nothing.
+- Whether an account has a password comes from `own_account_has_password()` (#80): Supabase Auth
+  gives no sign of it once a Google account sets one. It answers only about the caller, only yes or
+  no, and refuses without a session or for a deleted account, so the app never offers "Set a
+  password" without asking for the current one by mistake
+  (`supabase/tests/database/own-account-has-password.test.sql`).
 - Files do not cascade with the account: deleting the account (#23) must remove them too.
 
 ## Where it lives
 
-- Code: `src/features/profile/`, the theme in `src/lib/theme/`, the migrations
+- Code: `src/features/profile/` (`own-photo.tsx` holds the removal for the whole app), the Toast and
+  `useUndoTimer` in `src/design-system/`, the theme in `src/lib/theme/`, the migrations
   `supabase/migrations/*_avatars-storage.sql` and `*_profiles-avatar-path.sql`.
 - Tests: `src/features/profile/**/*.test.ts(x)`, `src/lib/theme/theme.test.ts`,
   `supabase/tests/database/avatars.test.sql`, `tests/e2e/profile.spec.ts`.

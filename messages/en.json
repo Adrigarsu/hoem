@@ -302,7 +302,11 @@
       "saved": "Photo updated",
       "tooLarge": "That file is too large. Choose a photo of 2 MB or less. Your photo has not changed.",
       "wrongType": "That file is not a JPEG or PNG image. Your photo has not changed.",
-      "failed": "We could not save your photo. Try again. Your photo has not changed."
+      "failed": "We could not save your photo. Try again. Your photo has not changed.",
+      "remove": "Remove photo",
+      "removed": "Photo removed",
+      "undo": "Undo",
+      "removeFailed": "We could not remove your photo. Try again."
     },
     "name": "Name",
     "email": "Email",
