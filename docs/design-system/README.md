@@ -47,7 +47,7 @@ Every accent has three steps. Use them only like this:
 | `{accent}-tint`    | Badges, selected cards, icon tiles                          | `{accent}-ink`              | ≥ 8:1    |
 | `{accent}-ink`     | Only on its own tint                                        | —                           | —        |
 
-Two more pairs, for the brand panel of the auth pages: `brand-tint` on `brand` (secondary text and the Ø of the inverse logo) and the module `-ink` colours on `surface` (module chips).
+Two more pairs, for the brand panel of the auth pages: `brand-tint` on `brand` (secondary text and the Ø of the inverse logo) and the module `-ink` colours on `surface` (module chips). The Toast is an inverse surface: `bg` text and `brand-tint` action on `text`, with a `success-tint` icon and a `bg` focus ring.
 
 Neutrals: `text` (16:1) for content, `text-secondary` (6.9:1) for metadata, `text-muted` (5.1:1) for placeholders and checked items. `border-control` (3.4:1) outlines every input and checkbox; `border` (1.25:1) is decorative and never the only edge of a control.
 
@@ -113,6 +113,18 @@ Every component is checked in two ways before it enters the system:
 2. **Contrast matrix:** every foreground/background pair the stylesheet actually uses (text, icons, control edges, focus ring, switch thumbs, check marks, toast text) is computed with the WCAG 2.2 formula in both themes. Last run: 120 pairs in light and 51 key pairs in the revised dark theme, 0 failures; the lowest text pair is 4.55:1 (light) and 5.61:1 (dark).
 
 What automation cannot prove is reviewed by hand per component and written in its guidelines: focus order, focus trapping in Modal and BottomSheet, Escape to close, live-region announcements in Toast, keyboard alternatives to drag and drop in MealSlot. In the product, the same axe checks run in CI with Playwright on real pages (NFR-A11Y-001).
+
+## Toast and undo
+
+`Toast` (`src/design-system/components/toast.tsx`) follows `.h-toast`: a message, an optional action
+such as "Undo", at most `column-narrow` wide. The shell sticks it to the bottom together with the
+tab bar, right above it. Its `status` and `alert` regions stay in the page while empty, so screen
+readers announce each message; confirmations use `status`, errors `alert`.
+
+A delete with undo (ADR-009) pairs it with `useUndoTimer`: hide the item, `start(commit)`, and
+`undo()` from the toast. The timer commits after 5 seconds, on `pagehide` and on unmount, and the
+toast pauses it while the pointer or the focus is on it (WCAG 2.2.1). Focus never falls to the page
+when the deleted item's button disappears: move it to the nearest control that stays.
 
 ## Accessibility checklist
 
