@@ -13,7 +13,10 @@ Sources of truth. Read the relevant parts before designing anything non-trivial:
 
 - `docs/srs.md`: requirements with IDs (`FR-EXP-007`, `NFR-A11Y-001`…)
 - `docs/architecture.md`: architecture, data model, row-level security, decisions (ADRs)
+- `docs/roadmap.md`: phases, gates, milestones and planned work not yet in issues
+- `docs/milestones/`: the issues of each milestone, as `gh` commands to create them
 - `docs/adr/`: architecture decisions, one file each (index in `docs/adr/README.md`)
+- `docs/guides/`: how to set up, deploy, migrate, test and take screenshots
 - `docs/design-system/`: design tokens (`tokens.json`), approved colour pairs, typography,
   spacing and component rules (`README.md`), and the reference component CSS
 - `docs/design-system/screens/`: the reference design of every screen (`<screen>.html` to open in a
@@ -54,6 +57,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   `src/features/<feature>/{components/, actions.ts, service.ts, domain/, repository.ts, schemas.ts, index.ts}`
 - Dependencies only point down: presentation → entry points (Server Actions, `src/app/api/v1`)
   → application (`service.ts`) → domain (`domain/`, pure) and data (`repository.ts`).
+  A service never imports its repository: it declares a gateway type and the entry point passes
+  the repository in (`architecture.md` §4.2). ESLint (`eslint-plugin-boundaries`) enforces both.
 - `domain/` is pure TypeScript: no React, no I/O, no Supabase.
 - A feature is imported by others only through its `index.ts`.
 - Business rules live once, in services. Server Actions and API routes stay thin:
@@ -66,8 +71,7 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   (see `NavLink`), or routes with a dynamic segment fail to build. A page that reads data renders
   it inside its own `<Suspense>` (see `settings/page.tsx`): the `(app)` `loading.tsx` does not
   cover a navigation inside the same segment (`/settings/account` → `/settings`), and `next dev`
-  reports it as a blocking route. In E2E, wait for the new page's heading after clicking a link
-  before calling `visit` on the same URL, or Safari interrupts the navigation.
+  reports it as a blocking route.
 
 ## Non-negotiables
 
@@ -121,14 +125,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - React resets a `<form>` after a successful action: a controlled field that must keep its value
   (such as the household type select) lives outside the form.
 - **Screenshots for every UI change.** When an issue adds or changes a page, run
-  `pnpm app:capture <page> …` (add `--signed-in` for pages behind sign-in; paths without the
-  leading slash, `home` is `/`). It writes one collage per page to the ignored `screenshots/`
-  folder: 360, 768 and 1440 px, light and dark. Show the collages to the developer, compare them
-  with the screen in `docs/design-system/screens/`, and list them for the pull request.
-  Never commit them.
-  It captures whatever answers on `APP_URL` (default port 3000): if that is an old server, run
-  `pnpm build`, `pnpm start --port 3200` (Playwright uses 3100) and capture with
-  `APP_URL=http://localhost:3200`.
+  `pnpm app:capture <page> …` (`--signed-in` for pages behind sign-in) as described in
+  `docs/guides/screenshots.md`. Show the collages to the developer, compare them with the screen in
+  `docs/design-system/screens/`, and list them for the pull request. Never commit them.
 
 ## Testing
 
@@ -136,22 +135,10 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - Test names start with the requirement ID:
   `it("FR-EXP-007 hides a private expense from flatmates", …)`.
 - Query components by role and accessible name, not by class names or test IDs.
-  jsdom joins the text of sibling spans without the spaces a browser adds, so a name built from
-  several spans may need a looser match (`/^Appearance ?, ?System$/`) in unit tests.
 - Every RLS change needs a policy test that signs in as each affected role.
-- Next.js keeps a route announcer with `role="alert"`: in E2E, look for a page's alert inside `main`.
-  Look for texts there too (`page.getByRole("main").getByText(…)`): while a page streams in, React
-  keeps a hidden copy of a Suspense boundary outside `main` for an instant, and strict mode fails.
-  `/settings` holds one block per width, so filter what is on screen (`:visible`). A modal shared by
-  both blocks lives once, outside them (see `DeleteAccountProvider`), never once per block.
-- Next.js keeps the previous route in a hidden `<Activity>` after a client navigation: its fields stay
-  in the DOM, so in E2E prefer `getByRole` to `getByLabel`, and interact without reloading to catch
-  what a route leaves behind. `getByLabel` matches substrings ("Email" also finds "Your email"): pass
-  `{ exact: true }`. Effects must clean up (`Dialog` closes itself, or the next page is inert).
-- In E2E, sign in and out with `signIn` and `signOut` from `tests/e2e/support/session.ts`: right
-  after signing out, Account settings (which has an Email field) is briefly still on screen.
-- E2E specs import a feature's pure modules (`domain/`, `schemas.ts`) directly: its `index.ts` also
-  brings `server-only` code, which Playwright cannot load.
+- **Before writing an E2E test, read `docs/guides/testing.md`.** It lists what breaks in jsdom,
+  Safari and Next.js navigations (route announcer, hidden `<Activity>` routes, `getByLabel`
+  substrings, `visit`, `signIn`/`signOut`), each learned from a failing test.
 
 ## Code style
 
@@ -197,6 +184,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   trade-offs and let the developer choose.
 - Every milestone ends with a `docs: <milestone> documentation review` issue, blocked by the
   rest of the milestone. When a milestone is split into issues, create it too.
+- `docs/milestones/<milestone>.md` holds the issues of each milestone still to split, as `gh`
+  commands the developer runs. When the SRS, a screen or a decision changes a later milestone,
+  update its file in the same pull request.
 
 ## Definition of done
 

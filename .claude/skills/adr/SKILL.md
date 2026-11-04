@@ -6,28 +6,11 @@ argument-hint: [short title]
 
 Write an Architecture Decision Record for: $ARGUMENTS
 
-1. Every ADR is a file in `docs/adr/`, listed in `docs/adr/README.md` and in the table in
-   `docs/architecture.md` §3. Take the next free number.
-2. Create `docs/adr/NNNN-kebab-case-title.md` with this structure, under one page:
-
-   ```markdown
-   # ADR-NNN Title
-
-   Date: YYYY-MM-DD · Status: Proposed
-
-   ## Context
-
-   The forces at play and the requirement IDs involved.
-
-   ## Decision
-
-   What we will do, in active voice ("We will…").
-
-   ## Consequences
-
-   What becomes easier and harder, and the alternatives we rejected with the reason.
-   ```
-
-3. If it replaces an earlier decision, mark the old one "Superseded by ADR-NNN".
-4. Add a row to the index in `docs/adr/README.md` and to the table in `docs/architecture.md` §3.
-5. Leave the status as Proposed. I change it to Accepted after reviewing.
+1. Read the rules in `docs/adr/README.md`. Take the next free number (never reuse one).
+2. Copy `docs/adr/template.md` to `docs/adr/NNNN-kebab-case-title.md` and fill it in, under one page.
+3. If it changes an earlier decision, say how on both status lines: `Supersedes ADR-NNN` /
+   `Superseded by ADR-NNN` when it replaces it entirely, `Amends ADR-NNN` / `Amended by ADR-NNN (what)`
+   when it changes one part. Update the old one's row in the index too.
+4. Add a row to the matching topic in `docs/adr/README.md`. That file is the only index: do not
+   copy the list anywhere else.
+5. Leave the status as Proposed. I change it to Accepted when its pull request merges.

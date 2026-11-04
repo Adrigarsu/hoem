@@ -20,7 +20,8 @@ allowed-tools: Bash(gh issue view *) Bash(git status *) Bash(git fetch origin) B
 
 ## Steps
 
-An issue is split when part of it must merge first, usually a migration (ADR-014). The issue was
+An issue is split when part of it must merge first, usually a migration (ADR-014,
+`docs/guides/migrations.md`). The issue was
 already started with `/start-issue`, and its plan is approved: this skill plans nothing new. If this
 part is not in the approved plan, or there is no plan, stop and ask me what it covers.
 

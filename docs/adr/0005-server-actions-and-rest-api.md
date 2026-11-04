@@ -1,6 +1,6 @@
 # ADR-005 Server Actions and a REST API with OpenAPI
 
-Date: 2026-10-14 · Status: Accepted
+Date: 2026-10-14 · Status: Accepted · Amended by ADR-020 (deletes sent on unload)
 
 ## Context
 

@@ -357,7 +357,25 @@ Each requirement has a measurable criterion so it can be verified, not just inte
 
 Every record belongs to a household, never directly to a user. Using HØEM alone is simply a household of one, so sharing later only means adding a membership.
 
-&#91;embedded content: conceptual data model · MVP entities\]
+```mermaid
+erDiagram
+  USER ||--o{ MEMBERSHIP : has
+  HOUSEHOLD ||--o{ MEMBERSHIP : has
+  HOUSEHOLD ||--o{ INVITATION : sends
+  HOUSEHOLD ||--o{ RECIPE : owns
+  HOUSEHOLD ||--o{ MEAL_PLAN_ENTRY : plans
+  RECIPE |o--o{ MEAL_PLAN_ENTRY : "used in"
+  HOUSEHOLD ||--o{ SHOPPING_LIST : keeps
+  SHOPPING_LIST ||--o{ SHOPPING_ITEM : holds
+  HOUSEHOLD ||--o{ EXPENSE : records
+  EXPENSE ||--|{ EXPENSE_SHARE : "split into"
+  HOUSEHOLD ||--o{ BUDGET : sets
+  HOUSEHOLD ||--o{ NOTE : writes
+  NOTE ||--o| REMINDER : schedules
+  USER ||--o{ NOTIFICATION : receives
+```
+
+The physical model, with every table and column, is in `docs/architecture.md` §6.
 
 Model rules:
 
@@ -377,24 +395,22 @@ HØEM is a full-stack TypeScript application built with Next.js on top of Supaba
 
 ### 7.1 Stack
 
-| Layer              | Technology                                    | Reason                                                                           |
-| ------------------ | --------------------------------------------- | -------------------------------------------------------------------------------- |
-| Language           | TypeScript (strict)                           | One typed language across client and server                                      |
-| Framework          | Next.js (App Router) + React                  | Server rendering, routing and server actions in one project                      |
-| Database           | PostgreSQL (Supabase)                         | Relational model fits households, members and shared data                        |
-| Auth               | Supabase Auth                                 | Email, Google OAuth and integration with row-level security                      |
-| Real time          | Supabase Realtime                             | Live updates of the shared shopping list (FR-SHOP-003)                           |
-| File storage       | Supabase Storage                              | Recipe photos and avatars                                                        |
-| ORM and migrations | Drizzle ORM                                   | SQL-first, type-safe, versioned migrations, RLS policies defined with the schema |
-| Validation         | Zod                                           | Same schemas on client forms and server actions                                  |
-| UI primitives      | Radix UI (via shadcn/ui)                      | Accessible, unstyled components themed by our tokens                             |
-| Styling            | Tailwind CSS + CSS custom properties          | Design tokens as variables; light and dark themes                                |
-| Motion             | Framer Motion                                 | Transitions that respect reduced-motion                                          |
-| i18n               | next-intl                                     | Externalised strings, locale formatting                                          |
-| Design system docs | Storybook                                     | Visual catalogue and accessibility checks per component                          |
-| Testing            | Vitest, Testing Library, Playwright, axe-core | Unit, component, end-to-end and accessibility tests                              |
-| Quality            | ESLint, Prettier, Husky, commitlint           | Consistent style and Conventional Commits                                        |
-| CI/CD              | GitHub Actions + Vercel                       | Checks on every pull request; preview deploy per branch                          |
+| Layer              | Technology                                                 | Reason                                                                           |
+| ------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Language           | TypeScript (strict)                                        | One typed language across client and server                                      |
+| Framework          | Next.js (App Router) + React                               | Server rendering, routing and server actions in one project                      |
+| Database           | PostgreSQL (Supabase)                                      | Relational model fits households, members and shared data                        |
+| Auth               | Supabase Auth                                              | Email, Google OAuth and integration with row-level security                      |
+| Real time          | Supabase Realtime                                          | Live updates of the shared shopping list (FR-SHOP-003)                           |
+| File storage       | Supabase Storage                                           | Recipe photos and avatars                                                        |
+| ORM and migrations | Drizzle ORM                                                | SQL-first, type-safe, versioned migrations, RLS policies defined with the schema |
+| Validation         | Zod                                                        | Same schemas on client forms and server actions                                  |
+| UI components      | Own design system (`src/design-system`) on native elements | Accessible components themed by our tokens, no third-party UI kit                |
+| Styling            | Tailwind CSS + CSS custom properties                       | Design tokens as variables; light and dark themes                                |
+| i18n               | next-intl                                                  | Externalised strings, locale formatting                                          |
+| Testing            | Vitest, Testing Library, Playwright, axe-core              | Unit, component, end-to-end and accessibility tests                              |
+| Quality            | ESLint, Prettier, Husky, commitlint                        | Consistent style and Conventional Commits                                        |
+| CI/CD              | GitHub Actions + Vercel                                    | Checks on every pull request; preview deploy per branch                          |
 
 ### 7.2 Architecture
 
@@ -419,7 +435,7 @@ Row-level security in PostgreSQL is the second line of defence: even a bug in th
 
 The project is portfolio-ready at Gate B: everything after it adds value but is optional. Each phase only starts when the previous gate's criteria are met.
 
-&#91;embedded content: release roadmap · 4 phases, 3 gates\]
+Phases, gates and milestones are described in [`docs/roadmap.md`](roadmap.md).
 
 ### Glossary
 

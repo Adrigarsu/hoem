@@ -15,7 +15,7 @@ this file holds only their order and the reason for it.
 
 When an issue is added, place it by these rules and write why in the last column. When an issue
 is shipped, remove its row. The milestone tracking chores (#35–#40) are split into issues before
-their milestone starts.
+their milestone starts, with the commands in `docs/milestones/`.
 
 ## Queue
 

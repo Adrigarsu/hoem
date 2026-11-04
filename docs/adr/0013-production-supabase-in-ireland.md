@@ -1,6 +1,6 @@
 # ADR-013 Production Supabase project in Ireland
 
-Date: 2026-10-24 · Status: Proposed
+Date: 2026-10-24 · Status: Accepted · Amends ADR-002
 
 ## Context
 
