@@ -81,6 +81,7 @@ Nineteen decisions shape the system. Each lives as its own file in `docs/adr/`, 
 | [018](adr/0018-theme-in-a-cookie-with-an-inline-script.md)            | Theme in a readable cookie, applied by an inline script before the first paint          | Proposed |
 | [019](adr/0019-delete-account-with-a-security-definer-function.md)    | Delete an account through a security definer function, without the service-role key     | Proposed |
 | [020](adr/0020-commit-undoable-deletes-on-pagehide-with-keepalive.md) | A delete waiting for its undo is sent on pagehide with a keepalive request to `/api/v1` | Proposed |
+| [021](adr/0021-rate-limits-in-postgres.md)                            | REST API rate limits counted in Postgres by a security definer function                 | Proposed |
 
 ## 4. Code organisation and conventions
 
@@ -160,6 +161,7 @@ Services throw typed `AppError` subclasses, never strings. Each carries a stable
 | `DemoRestrictedError`   | `demo_restricted`   | 403                                                                                                    |
 | `AuthFailedError`       | `auth_failed`       | 401 (sign-up, sign-in or verification refused; the reason never says whether an e-mail has an account) |
 | `AuthFailedError`       | `rate_limited`      | 429 (the same error when Supabase Auth rate-limits the request, so clients back off)                   |
+| `RateLimitedError`      | `rate_limited`      | 429 with `Retry-After` (over a rate limit of the REST API, §5.5, ADR-021)                              |
 
 Unexpected errors are logged with a request ID and shown to the user as a generic message with that ID (`internal_error`, 500); stack traces never reach the client. An error's own message is for the logs only and is never sent, not even for typed errors.
 
@@ -187,7 +189,7 @@ The web app talks to the server through Server Actions; everything else uses the
 
 ### 5.2 Authentication
 
-Requests send the Supabase access token as `Authorization: Bearer <jwt>`. The route handler creates a Supabase client with that token (`createTokenClient`), so every query runs as the user and RLS applies (ADR-004). A request without that header uses the session cookie, accepted only when its `Origin` is the app's own, which guards against cross-site request forgery; `apiCredentials` (`src/lib/api-credentials.ts`) decides, and a malformed header is refused. The web app calls the API only to send a delete when the page unloads (ADR-020). The web app uses the same token through HTTP-only cookies managed by `@supabase/ssr` (ADR-016): `src/proxy.ts` refreshes the session on every page request, sends signed-out visitors to `/sign-in?next=…` (only `/sign-in`, `/sign-up` and `/auth/*` are public) and applies the no-cache headers that `@supabase/ssr` asks for, so a CDN never stores a response that sets auth cookies. Sign-up sends a verification e-mail whose link goes to `/auth/confirm`, which verifies the one-time token and starts the session; passwords go only to Supabase Auth (NFR-SEC-003), with at least 10 characters and at most 72 bytes.
+Requests send the Supabase access token as `Authorization: Bearer <jwt>`. The route handler creates a Supabase client with that token (`createTokenClient`), so every query runs as the user and RLS applies (ADR-004). A request without that header uses the session cookie, accepted only when its `Origin` is the app's own, which guards against cross-site request forgery; `apiCredentials` (`src/lib/api-credentials.ts`) decides, and a malformed header is refused. Every write route then calls `limitWrites` (`src/lib/rate-limit.ts`) before the service, so a client over 60 write requests per minute gets 429 Problem Details with `Retry-After` (§5.5, ADR-021); the single keepalive request the web app sends on unload stays far below it. The web app calls the API only to send a delete when the page unloads (ADR-020). The web app uses the same token through HTTP-only cookies managed by `@supabase/ssr` (ADR-016): `src/proxy.ts` refreshes the session on every page request, sends signed-out visitors to `/sign-in?next=…` (only `/sign-in`, `/sign-up` and `/auth/*` are public) and applies the no-cache headers that `@supabase/ssr` asks for, so a CDN never stores a response that sets auth cookies. Sign-up sends a verification e-mail whose link goes to `/auth/confirm`, which verifies the one-time token and starts the session; passwords go only to Supabase Auth (NFR-SEC-003), with at least 10 characters and at most 72 bytes.
 
 ### 5.3 Errors
 
@@ -224,7 +226,7 @@ The OpenAPI 3.1 document is generated at build time from the Zod schemas (`@aste
 | Notes         | `GET/POST …/notes`, `PATCH/DELETE …/notes/{noteId}`, `POST …/notes/{noteId}/reminder/done`                                                    | FR-NOTE-001 to 006                    |
 | Notifications | `GET /notifications`, `POST /notifications/read`, `POST/DELETE /push-subscriptions`                                                           | FR-NOTIF-001 to 003                   |
 
-Rate limits: 60 write requests per minute per user and 10 demo sessions per hour per IP address, returning 429 with a `Retry-After` header.
+Rate limits: 60 write requests per minute per user and 10 demo sessions per hour per IP address, returning 429 with a `Retry-After` header. The counters live in Postgres, in `private.api_rate_limits`, counted by `public.consume_rate_limit` with the user's own JWT in a fixed window shared by every serverless instance (ADR-021).
 
 ## 6. Physical data model
 

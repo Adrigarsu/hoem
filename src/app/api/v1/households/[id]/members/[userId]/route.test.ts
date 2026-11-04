@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { removeHouseholdMember } from "@/features/households";
-import { ForbiddenError, ValidationError } from "@/lib/errors";
+import { ForbiddenError, RateLimitedError, ValidationError } from "@/lib/errors";
+import { limitWrites } from "@/lib/rate-limit";
 import { DELETE } from "./route";
 
 vi.mock("@/features/households", () => ({ removeHouseholdMember: vi.fn(async () => undefined) }));
+vi.mock("@/lib/rate-limit", () => ({ limitWrites: vi.fn(async () => undefined) }));
 
 const householdId = "00000000-0000-7000-8000-00000000a001";
 const userId = "00000000-0000-7000-8000-000000000002";
@@ -55,5 +57,22 @@ describe("DELETE /api/v1/households/{id}/members/{userId}", () => {
     vi.mocked(removeHouseholdMember).mockRejectedValueOnce(new ValidationError([]));
     const response = await call({ origin: "https://hoemapp.com" });
     expect(response.status).toBe(422);
+  });
+
+  it("NFR-SEC-006 counts the request against the caller's write limit", async () => {
+    await call({ authorization: "Bearer eyJ.token.sig" });
+    expect(limitWrites).toHaveBeenCalledWith({ accessToken: "eyJ.token.sig" });
+  });
+
+  it("NFR-SEC-006 answers 429 with Retry-After once over the limit and removes nobody", async () => {
+    vi.mocked(limitWrites).mockRejectedValueOnce(new RateLimitedError(25));
+    const response = await call({ origin: "https://hoemapp.com" });
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("25");
+    expect(await response.json()).toMatchObject({
+      type: "https://hoemapp.com/problems/rate_limited",
+      instance: path,
+    });
+    expect(removeHouseholdMember).not.toHaveBeenCalled();
   });
 });

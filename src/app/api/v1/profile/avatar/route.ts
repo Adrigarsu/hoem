@@ -1,6 +1,7 @@
 import { removeOwnPhoto } from "@/features/profile";
 import { apiCredentials } from "@/lib/api-credentials";
 import { problemResponse } from "@/lib/problem-details";
+import { limitWrites } from "@/lib/rate-limit";
 import { uuidV7 } from "@/lib/uuid-v7";
 
 const instance = "/api/v1/profile/avatar";
@@ -10,7 +11,9 @@ const instance = "/api/v1/profile/avatar";
 // (ADR-020). Repeating it is harmless: without a photo it does nothing.
 export async function DELETE(request: Request): Promise<Response> {
   try {
-    await removeOwnPhoto(apiCredentials(request.headers));
+    const credentials = apiCredentials(request.headers);
+    await limitWrites(credentials);
+    await removeOwnPhoto(credentials);
     return new Response(null, { status: 204 });
   } catch (error) {
     return problemResponse(error, { instance, requestId: uuidV7() });

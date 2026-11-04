@@ -90,6 +90,17 @@ export class DemoRestrictedError extends AppError {
   }
 }
 
+// Too many requests in the current window of a rate limit (NFR-SEC-006, ADR-021). The REST API sends
+// the seconds as Retry-After, so clients know when to try again.
+export class RateLimitedError extends AppError {
+  readonly code = "rate_limited";
+  readonly status = 429;
+
+  constructor(readonly retryAfterSeconds: number) {
+    super("Rate limited");
+  }
+}
+
 // Sign-up, sign-in or verification refused by Supabase Auth. `reason` is a message key, chosen so
 // it never reveals whether an e-mail address has an account. A rate limit is a 429, so API clients
 // back off instead of treating it as a bad token.

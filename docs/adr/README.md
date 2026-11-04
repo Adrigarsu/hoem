@@ -26,6 +26,7 @@ else: a new ADR supersedes or amends it, and the old one points to the new one.
 | 018 | [Theme in a readable cookie, applied by an inline script](0018-theme-in-a-cookie-with-an-inline-script.md)                                 | 2026-11-03 | Proposed                                                      |
 | 019 | [Delete an account through a security definer function](0019-delete-account-with-a-security-definer-function.md)                           | 2026-11-03 | Proposed                                                      |
 | 020 | [Commit undoable deletes on pagehide with a keepalive request to the REST API](0020-commit-undoable-deletes-on-pagehide-with-keepalive.md) | 2026-11-04 | Proposed                                                      |
+| 021 | [Count REST API rate limits in Postgres](0021-rate-limits-in-postgres.md)                                                                  | 2026-11-04 | Proposed                                                      |
 
 To add one, run `/adr <title>` in Claude Code or copy the structure of an existing file with the
 next free number. New ADRs start as Proposed; the developer changes them to Accepted after review.
