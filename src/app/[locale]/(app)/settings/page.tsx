@@ -3,6 +3,11 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import {
+  DeleteAccountButton,
+  DeleteAccountProvider,
+  ownDeletionBlockers,
+} from "@/features/account";
 import { EmailForm, ownAccount, SignOutButton } from "@/features/auth";
 import { currentHousehold } from "@/features/households";
 import { AccountForm, LanguageField, ownProfile, ThemeForm } from "@/features/profile";
@@ -33,11 +38,12 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
 
 async function Settings({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "Settings" });
-  const [profile, account, households] = await Promise.all([
+  const [profile, account, households, blockers] = await Promise.all([
     ownProfile(),
     ownAccount(),
     // The same read as the sidebar switcher, so the households are queried once per request.
     currentHousehold().then(({ households }) => households),
+    ownDeletionBlockers(),
   ]);
 
   return (
@@ -57,26 +63,31 @@ async function Settings({ locale }: { locale: Locale }) {
         </div>
       }
     >
-      {/* One or the other by width, never both: a hidden block is out of the accessibility tree. */}
-      <SettingsMenu
-        // The address from Supabase Auth, as in the Account card: the token may still have the old one.
-        profile={{ ...profile, email: account.email }}
-        households={households}
-        locale={locale}
-        signOut={<SignOutButton />}
-      />
-      <SettingsCards
-        households={households}
-        account={
-          <AccountForm
-            profile={profile}
-            email={<EmailForm account={account} passwordHref={settingsPaths.password} />}
-          />
-        }
-        theme={<ThemeForm theme={profile.theme} />}
-        language={<LanguageField locale={locale} />}
-        signOut={<SignOutButton />}
-      />
+      {/* One or the other by width, never both: a hidden block is out of the accessibility tree.
+          Both share the one delete dialog, which lives outside them. The address comes from
+          Supabase Auth, as in the Account card: the token may still have the old one. */}
+      <DeleteAccountProvider email={account.email} blockers={blockers}>
+        <SettingsMenu
+          profile={{ ...profile, email: account.email }}
+          households={households}
+          locale={locale}
+          signOut={<SignOutButton />}
+          deleteAccount={<DeleteAccountButton />}
+        />
+        <SettingsCards
+          households={households}
+          account={
+            <AccountForm
+              profile={profile}
+              email={<EmailForm account={account} passwordHref={settingsPaths.password} />}
+            />
+          }
+          theme={<ThemeForm theme={profile.theme} />}
+          language={<LanguageField locale={locale} />}
+          signOut={<SignOutButton />}
+          deleteAccount={<DeleteAccountButton />}
+        />
+      </DeleteAccountProvider>
     </Page>
   );
 }

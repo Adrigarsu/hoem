@@ -26,6 +26,10 @@ Column, padding `space-16` top (64 px), `space-6` sides, `space-8` bottom; gap `
    - "Explore a household full of sample meals, lists and expenses. No account needed." — 14/20, `text-secondary`.
    - Secondary button, full width: "Try the demo" + arrow icon.
 
+## After deleting an account
+
+`/sign-in?deleted=1` shows a success FormMessage above the form: "Your account has been deleted." (`auth.signIn.deleted`, FR-ACC-007). It is a fixed text: nothing from the address reaches the page.
+
 ## Layout — desktop (1440 px)
 
 Two columns that wrap below 960 px (`flex: 1 1 480px` each):

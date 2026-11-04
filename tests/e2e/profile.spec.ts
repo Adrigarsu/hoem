@@ -187,7 +187,7 @@ test.describe("FR-ACC-007 edit my profile", () => {
     const otherDevice = await browser.newContext({ baseURL });
     const other = await otherDevice.newPage();
     await other.goto("/sign-in");
-    await other.getByLabel("Email").fill(email);
+    await other.getByLabel("Email", { exact: true }).fill(email);
     await other.getByLabel("Password", { exact: true }).fill(password);
     await other.getByRole("button", { name: "Sign in" }).click();
     await expect(other).toHaveURL(/\/$/);
