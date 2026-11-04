@@ -11,7 +11,7 @@ test.beforeAll(async ({ browser }, testInfo) => {
   const page = await browser.newPage({ baseURL: testInfo.project.use.baseURL });
   await page.goto("/sign-up");
   await page.getByLabel("Your name").fill("Lucía");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Repeat the password").fill(password);
   await page.getByRole("button", { name: "Create account" }).click();
@@ -23,7 +23,7 @@ test.beforeAll(async ({ browser }, testInfo) => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/sign-in");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/$/);
