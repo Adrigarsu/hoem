@@ -12,6 +12,7 @@ import {
   householdSettings,
   type HouseholdSettingsView,
 } from "@/features/households";
+import { OwnAvatar } from "@/features/profile";
 import { settingsPaths } from "@/features/settings";
 import { LaunchScreen, Page } from "@/features/shell";
 import { NotFoundError } from "@/lib/errors";
@@ -57,6 +58,7 @@ async function HouseholdSettings({
   const { created } = await searchParams;
   const t = await getTranslations({ locale, namespace: "Households.settings" });
   const household = await load(id);
+  const you = household.members.find((member) => member.isYou);
 
   return (
     <Page
@@ -80,7 +82,10 @@ async function HouseholdSettings({
         {created === "1" && (
           <FormMessage tone="success">{t("created", { name: household.name })}</FormMessage>
         )}
-        <HouseholdMembers household={household} />
+        <HouseholdMembers
+          household={household}
+          ownAvatar={<OwnAvatar name={you?.displayName ?? ""} src={you?.avatarUrl ?? null} />}
+        />
         <HouseholdDetails household={household} />
       </div>
     </Page>

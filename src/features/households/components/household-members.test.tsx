@@ -2,7 +2,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ToastSlot, ToastSlotProvider, undoDelayMs } from "@/design-system";
+import { Avatar, ToastSlot, ToastSlotProvider, undoDelayMs } from "@/design-system";
 import messages from "../../../../messages/en.json";
 import type { MemberFormState } from "../actions";
 import type { HouseholdSettingsView, MemberView } from "../service";
@@ -76,7 +76,7 @@ function renderMembers(household: HouseholdSettingsView = flat) {
     <NextIntlClientProvider locale="en" messages={messages}>
       <ToastSlotProvider>
         <main>
-          <HouseholdMembers household={household} />
+          <HouseholdMembers household={household} ownAvatar={<Avatar name="Lucía" />} />
         </main>
         <footer>
           <ToastSlot />

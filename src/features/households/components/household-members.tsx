@@ -2,7 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { startTransition, useActionState, useRef, useState } from "react";
+import { startTransition, useActionState, useRef, useState, type ReactNode } from "react";
 import {
   Avatar,
   Button,
@@ -15,7 +15,6 @@ import {
   ToastPortal,
   useUndoTimer,
 } from "@/design-system";
-import { OwnAvatar } from "@/features/profile";
 import {
   changeFamilyRoleAction,
   removeMemberAction,
@@ -40,7 +39,17 @@ function useMemberName() {
 // The Members section of household settings (FR-ACC-006, FR-HH-006, FR-HH-008): everyone sees every
 // member's name, photo and role; whoever may change a member gets "Options for {name}". Removing
 // someone hides their row at once with a 5-second undo (ADR-009).
-export function HouseholdMembers({ household }: { household: HouseholdSettingsView }) {
+//
+// The signed-in user's own avatar comes from the page as ownAvatar: it is profile's OwnAvatar, which
+// hides the photo during its own undo, and profile's index also holds server-only code a client
+// component cannot import.
+export function HouseholdMembers({
+  household,
+  ownAvatar,
+}: {
+  household: HouseholdSettingsView;
+  ownAvatar: ReactNode;
+}) {
   const t = useTranslations("Households");
   const nameOf = useMemberName();
   const [openId, setOpenId] = useState<string | null>(null);
@@ -126,7 +135,7 @@ export function HouseholdMembers({ household }: { household: HouseholdSettingsVi
               className="flex min-h-16 items-center gap-3 border-t border-border py-2 pr-2 pl-2 first:border-t-0"
             >
               {member.isYou ? (
-                <OwnAvatar name={name} src={member.avatarUrl} />
+                ownAvatar
               ) : (
                 // Another member's photo, not the signed-in user's: OwnAvatar is only for one's own.
                 // eslint-disable-next-line no-restricted-syntax
