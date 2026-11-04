@@ -137,7 +137,12 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   several spans may need a looser match (`/^Appearance ?, ?System$/`) in unit tests.
 - Every RLS change needs a policy test that signs in as each affected role.
 - Next.js keeps a route announcer with `role="alert"`: in E2E, look for a page's alert inside `main`.
-  `/settings` holds one block per width, so filter what is on screen (`:visible`).
+  `/settings` holds one block per width, so filter what is on screen (`:visible`). A modal shared by
+  both blocks lives once, outside them (see `DeleteAccountProvider`), never once per block.
+- Next.js keeps the previous route in a hidden `<Activity>` after a client navigation: its fields stay
+  in the DOM, so in E2E prefer `getByRole` to `getByLabel`, and interact without reloading to catch
+  what a route leaves behind. `getByLabel` matches substrings ("Email" also finds "Your email"): pass
+  `{ exact: true }`. Effects must clean up (`Dialog` closes itself, or the next page is inert).
 - In E2E, sign in and out with `signIn` and `signOut` from `tests/e2e/support/session.ts`: right
   after signing out, Account settings (which has an Email field) is briefly still on screen.
 - E2E specs import a feature's pure modules (`domain/`, `schemas.ts`) directly: its `index.ts` also

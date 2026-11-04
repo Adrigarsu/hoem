@@ -9,7 +9,7 @@ const password = "correct horse battery";
 async function signUp(page: Page, visit: (path: string) => Promise<void>, email: string) {
   await visit("/sign-up");
   await page.getByLabel("Your name").fill("Ana");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Repeat the password").fill(password);
   await page.getByRole("button", { name: "Create account" }).click();
@@ -23,7 +23,7 @@ function alert(page: Page, text: string) {
 }
 
 async function signIn(page: Page, email: string, withPassword = password) {
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(withPassword);
   await page.getByRole("button", { name: "Sign in" }).click();
 }
@@ -169,7 +169,7 @@ test.describe("FR-ACC-001 e-mail sign-up and sign-in", () => {
 
     await expect(page).toHaveURL(/\/sign-up$/);
     await expect(page.getByLabel("Your name")).toHaveValue("Ana");
-    await expect(page.getByLabel("Email")).toHaveValue(email);
+    await expect(page.getByLabel("Email", { exact: true })).toHaveValue(email);
     await expect(page.getByLabel("Password", { exact: true })).toHaveValue("");
   });
 

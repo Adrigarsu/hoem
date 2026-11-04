@@ -7,9 +7,8 @@ export const settingsPaths = {
   language: "/settings/language",
   // Its own page on every width: the screen only draws the link (decided in #80).
   password: "/settings/password",
-  // Coming soon until their issue builds them: Delete account (#23), Notifications (M5) and
-  // Download my data (NFR-LEG-003).
+  // Coming soon until their issue builds them: Notifications (M5) and Download my data
+  // (NFR-LEG-003).
   notifications: "/settings/notifications",
   downloadData: "/settings/download-data",
-  deleteAccount: "/settings/delete-account",
 } as const;

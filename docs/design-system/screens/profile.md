@@ -33,7 +33,7 @@ Card, Avatar, ListRow with value, SegmentedControl, Select, Switch, Field + Inpu
 
 - **Sections not built yet** (M1): Notifications and Download my data open an EmptyState "Coming soon".
 - **Saved**: "Changes saved" next to the form; the app has no Toast yet.
-- **Delete account**: typed confirmation dialog (type your e-mail); blocked if you are the last owner of a shared household (M1-10).
+- **Delete account**: typed confirmation dialog (type your e-mail); blocked if you are the last owner of a household with other members, or the last parent of such a family, with links to those households (M1-10). A danger row at every width, as built in #21, opening the dialog; it replaces the "Coming soon" page.
 - **Push blocked**: the push switch is disabled with "Blocked in your browser settings".
 
 ## Accessibility

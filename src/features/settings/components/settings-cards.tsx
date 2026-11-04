@@ -16,6 +16,7 @@ type SettingsCardsProps = {
   theme: ReactNode;
   language: ReactNode;
   signOut: ReactNode;
+  deleteAccount: ReactNode;
 };
 
 // Profile and settings on wider screens (FR-NAV-003, FR-ACC-007, profile.md): the forms are right
@@ -26,6 +27,7 @@ export function SettingsCards({
   theme,
   language,
   signOut,
+  deleteAccount,
 }: SettingsCardsProps) {
   const t = useTranslations("Settings");
   return (
@@ -46,7 +48,7 @@ export function SettingsCards({
       <HouseholdSection id="settings-cards-household" households={households} />
 
       <Section id="settings-cards-privacy" title={t("privacy")}>
-        <PrivacyRows />
+        <PrivacyRows deleteAccount={deleteAccount} />
         {signOut}
       </Section>
     </div>

@@ -21,7 +21,6 @@ their milestone starts.
 
 | #   | Issue                                                    | Milestone | Priority | Blocked by | Why here                                                    |
 | --- | -------------------------------------------------------- | --------- | -------- | ---------- | ----------------------------------------------------------- |
-| 23  | FR-ACC-007: delete my account                            | M1a       | must     | —          | Entry point is the profile menu                             |
 | 25  | FR-ACC-002: sign in with Google                          | M1a       | should   | —          | Should; independent                                         |
 | 55  | ci: cache Playwright system libraries, time out installs | M1a       | should   | —          | Move up if CI installs keep stalling                        |
 | 50  | chore: run end-to-end tests in Firefox and Edge          | M1a       | should   | —          | Widens browser coverage; no feature depends                 |
