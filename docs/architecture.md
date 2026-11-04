@@ -40,7 +40,36 @@ The five goals below drive every trade-off, in this order of priority.
 
 HØEM is one web app on Vercel and one Supabase project, both in the EU; the browser talks to the app over HTTPS and to Supabase Realtime directly for live list updates.
 
-&#91;embedded content: C4 container view · 1 app, 5 Supabase services, 2 external services\]
+```mermaid
+flowchart LR
+  user(["Household member<br/>browser or installed PWA"])
+  subgraph vercel["Vercel · fra1"]
+    app["Web app<br/>Next.js"]
+  end
+  subgraph supabase["Supabase · EU"]
+    auth["Auth"]
+    db[("PostgreSQL<br/>RLS policies")]
+    realtime["Realtime"]
+    storage["Storage"]
+    jobs["Jobs<br/>Edge Functions + pg_cron"]
+  end
+  resend["Resend<br/>e-mail"]
+  push["Push services<br/>Apple, Google, Mozilla"]
+
+  user -- HTTPS --> app
+  user -- live list updates --> realtime
+  app -- user's JWT --> db
+  app --> auth
+  app --> storage
+  app --> resend
+  realtime --> db
+  jobs --> db
+  jobs --> push
+  push --> user
+  auth -- SMTP --> resend
+
+  style db stroke-width:3px
+```
 
 PostgreSQL, highlighted, is where privacy is decided: the app and the browser reach data only with the user's own token, so the row-level security policies in section 7 apply to every query and every live update.
 
@@ -89,47 +118,59 @@ Code is grouped by feature first and by layer second, so everything about shoppi
 
 ### 4.1 Repository layout
 
+Folders marked _(planned)_ come with the milestone that needs them (`docs/roadmap.md`).
+
 ```
 hoem/
 ├── src/
 │   ├── app/                     Next.js routes only: pages, layouts, route handlers
 │   │   ├── [locale]/            hidden locale segment filled in by proxy.ts (ADR-015)
-│   │   │   ├── (auth)/          sign-in, sign-up, password reset
-│   │   │   └── (app)/           signed-in area: home, meals, shopping, expenses, planner, settings
+│   │   │   ├── (auth)/          sign-in, sign-up, password reset, e-mail confirmation
+│   │   │   ├── (app)/           signed-in area with the app shell: home, meals, shopping,
+│   │   │   │                    expenses, planner, notifications, settings
+│   │   │   └── (focus)/         signed-in flows without the shell, such as a new household
 │   │   └── api/v1/              REST route handlers (thin: parse, call service, respond)
-│   ├── features/
-│   │   ├── households/          one folder per bounded context
-│   │   ├── meals/
-│   │   ├── shopping/
-│   │   ├── expenses/
-│   │   ├── planner/             notes and reminders
-│   │   └── notifications/
-│   ├── design-system/           tokens and components
+│   ├── features/                one folder per bounded context, each with its own docs/features/ page
+│   │   ├── auth/                sign-up, sign-in, sessions, password reset
+│   │   ├── account/             change e-mail and password, delete the account
+│   │   ├── profile/             name, photo, theme and language
+│   │   ├── households/          households, types, members, roles, the active household
+│   │   ├── settings/            the settings menu
+│   │   ├── shell/               tab bar, sidebar and header
+│   │   ├── home/                the Home hub (the dashboard grows here in M6)
+│   │   └── meals/, shopping/, expenses/, planner/, notifications/   (planned)
+│   ├── design-system/           tokens, contrast checks and components
 │   ├── db/
 │   │   ├── schema/              Drizzle table definitions
-│   │   └── seed/                demo template and local test data
-│   └── lib/                     Supabase clients, errors, env, i18n, logging
+│   │   └── seed/                local test data (the demo template comes in M6)
+│   ├── lib/                     Supabase clients, errors, Problem Details, env, i18n, theme
+│   └── proxy.ts                 locale rewrite and session refresh (ADR-015, ADR-016)
 ├── supabase/
 │   ├── migrations/              generated + hand-written SQL (policies, triggers), ADR-014
-│   ├── tests/                   pgTAP database and policy tests
-│   └── functions/               Edge Functions: dispatch-reminders, cleanup-demo
-├── messages/                    en.json, es.json
-├── tests/e2e/                   Playwright specs, one per user story
-├── docs/adr/                    Architecture Decision Records
-└── docs/design-system/          tokens, component rules and the screen designs (screens/)
+│   ├── tests/database/          pgTAP database and policy tests
+│   ├── templates/               Auth e-mail templates
+│   └── functions/               Edge Functions: dispatch-reminders, cleanup-demo (planned)
+├── messages/                    en.json (es.json comes with FR-I18N-001)
+├── tests/e2e/                   Playwright specs, one per user story, and their support/ helpers
+├── scripts/                     screenshot tools (pnpm app:capture, pnpm screens:capture)
+└── docs/                        see docs/README.md
 ```
 
 ### 4.2 Layers inside a feature
 
-Dependencies only point down; an ESLint rule (`eslint-plugin-boundaries`) fails the build when one points up.
+Dependencies only point down. ESLint fails the build when one points up (`eslint-plugin-boundaries` and, for the domain, `no-restricted-imports`, in `eslint.config.mjs`); unit tests are exempt so they can reach the layer they test.
 
-| Layer        | Files                                 | Allowed to import | Responsibility                                           |
-| ------------ | ------------------------------------- | ----------------- | -------------------------------------------------------- |
-| Presentation | `components/`, `app/` pages           | Application       | Render, collect input, show errors                       |
-| Entry points | `actions.ts`, `app/api/v1/…/route.ts` | Application       | Auth session, input parsing, response mapping            |
-| Application  | `service.ts`                          | Domain, Data      | Use cases, membership and role checks                    |
-| Domain       | `domain/*.ts`                         | nothing           | Pure rules: splits, merging ingredients, next occurrence |
-| Data         | `repository.ts`                       | `src/db`          | Queries, always scoped by `household_id`                 |
+| Layer        | Files                                 | May import                                                   | Responsibility                                           |
+| ------------ | ------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
+| Presentation | `components/`, `app/` pages           | Server Actions, schemas, domain; service types only          | Render, collect input, show errors                       |
+| Entry points | `actions.ts`, `app/api/v1/…/route.ts` | Service, repository (to hand it to the service), schemas     | Auth session, input parsing, wiring, response mapping    |
+| Application  | `service.ts`                          | Domain, schemas; never the repository                        | Use cases, membership and role checks                    |
+| Domain       | `domain/*.ts`                         | Other domain files only: no React, Next.js, Supabase or `db` | Pure rules: splits, merging ingredients, next occurrence |
+| Data         | `repository.ts`                       | `src/db`, `src/lib`, the service's gateway type and errors   | Queries, always scoped by `household_id`                 |
+
+**Gateways (dependency inversion).** A service does not import its repository. It declares the data access it needs as a type, its gateway (`HouseholdGateway` in `households/service.ts`), and receives one as an argument. `repository.ts` implements that type (`householdGateway`), and the entry point, a Server Action or a route handler, passes it in: `activeHousehold(householdGateway)`. Business rules therefore depend on an interface they own, not on Supabase, and service tests pass a fake gateway instead of a database.
+
+Between features, only `index.ts` may be imported, from anywhere in `src/`. End-to-end specs are the exception: they import a feature's pure `domain/` and `schemas.ts` directly, because `index.ts` also brings `server-only` code.
 
 Shared contracts sit beside them: `schemas.ts` (Zod, used by forms, actions and the API) and `index.ts` (the only file other features may import).
 
@@ -232,7 +273,27 @@ Rate limits: 60 write requests per minute per user and 10 demo sessions per hour
 
 Eighteen tables in the `public` schema hold the MVP. Every row of household content reaches a `household_id`, either in its own column or through its parent (an ingredient through its recipe), and that column is what row-level security checks; only profiles, push subscriptions and notifications belong to a user instead.
 
-&#91;embedded content: table relationships · 18 tables in 6 groups\]
+```mermaid
+erDiagram
+  profiles ||--o{ memberships : "belongs to"
+  households ||--o{ memberships : has
+  households ||--o{ invitations : sends
+  households ||--o{ recipes : owns
+  recipes ||--o{ recipe_ingredients : lists
+  households ||--o{ meal_plan_entries : plans
+  recipes |o--o{ meal_plan_entries : "cooked in"
+  households ||--o{ shopping_lists : keeps
+  shopping_lists ||--o{ shopping_items : holds
+  households ||--o{ expenses : records
+  expenses ||--|{ expense_shares : "split into"
+  households ||--o{ budgets : sets
+  households ||--o{ notes : writes
+  notes ||--o| reminders : schedules
+  reminders ||--o{ reminder_recipients : notifies
+  profiles ||--o{ notifications : receives
+  profiles ||--o{ push_subscriptions : registers
+  households ||--o{ activity_events : logs
+```
 
 Households, highlighted, own every module's tables; memberships join users to households and carry the role used by every policy.
 
@@ -419,7 +480,7 @@ Every pull request gets its own preview deployment and must pass the same checks
 | Preview (per pull request) | `*.vercel.app` preview URL                    | Vercel preview             | Supabase staging project, migrations from `main` | Seed data, reset weekly                    |
 | Production                 | `https://hoemapp.com` (`www` redirects to it) | Vercel, `fra1` (Frankfurt) | Supabase production project, Ireland (ADR-013)   | Real users and the demo template           |
 
-**Domain and e-mail.** The domain `hoemapp.com` is registered at Cloudflare, which also hosts its DNS. Vercel serves the app on it with an automatic TLS certificate. Resend sends from `no-reply@hoemapp.com` (region eu-west-1) on a verified domain. Its records are added through Resend's Cloudflare integration (MX and SPF on send, DKIM on resend.\_domainkey), plus a DMARC record on \_dmarc that we add ourselves, so invitations are not marked as spam. Every record for Vercel and Resend is "DNS only" (Cloudflare proxy off), so TLS and caching stay with Vercel and e-mail authentication is not altered. Supabase Auth uses the same Resend account as its SMTP server, so password-reset and confirmation e-mails come from the same address. The VAPID contact for Web Push is `mailto:hello@hoemapp.com`.
+**Domain and e-mail.** `hoemapp.com` is registered at Cloudflare and served by Vercel; Resend (eu-west-1) sends from `no-reply@hoemapp.com`, also as the SMTP server of Supabase Auth. The records and settings are in `docs/guides/deployment.md`.
 
 ### 9.2 Pipeline
 
@@ -441,9 +502,11 @@ A scheduled workflow (`keep-alive.yml`, every three days and on demand) calls th
 
 ### 9.3 Observability
 
-- Errors from the browser and server go to Sentry, with the request ID and no personal data in the payload.
-- Logs are structured JSON (`pino`), one line per request, with user and household IDs but never note text or amounts.
-- Vercel Analytics records Core Web Vitals from real visits.
+None of this is installed yet; it is planned before the release (`docs/roadmap.md`). Until then, errors reach the Vercel function logs with their request ID.
+
+- Errors from the browser and server will go to Sentry, with the request ID and no personal data in the payload.
+- Logs will be structured JSON (`pino`), one line per request, with user and household IDs but never note text or amounts.
+- Vercel Analytics will record Core Web Vitals from real visits.
 
 ### 9.4 Traceability
 
@@ -456,7 +519,7 @@ Every requirement ID in the SRS appears in the branch name, the commit messages 
 | Expenses and splits (FR-EXP)              | `features/expenses/domain`                  | TDD on splits and balances                        |
 | Planner and reminders (FR-NOTE, FR-NOTIF) | `features/planner`, `dispatch-reminders`    | Unit tests for next occurrence across DST changes |
 | Demo (FR-DEMO)                            | Clone function, `cleanup-demo`              | E2E: two visitors never see each other's changes  |
-| Accessibility (NFR-A11Y)                  | Design system                               | axe-core in Storybook and E2E                     |
+| Accessibility (NFR-A11Y)                  | Design system                               | axe-core in E2E, contrast pairs in unit tests     |
 
 ### 9.5 Resolved questions
 

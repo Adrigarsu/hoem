@@ -1,6 +1,6 @@
 # ADR-015 Locale through an internal rewrite
 
-Date: 2026-10-25 · Status: Accepted
+Date: 2026-10-25 · Status: Accepted · Amends ADR-012
 
 ## Context
 

@@ -2,6 +2,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import prettier from "eslint-config-prettier/flat";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import boundaries from "eslint-plugin-boundaries";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import i18next from "eslint-plugin-i18next";
 import jsxA11y from "eslint-plugin-jsx-a11y";
@@ -99,6 +100,152 @@ const eslintConfig = defineConfig([
               String.raw`^t(?:[A-Z]\w*)?\.(rich|markup|raw|has)$`,
             ],
           },
+        },
+      ],
+    },
+  },
+  {
+    // Architecture rules (docs/architecture.md §4.2): dependencies only point down, and a feature
+    // is reached from outside only through its index.ts. Each feature folder is an element and its
+    // layers are file categories. Unit tests may reach inside the layer they test, so they are
+    // left out.
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/**/*.test.{ts,tsx}"],
+    plugins: { boundaries },
+    settings: {
+      "import/resolver": { typescript: { alwaysTryTypes: true } },
+      "boundaries/elements": [
+        { type: "feature", pattern: "src/features/*", partialMatch: false, capture: ["feature"] },
+        ...["app", "design-system", "db", "lib"].map((type) => ({
+          type,
+          pattern: `src/${type}`,
+          partialMatch: false,
+        })),
+      ],
+      // The first category that matches a file is its only one.
+      "boundaries/files": [
+        ...["domain", "components"].map((category) => ({
+          category,
+          pattern: `src/features/*/${category}/**`,
+          stopMatching: true,
+        })),
+        ...["repository", "service", "actions", "schemas", "index"].map((category) => ({
+          category,
+          pattern: `src/features/*/${category}.ts`,
+          stopMatching: true,
+        })),
+        // Other files of a feature, such as cookies or helpers its layers share.
+        { category: "internal", pattern: "src/features/*/*.{ts,tsx}" },
+      ],
+    },
+    rules: {
+      "boundaries/dependencies": [
+        "error",
+        {
+          default: "allow",
+          // Layers live in the same feature folder, so imports inside it are checked too.
+          checkInternals: true,
+          policies: [
+            {
+              from: { element: { type: "feature" } },
+              disallow: {
+                to: {
+                  element: {
+                    type: "feature",
+                    captured: { feature: "!{{ from.captured.feature }}" },
+                  },
+                  file: { categories: "!index" },
+                },
+              },
+              message: "Import another feature only through its index.ts.",
+            },
+            {
+              from: { element: { types: ["app", "design-system", "db", "lib"] } },
+              disallow: { to: { element: { type: "feature" }, file: { categories: "!index" } } },
+              message: "Import a feature only through its index.ts.",
+            },
+            {
+              from: { file: { categories: "domain" } },
+              disallow: [
+                { to: { element: { type: "feature" }, file: { categories: "!domain" } } },
+                { to: { element: { types: ["app", "design-system", "db", "lib"] } } },
+              ],
+              message: "The domain is pure TypeScript: it imports only other domain files.",
+            },
+            {
+              // The repository implements the gateway type its service declares (dependency
+              // inversion), so it may import the service, but nothing above it.
+              from: { file: { categories: "repository" } },
+              disallow: {
+                to: {
+                  element: { type: "feature" },
+                  file: { categories: ["actions", "components"] },
+                },
+              },
+              message: "A repository does not depend on Server Actions or components.",
+            },
+            {
+              // A service works through the gateway it declares; the entry point passes it the
+              // repository, so the service never imports one.
+              from: { file: { categories: "service" } },
+              disallow: {
+                to: {
+                  element: { type: "feature" },
+                  file: { categories: ["repository", "actions", "components"] },
+                },
+              },
+              message: "A service receives its repository as a gateway; it never imports one.",
+            },
+            {
+              from: { file: { categories: "actions" } },
+              disallow: {
+                to: { file: { categories: "components" } },
+              },
+              message: "A Server Action does not depend on components.",
+            },
+            {
+              // Components may share a service's types, but call it only through a Server Action.
+              from: { file: { categories: "components" } },
+              disallow: {
+                to: {
+                  element: { type: "feature" },
+                  file: { categories: ["repository", "service"] },
+                },
+                dependency: { kind: "value" },
+              },
+              message:
+                "Components reach data through Server Actions, not services or repositories.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The domain is pure TypeScript (docs/architecture.md §4.2): no framework, no I/O.
+    files: ["src/features/*/domain/**/*.ts"],
+    ignores: ["src/**/*.test.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["react", "react-dom", "next", "next/*", "next-intl", "next-intl/*"],
+              message: "The domain is pure TypeScript: no React or Next.js.",
+            },
+            {
+              group: [
+                "@supabase/*",
+                "drizzle-orm",
+                "drizzle-orm/*",
+                "server-only",
+                "@/db",
+                "@/db/*",
+              ],
+              message: "The domain is pure TypeScript: no Supabase or database code.",
+            },
+          ],
         },
       ],
     },
