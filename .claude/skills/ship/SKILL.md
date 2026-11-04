@@ -2,7 +2,7 @@
 name: ship
 description: Finish the current task - verify it, commit and open a pull request. Use when the developer says the work is ready to ship.
 disable-model-invocation: true
-allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git fetch origin) Bash(git merge origin/main) Bash(gh pr view *) Bash(gh pr list *)
+allowed-tools: Bash(pnpm check) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git fetch origin) Bash(git merge origin/main) Bash(gh pr view *) Bash(gh pr list *)Skill Bash(pnpm db:reset) Bash(pnpm db:test) Bash(pnpm app:capture *) Bash(git add *) Bash(git commit -m *) Bash(git push *) Bash(gh pr edit *) Bash(gh pr ready *) Bash(gh pr create *) Bash(gh issue view *)
 ---
 
 ## Branch

@@ -2,7 +2,7 @@
 name: ship-partial
 description: Finish one pull request of an issue split across several - verify it, commit it and mark it ready without closing the issue. Use when the developer says a part of an issue is ready to ship.
 disable-model-invocation: true
-allowed-tools: Bash(pnpm check) Bash(pnpm db:reset) Bash(pnpm db:test) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git fetch origin) Bash(git merge origin/main) Bash(gh pr view *) Bash(gh pr list *) Bash(gh issue view *)
+allowed-tools: Bash(pnpm check) Bash(pnpm db:reset) Bash(pnpm db:test) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git fetch origin) Bash(git merge origin/main) Bash(gh pr view *) Bash(gh pr list *) Bash(gh issue view *) Skill Bash(pnpm app:capture *) Bash(git add *) Bash(git commit -m *) Bash(git push *) Bash(gh pr edit *) Bash(gh pr ready *)
 ---
 
 ## Branch

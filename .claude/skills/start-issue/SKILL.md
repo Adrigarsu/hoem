@@ -3,7 +3,7 @@ name: start-issue
 description: Start work on a GitHub issue - read it, create the branch, open a draft pull request and propose a plan before coding. Use when the developer asks to start or pick up an issue.
 argument-hint: [issue-number]
 disable-model-invocation: true
-allowed-tools: Bash(gh issue view *) Bash(git status *) Bash(git switch *) Bash(git pull) Bash(git commit --allow-empty -m *) Bash(git push -u origin *) Bash(gh pr create --draft *) Bash(gh pr view *) EnterPlanMode ExitPlanMode
+allowed-tools: Bash(gh issue view *) Bash(git status *) Bash(git switch *) Bash(git pull) Bash(git commit --allow-empty -m *) Bash(git push -u origin *) Bash(gh pr create --draft *) Bash(gh pr view *) Bash(git pull) por Bash(git pull origin main) EnterPlanMode ExitPlanMode
 ---
 
 ## Issue
