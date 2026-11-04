@@ -141,6 +141,15 @@ decision wins and the screen's spec says so.
 | Households         | The rows of #21, without the role or the "Switch" button of the desktop frame: the switcher is in the header.                                                                                                                                                                                                     |
 | Saved              | A message next to the form, as in household settings; the app has no Toast yet.                                                                                                                                                                                                                                   |
 
+### Decisions taken changing the e-mail and password (#80)
+
+| Topic           | Decision                                                                                                                                                         |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Email           | An editable field with its own secondary "Change email" button, not the card's "Save changes": nothing changes until the link sent to the new address is opened. |
+| Waiting         | "We sent a link to …" after sending, and "Waiting for you to confirm …" while Supabase holds the new address, in the status line next to the button.             |
+| Change password | A ghost link under the Email field, "Set a password" for an account without one. It opens `/settings/password` on every width, which the screen did not define.  |
+| Password page   | The fields of Set a new password (reset-password), with "Current password" first when the account has one; a success message instead of a redirect.              |
+
 ### Decisions taken removing the profile photo (#79)
 
 | Topic         | Decision                                                                                                                                                 |

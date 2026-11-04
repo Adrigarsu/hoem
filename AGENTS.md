@@ -136,6 +136,8 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
 - Every RLS change needs a policy test that signs in as each affected role.
 - Next.js keeps a route announcer with `role="alert"`: in E2E, look for a page's alert inside `main`.
   `/settings` holds one block per width, so filter what is on screen (`:visible`).
+- In E2E, sign in and out with `signIn` and `signOut` from `tests/e2e/support/session.ts`: right
+  after signing out, Account settings (which has an Email field) is briefly still on screen.
 - E2E specs import a feature's pure modules (`domain/`, `schemas.ts`) directly: its `index.ts` also
   brings `server-only` code, which Playwright cannot load.
 

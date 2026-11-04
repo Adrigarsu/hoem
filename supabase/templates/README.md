@@ -10,6 +10,11 @@ Templates); `supabase/config.toml` points the local stack at them.
 - `recovery.html`: password reset (FR-ACC-008). The link goes to `/auth/reset-password` on the site
   that asked for it (`redirectTo`), where the token is verified only when the new password is sent.
 
+- `email_change.html`: change of e-mail (FR-ACC-007). Sent to the new address only
+  (`double_confirm_changes = false`; in the dashboard, Authentication → Providers → Email, "Secure
+  email change" off). The link goes to `/auth/confirm` with `type=email_change`, which signs the user
+  in and opens Account settings.
+
 Colours are the light-theme tokens (`bg`, `surface`, `text`, `text-secondary`, `brand`,
 `on-brand`) written as hex values: e-mail clients do not support CSS variables.
 

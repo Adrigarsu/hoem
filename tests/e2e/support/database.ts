@@ -95,3 +95,15 @@ export async function avatarPathOf(email: string, password: string) {
   if (error) throw error;
   return data.avatar_path;
 }
+
+// Another device signed in to the same account, through the API. Supabase Auth checks its session
+// on every getUser, so it reports whether that session was signed out (FR-ACC-007).
+export async function otherDevice(email: string, password: string) {
+  const supabase = await signedInAs(email, password);
+  return {
+    async signedIn() {
+      const { error } = await supabase.auth.getUser();
+      return !error;
+    },
+  };
+}

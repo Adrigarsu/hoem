@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expectNoA11yViolations } from "./support/accessibility";
 import { expect, test } from "./support/fixtures";
-import { signOut } from "./support/session";
+import { signIn, signOut } from "./support/session";
 import { emailLink, uniqueEmail } from "./support/mailbox";
 
 const oldPassword = "correct horse battery";
@@ -31,12 +31,6 @@ async function requestReset(page: Page, email: string) {
   await form.getByLabel("Email").fill(email);
   await form.getByRole("button", { name: "Send link" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Check your inbox" })).toBeFocused();
-}
-
-async function signIn(page: Page, email: string, password: string) {
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Sign in" }).click();
 }
 
 test.describe("FR-ACC-008 password reset", () => {
