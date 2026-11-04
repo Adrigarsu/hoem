@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
 // ADR-009 and NFR-UX-002: the interface hides an item at once, and only commits the delete when
 // nobody undid it in this time.
@@ -29,21 +29,35 @@ export async function commitWaitingUndos() {
   await Promise.all([...flushers].map((flush) => flush()));
 }
 
+// Empties the ref and stops its timer, returning what was waiting.
+function take(waiting: RefObject<Waiting | null>) {
+  const current = waiting.current;
+  if (current?.timer) clearTimeout(current.timer);
+  waiting.current = null;
+  return current;
+}
+
+// Commits and remembers the action until its commit settles, so an unload in the meantime can
+// still send it with keepalive: the commit's own request is cancelled with the page.
+async function commitTracked(current: Waiting | null, running: RefObject<Set<Waiting>>) {
+  if (!current) return;
+  running.current.add(current);
+  try {
+    await current.commit();
+  } finally {
+    running.current.delete(current);
+  }
+}
+
 // One action waiting to be committed, such as a delete. It commits after 5 seconds, or at once when
 // the page is closed (pagehide) or the component unmounts, so leaving never keeps a deleted item. It
 // can be paused while someone reads or reaches the Undo button (WCAG 2.2.1, Timing Adjustable).
 export function useUndoTimer() {
   const waiting = useRef<Waiting | null>(null);
-
-  function take() {
-    const current = waiting.current;
-    if (current?.timer) clearTimeout(current.timer);
-    waiting.current = null;
-    return current;
-  }
+  const running = useRef(new Set<Waiting>());
 
   async function flush() {
-    await take()?.commit();
+    await commitTracked(take(waiting), running);
   }
 
   function schedule(current: Waiting) {
@@ -73,25 +87,18 @@ export function useUndoTimer() {
   }
 
   function undo() {
-    take();
+    take(waiting);
   }
 
-  // Reads the ref, not state, so the latest action is the one committed.
+  // Reads the refs, not state, so the latest action is the one committed.
   useEffect(() => {
-    const takeWaiting = () => {
-      const current = waiting.current;
-      if (current?.timer) clearTimeout(current.timer);
-      waiting.current = null;
-      return current;
-    };
-    const commitNow = async () => {
-      await takeWaiting()?.commit();
-    };
+    const commitNow = () => commitTracked(take(waiting), running);
     const onPageHide = () => {
-      const current = takeWaiting();
-      if (!current) return;
-      if (current.onUnload) current.onUnload();
-      else void current.commit();
+      const current = take(waiting);
+      if (current && !current.onUnload) void commitTracked(current, running);
+      const unloads = [...running.current, ...(current ? [current] : [])];
+      running.current.clear();
+      for (const action of unloads) action.onUnload?.();
     };
     flushers.add(commitNow);
     window.addEventListener("pagehide", onPageHide);

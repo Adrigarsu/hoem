@@ -95,6 +95,26 @@ describe("useUndoTimer", () => {
     expect(commit).not.toHaveBeenCalled();
   });
 
+  it("NFR-UX-002 also sends the unload request when the page unloads while the commit is running", async () => {
+    let finish = () => undefined as void;
+    const commit = vi.fn(() => new Promise<void>((resolve) => (finish = resolve)));
+    const onUnload = vi.fn();
+    const hook = renderHook(() => useUndoTimer());
+    act(() => hook.result.current.start(commit, { onUnload }));
+    act(() => vi.advanceTimersByTime(undoDelayMs));
+    expect(commit).toHaveBeenCalledTimes(1);
+    act(() => {
+      window.dispatchEvent(new Event("pagehide"));
+    });
+    expect(onUnload).toHaveBeenCalledTimes(1);
+    finish();
+    await act(async () => undefined);
+    act(() => {
+      window.dispatchEvent(new Event("pagehide"));
+    });
+    expect(onUnload).toHaveBeenCalledTimes(1);
+  });
+
   it("NFR-UX-002 still commits on unmount when it has an unload request, as the page stays", () => {
     const commit = vi.fn();
     const onUnload = vi.fn();

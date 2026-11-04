@@ -21,7 +21,7 @@ const problemTypeBase = "https://hoemapp.com/problems/";
 const titles: Record<ErrorCode, string> = {
   validation_failed: "The request has invalid fields",
   not_authenticated: "Sign in to continue",
-  forbidden: "You cannot do this in this household",
+  forbidden: "You do not have permission to do this",
   not_found: "Not found",
   conflict: "The request conflicts with the current state",
   demo_restricted: "Not available in the demo",

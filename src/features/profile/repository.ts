@@ -32,7 +32,8 @@ export async function profileGateway({
     // getClaims verifies the JWT signature, like the proxy does.
     async signedInUser() {
       const { data } = await supabase.auth.getClaims(accessToken);
-      if (!data) return null;
+      // A signed token without a subject (the anon key, a service token) is no user.
+      if (!data?.claims.sub) return null;
       // Every way to sign up asks for an email; without one the menu leaves out the email line.
       return { id: data.claims.sub, email: data.claims.email ?? "" };
     },

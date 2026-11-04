@@ -290,6 +290,22 @@ test.describe("FR-ACC-007 edit my profile", () => {
     expect(await avatarPathOf(email, password)).toBeNull();
   });
 
+  test("NFR-SEC-001 the API refuses a Bearer token that is not a user's", async ({
+    page,
+    visit,
+  }) => {
+    await visit(accountPage(page));
+    await uploadPhoto(page);
+    const api = await playwrightRequest.newContext();
+    const response = await api.delete(new URL("/api/v1/profile/avatar", page.url()).href, {
+      headers: { authorization: "Bearer not-a-token" },
+    });
+    expect(response.status()).toBe(401);
+    expect(response.headers()["www-authenticate"]).toBe("Bearer");
+    await api.dispose();
+    expect(await avatarPathOf(email, password)).not.toBeNull();
+  });
+
   test("NFR-SEC-006 the API refuses a cookie request from another origin", async ({
     page,
     visit,

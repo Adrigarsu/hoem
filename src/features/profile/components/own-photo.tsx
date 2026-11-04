@@ -73,7 +73,14 @@ export function OwnPhotoProvider({ children }: { children: ReactNode }) {
       dismissal.undo();
       setHidden(true);
       setNotice("removed");
-      removal.start(commit, { onUnload: sendOnUnload });
+      removal.start(commit, {
+        onUnload() {
+          sendOnUnload();
+          // The page may come back from the browser's cache (Back): the photo is gone by then,
+          // so Undo must not be offered. The photo stays hidden until the next load.
+          setNotice(null);
+        },
+      });
     },
     undo() {
       removal.undo();

@@ -101,6 +101,9 @@ describe("Remove my profile photo", () => {
       keepalive: true,
     });
     expect(removePhotoAction).not.toHaveBeenCalled();
+    // Back from the browser's page cache, Undo must not be offered for a photo already deleted.
+    expect(screen.queryByText("Photo removed")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Undo" })).not.toBeInTheDocument();
     vi.unstubAllGlobals();
   });
 
