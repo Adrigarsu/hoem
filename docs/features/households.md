@@ -30,13 +30,19 @@ shopping lists and splitting (SRS §3.7).
   it. Someone who is the last owner of a household with other members cannot delete their account,
   or leave, until someone else is an owner (`last_owner`). The app does not offer this yet: the
   database function comes first, and the screen with the rest of #23.
-- **Members and roles** (FR-ACC-006, FR-HH-006, FR-HH-008): the database side is in place (#26,
-  part 1). Every member reads the member list with names and photos. Owners manage members outside a
-  family; in a family, parents set parent, child or relative and remove members. In every type, an
-  owner makes someone an owner or stops being one (`set_member_role`), whether or not they are a
-  parent, so an owner who is a relative can always hand over ownership. A family always keeps a
-  parent: the last one cannot stop being a parent, leave, be removed or delete their account while
-  others belong (`last_parent`). The screen comes in part 2 of #26.
+- **Members and roles** (FR-ACC-006, FR-HH-006, FR-HH-008): household settings, "Members"
+  section. Every member sees every member's name, photo and role (plus parent, child or relative in
+  a family), in joining order. "Options for {name}" opens a dialog with only what the user may do:
+  - Owners manage members outside a family; in a family, parents set parent, child or relative and
+    remove members. Only an owner changes or removes an owner.
+  - In every type, an owner makes someone an owner or stops being one (`set_member_role`), parent
+    or not, so an owner who is a relative can always hand over ownership.
+  - The only owner is asked to make someone else owner first (`last_owner`); the last parent of a
+    family, to make someone else a parent first (`last_parent`). This also blocks leaving and
+    deleting the account while others belong.
+  - Removing hides the member at once with a 5-second undo (ADR-009); closing the tab sends it as a
+    keepalive `DELETE /api/v1/households/{id}/members/{userId}` (ADR-020). Removing yourself is
+    leaving, a separate issue.
 
 ## Privacy rules
 
@@ -51,14 +57,17 @@ shopping lists and splitting (SRS §3.7).
 - The database chooses each type's rules (`private.default_household_settings`); the client never
   sends them.
 - Members see each other's name and photo only, through `household_members`: the rest of a profile
-  (age, language, time zone) stays readable only by its owner. Until the screen of #26 uses it, the
-  family-roles dialog still shows "You" and "Member 2, 3…" in the order they joined.
+  (age, language, time zone) stays readable only by its owner. The photos are signed URLs that
+  expire after 15 minutes. A member without a profile shows as "Member without a name" (and as
+  "Member 2, 3…" in the family-roles dialog).
+- Removed members lose access at once: row-level security reads the membership on every query.
 
 ## Where it lives
 
 - Code: `src/features/households/` (domain rules in `domain/`, `service.ts`, `repository.ts`,
   `actions.ts`, components `new-household-form.tsx`, `household-details.tsx`,
-  `household-switcher.tsx` and `household-menu.tsx`). Other features read the active household
+  `household-members.tsx`, `household-switcher.tsx` and `household-menu.tsx`; member rules in
+  `domain/member-rules.ts`; REST route `src/app/api/v1/households/[id]/members/[userId]/route.ts`). Other features read the active household
   with `currentHousehold()`.
 - Database: `households`, `memberships` and the functions `create_household` and
   `change_household_type` (`supabase/migrations/20261028190949_household-type.sql`),
@@ -67,7 +76,9 @@ shopping lists and splitting (SRS §3.7).
   `docs/architecture.md` §7.
 - Tests: `supabase/tests/database/household-type.test.sql`,
   `supabase/tests/database/household-members.test.sql`, `tests/e2e/household-type.spec.ts`,
-  `tests/e2e/household-switcher.spec.ts`.
+  `tests/e2e/household-members.spec.ts`, `tests/e2e/household-switcher.spec.ts`. Households with
+  several people need invitations (#27, #28), so the end-to-end test covers one account; the rules
+  between members are tested with every role in pgTAP and in the unit tests.
 
 ## Requirements
 
@@ -77,4 +88,4 @@ NFR-LEG-001.
 ## Screens
 
 `household-switcher`, `new-household`, `household-type` (the Details section and the type-change dialogs) and
-`household-settings` in `docs/design-system/screens/`.
+`household-settings` (Members) in `docs/design-system/screens/`.

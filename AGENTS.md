@@ -96,7 +96,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   from the app's own origin) and answers errors with `problemResponse`; see
   `src/app/api/v1/profile/avatar/route.ts`.
 - The signed-in user's own avatar is `OwnAvatar` (`@/features/profile`), never `Avatar` with
-  `avatarUrl`: it hides the photo during its undo window. A lint rule enforces it.
+  `avatarUrl`: it hides the photo during its undo window. A lint rule enforces it. A client
+  component cannot import `@/features/profile` (its index holds `server-only` code): the page passes
+  `<OwnAvatar>` in as a prop (see `HouseholdMembers`).
 - **Migrations are backward compatible (expand/contract, ADR-014):** a migration that adds a
   column, table or function merges in its own pull request, before the code that uses it, because
   Vercel deploys the app while `migrate.yml` is still running. Remove the old one in a later pull

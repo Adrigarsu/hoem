@@ -26,10 +26,9 @@ their milestone starts.
 | 55  | ci: cache Playwright system libraries, time out installs | M1a       | should   | —          | Move up if CI installs keep stalling                        |
 | 50  | chore: run end-to-end tests in Firefox and Edge          | M1a       | should   | —          | Widens browser coverage; no feature depends                 |
 | 99  | chore: rate-limit REST API write routes                  | M1a       | should   | —          | Chore, end of milestone (rule 5); only one API route so far |
-| 26  | FR-ACC-006: see household members and manage roles       | M1b       | must     | —          | Unblocks #27, #30                                           |
 | 32  | FR-ONB-001: guided household setup, step 1 and progress  | M1b       | must     | —          | Starts the setup chain #33 → #34                            |
-| 27  | FR-ACC-005: invite people to a household by e-mail       | M1b       | must     | #26        | Unblocks #28, #34                                           |
-| 30  | FR-HH-009: parents decide who can split expenses         | M1b       | must     | #26        | Needs member roles                                          |
+| 27  | FR-ACC-005: invite people to a household by e-mail       | M1b       | must     | —          | Unblocks #28, #34                                           |
+| 30  | FR-HH-009: parents decide who can split expenses         | M1b       | must     | —          | Needs member roles                                          |
 | 33  | FR-ONB-003: setup steps for meals and money              | M1b       | must     | #32        | Next step of the setup chain                                |
 | 28  | FR-ACC-005: accept an invitation, or see that it expired | M1b       | must     | #27        | Unblocks #29                                                |
 | 29  | NFR-LEG-001: children under 14 join only through family  | M1b       | must     | #28        | Builds on accepting invitations                             |

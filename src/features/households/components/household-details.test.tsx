@@ -30,8 +30,24 @@ const flat: HouseholdSettingsView = {
   type: "shared_flat",
   isOwner: true,
   members: [
-    { userId: lucia, role: "owner", familyRole: null, isYou: true },
-    { userId: marcos, role: "member", familyRole: null, isYou: false },
+    {
+      userId: lucia,
+      role: "owner",
+      familyRole: null,
+      displayName: "Lucía",
+      avatarUrl: null,
+      isYou: true,
+      permissions: {},
+    },
+    {
+      userId: marcos,
+      role: "member",
+      familyRole: null,
+      displayName: "Marcos",
+      avatarUrl: null,
+      isYou: false,
+      permissions: {},
+    },
   ],
 };
 
@@ -88,7 +104,20 @@ describe("HouseholdDetails", () => {
     await userEvent.selectOptions(typeSelect(), "family");
     await userEvent.click(screen.getByRole("button", { name: "Continue" }));
     expect(screen.getByRole("combobox", { name: "You · Owner" })).toHaveValue("parent");
-    expect(screen.getByRole("combobox", { name: "Member 2 · Member" })).toHaveValue("");
+    expect(screen.getByRole("combobox", { name: "Marcos · Member" })).toHaveValue("");
+  });
+
+  it("FR-ACC-006 names a member without a profile by their place in the joining order", async () => {
+    renderDetails({
+      ...flat,
+      members: flat.members.map((member) => ({
+        ...member,
+        displayName: member.isYou ? member.displayName : null,
+      })),
+    });
+    await userEvent.selectOptions(typeSelect(), "family");
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }));
+    expect(screen.getByRole("combobox", { name: "Member 2 · Member" })).toBeInTheDocument();
   });
 
   it("FR-HH-007 does not change the type while a member has no family role", async () => {
@@ -96,8 +125,8 @@ describe("HouseholdDetails", () => {
     await userEvent.selectOptions(typeSelect(), "family");
     await userEvent.click(screen.getByRole("button", { name: "Continue" }));
     await userEvent.click(screen.getByRole("button", { name: "Change to Family" }));
-    const missing = screen.getByRole("combobox", { name: "Member 2 · Member" });
-    expect(missing).toHaveAccessibleDescription("Choose a role for Member 2");
+    const missing = screen.getByRole("combobox", { name: "Marcos · Member" });
+    expect(missing).toHaveAccessibleDescription("Choose a role for Marcos");
     expect(missing).toHaveFocus();
     expect(actions.changeHouseholdTypeAction).not.toHaveBeenCalled();
   });
@@ -107,7 +136,7 @@ describe("HouseholdDetails", () => {
     await userEvent.selectOptions(typeSelect(), "family");
     await userEvent.click(screen.getByRole("button", { name: "Continue" }));
     await userEvent.selectOptions(
-      screen.getByRole("combobox", { name: "Member 2 · Member" }),
+      screen.getByRole("combobox", { name: "Marcos · Member" }),
       "child",
     );
     await userEvent.click(screen.getByRole("button", { name: "Change to Family" }));
@@ -124,7 +153,7 @@ describe("HouseholdDetails", () => {
       "relative",
     );
     await userEvent.selectOptions(
-      screen.getByRole("combobox", { name: "Member 2 · Member" }),
+      screen.getByRole("combobox", { name: "Marcos · Member" }),
       "child",
     );
     await userEvent.click(screen.getByRole("button", { name: "Change to Family" }));
@@ -167,11 +196,11 @@ describe("HouseholdDetails", () => {
       "relative",
     );
     await userEvent.selectOptions(
-      screen.getByRole("combobox", { name: "Member 2 · Member" }),
+      screen.getByRole("combobox", { name: "Marcos · Member" }),
       "parent",
     );
     await userEvent.click(screen.getByRole("button", { name: "Change to Family" }));
-    expect(await screen.findByText("Choose a role for Member 2")).toBeInTheDocument();
+    expect(await screen.findByText("Choose a role for Marcos")).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "You · Owner" })).toHaveValue("relative");
   });
 

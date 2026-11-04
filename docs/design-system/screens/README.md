@@ -109,7 +109,7 @@ decision wins and the screen's spec says so.
 | Create           | Variant A of `new-household`: a standalone form without progress bar, because the setup guide does not exist yet. #32 may make creating step 1 of the guide (variant B), so name and type are not asked twice. |
 | Route            | `/settings/household/[id]` until #20 adds the active household.                                                                                                                                                |
 | Owner and parent | Separate: an owner can be a relative, a member can be a parent. The owner changing the type is pre-set as a parent; a family needs at least one parent.                                                        |
-| Member names     | Members cannot read each other's profiles yet, so the roles dialog says "You" and "Member 2, 3…" in joining order; names come with #26.                                                                        |
+| Member names     | Since #26 the roles dialog shows each member's name; "Member 2, 3…" in joining order only for a member without a profile.                                                                                      |
 | Dialogs          | Centred native `<dialog>`s on every width (the design system's Dialog), not bottom sheets. New tokens: `column` (480 px), `content-width` (720 px), `dialog-width` (440 px).                                   |
 | Saved            | A success message under the select instead of a toast; the app has no Toast yet.                                                                                                                               |
 | Under 14         | Only the database knows ages, so the refusal appears after "Change type", not before.                                                                                                                          |
@@ -173,6 +173,19 @@ decision wins and the screen's spec says so.
 | "Just me"       | A single household shows only its type, never "1 member".                                                                                                                                                                 |
 | Sidebar rows    | Smaller icon (32 px) and padding, so "Shared flat · 2 members" and "Create a new household" fit the 264 px sidebar on one line.                                                                                           |
 | Kept            | The household in settings stays at `/settings/household/[id]`, and creating a household still opens its settings: #20 adds only the switcher.                                                                             |
+
+### Decisions taken building members and roles (#26)
+
+| Topic         | Decision                                                                                                                                                                                  |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Row           | As drawn in the HTML, not the `.md`: the role is secondary text under the name ("Owner · Parent" in a family), not a Badge, and the chevron button opens a Dialog, not a Menu.            |
+| Section       | A Card with an `h2` "Members", like Details (#19), above Details as in the screen. "Invite" comes with #27.                                                                               |
+| Row height    | 64 px (`min-h-16`, the 8-point grid), not the 60 px of the HTML.                                                                                                                          |
+| Desktop       | The same list in the 720 px column, not a table: one markup for every width, and the dialog holds the actions a table would put in columns.                                               |
+| Options       | Only for members the user may change. The dialog lists only allowed actions; a blocked one says what to do first ("Make someone else owner first.", "Make someone else a parent first."). |
+| Own row       | The only owner sees the chevron too: their dialog explains why they cannot step down yet. Removing yourself is leaving, a separate issue.                                                 |
+| Confirmations | Role changes close the dialog and show a success message at the top of the section; focus returns to the row's button.                                                                    |
+| Removal       | Hidden at once with "{name} removed from the household" and Undo (ADR-009), in the shell's toast slot; focus moves to the "Members" heading, since the row's button disappears.           |
 
 ## Open questions
 

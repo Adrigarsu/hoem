@@ -7,17 +7,28 @@ import {
 } from "@/lib/errors";
 import { pickActiveHousehold } from "./domain/active-household";
 import type { FamilyRole, HouseholdType } from "./domain/household-rules";
+import {
+  memberPermissions,
+  type MemberPermissions,
+  type MemberRole,
+  type MemberRoles,
+} from "./domain/member-rules";
 import { familyRoleProblems, typeChangeBlock } from "./domain/type-change";
 import type {
+  ChangeFamilyRoleInput,
   ChangeHouseholdTypeInput,
   CreateHouseholdInput,
+  RemoveMemberInput,
   RenameHouseholdInput,
+  SetMemberRoleInput,
   SwitchHouseholdInput,
 } from "./schemas";
 
 export type Household = { id: string; name: string; type: HouseholdType };
 export type HouseholdSummary = Household & { memberCount: number };
-export type Member = { userId: string; role: "owner" | "member"; familyRole: FamilyRole | null };
+// The name and the photo are the only parts of another member's profile anyone sees. The name is
+// missing only for a member without a profile.
+export type Member = MemberRoles & { displayName: string | null; avatarPath: string | null };
 
 export type HouseholdGateway = {
   // From the verified session, never from the request.
@@ -35,6 +46,12 @@ export type HouseholdGateway = {
     type: HouseholdType,
     familyRoles: Record<string, FamilyRole>,
   ): Promise<void>;
+  // Short-lived signed URLs of the given photos, by path.
+  avatarUrls(paths: string[]): Promise<Record<string, string>>;
+  setMemberRole(householdId: string, userId: string, role: MemberRole): Promise<void>;
+  // False when row-level security left the row untouched.
+  setFamilyRole(householdId: string, userId: string, familyRole: FamilyRole): Promise<boolean>;
+  removeMember(householdId: string, userId: string): Promise<void>;
   // The household the user last chose on this device (FR-ACC-004). Only a preference: anyone can
   // put any id in a cookie, so it is never used without checking membership first.
   preferredHouseholdId(): Promise<string | null>;
@@ -59,15 +76,31 @@ export class MinorCannotCreateError extends ForbiddenError {
   }
 }
 
+// A change the household cannot take now: the last owner or the last parent would be gone
+// (FR-ACC-006, FR-HH-006). The user is asked to name someone else first.
+export type MemberChangeRefusal = "lastOwner" | "lastParent";
+
+export class MemberChangeRefusedError extends ConflictError {
+  constructor(readonly reason: MemberChangeRefusal) {
+    super(`Member change refused: ${reason}`);
+  }
+}
+
 export type ActiveHouseholdView = {
   // Null only for someone who belongs to no household.
   active: HouseholdSummary | null;
   households: HouseholdSummary[];
 };
 
+export type MemberView = Omit<Member, "avatarPath"> & {
+  avatarUrl: string | null;
+  isYou: boolean;
+  permissions: MemberPermissions;
+};
+
 export type HouseholdSettingsView = Household & {
   isOwner: boolean;
-  members: (Member & { isYou: boolean })[];
+  members: MemberView[];
 };
 
 async function requireUser(gateway: HouseholdGateway): Promise<string> {
@@ -122,11 +155,67 @@ export async function householdSettings(
   householdId: string,
 ): Promise<HouseholdSettingsView> {
   const { household, members, you } = await memberView(gateway, householdId);
+  const paths = members.flatMap(({ avatarPath }) => (avatarPath ? [avatarPath] : []));
+  const urls = paths.length > 0 ? await gateway.avatarUrls(paths) : {};
   return {
     ...household,
     isOwner: you.role === "owner",
-    members: members.map((member) => ({ ...member, isYou: member.userId === you.userId })),
+    members: members.map(({ avatarPath, ...member }) => ({
+      ...member,
+      avatarUrl: (avatarPath && urls[avatarPath]) || null,
+      isYou: member.userId === you.userId,
+      permissions: memberPermissions(household.type, members, you.userId, member.userId),
+    })),
   };
+}
+
+// The member the change is about, with what the caller may do to them.
+async function memberChange(gateway: HouseholdGateway, householdId: string, userId: string) {
+  const { household, members, you } = await memberView(gateway, householdId);
+  const target = members.find((member) => member.userId === userId);
+  const permissions = target ? memberPermissions(household.type, members, you.userId, userId) : {};
+  return { target, permissions };
+}
+
+// Owners make someone an owner, or step down, in every household type (FR-ACC-006);
+// private.set_member_role checks it again and keeps the last owner.
+export async function setMemberRole(
+  gateway: HouseholdGateway,
+  input: SetMemberRoleInput,
+): Promise<void> {
+  const { target, permissions } = await memberChange(gateway, input.householdId, input.userId);
+  if (!target) throw new NotFoundError("Member not found");
+  const allowed = input.role === "owner" ? permissions.makeOwner : permissions.stepDown;
+  if (allowed === "lastOwner") throw new MemberChangeRefusedError("lastOwner");
+  if (allowed !== "allowed") throw new ForbiddenError("Not allowed to change this role");
+  await gateway.setMemberRole(input.householdId, input.userId, input.role);
+}
+
+// Parents set parent, child or relative (FR-HH-006); a relative or a child cannot (FR-HH-008).
+// Row-level security and the last-parent trigger enforce the same.
+export async function changeFamilyRole(
+  gateway: HouseholdGateway,
+  input: ChangeFamilyRoleInput,
+): Promise<void> {
+  const { target, permissions } = await memberChange(gateway, input.householdId, input.userId);
+  if (!target) throw new NotFoundError("Member not found");
+  if (!permissions.familyRole) throw new ForbiddenError("Not allowed to change family roles");
+  if (input.familyRole === target.familyRole) return;
+  if (permissions.familyRole === "lastParent") throw new MemberChangeRefusedError("lastParent");
+  const changed = await gateway.setFamilyRole(input.householdId, input.userId, input.familyRole);
+  if (!changed) throw new ForbiddenError("Not allowed to change family roles");
+}
+
+// Managers remove members (FR-ACC-006, FR-HH-006). Someone already gone is not an error: the web app
+// may send the same removal again when the page closes during the undo (ADR-020).
+export async function removeMember(
+  gateway: HouseholdGateway,
+  input: RemoveMemberInput,
+): Promise<void> {
+  const { target, permissions } = await memberChange(gateway, input.householdId, input.userId);
+  if (!target) return;
+  if (permissions.remove !== "allowed") throw new ForbiddenError("Not allowed to remove members");
+  await gateway.removeMember(input.householdId, input.userId);
 }
 
 // Owners rename the household (FR-ACC-009); row-level security enforces the same rule.
