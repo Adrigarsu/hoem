@@ -14,6 +14,7 @@ const accountPage = (page: Page) =>
   (page.viewportSize()?.width ?? 0) < 768 ? "/settings/account" : "/settings";
 
 const emailField = (page: Page) => page.getByRole("textbox", { name: "Email" });
+// Texts are looked up inside main: while a page streams in, React keeps a hidden copy of it outside.
 
 // The link path, so it opens on the app under test whatever origin the e-mail names.
 const pathOf = (link: string) => new URL(link).pathname + new URL(link).search;
@@ -32,12 +33,16 @@ test.describe("FR-ACC-007 change my e-mail and password", () => {
     await emailField(page).fill(newEmail);
     await page.getByRole("button", { name: "Change email" }).click();
     await expect(
-      page.getByText(`We sent a link to ${newEmail}. Your email changes once you open it.`),
+      page
+        .getByRole("main")
+        .getByText(`We sent a link to ${newEmail}. Your email changes once you open it.`),
     ).toBeVisible();
 
     await page.reload();
     await expect(emailField(page)).toHaveValue(email);
-    await expect(page.getByText(`Waiting for you to confirm ${newEmail}.`)).toBeVisible();
+    await expect(
+      page.getByRole("main").getByText(`Waiting for you to confirm ${newEmail}.`),
+    ).toBeVisible();
     await expectNoA11yViolations(page);
 
     const { subject, link } = await emailLink(newEmail);
@@ -64,7 +69,7 @@ test.describe("FR-ACC-007 change my e-mail and password", () => {
     await visit(accountPage(page));
     await emailField(page).fill(newEmail);
     await page.getByRole("button", { name: "Change email" }).click();
-    await expect(page.getByText(`We sent a link to ${newEmail}.`)).toBeVisible();
+    await expect(page.getByRole("main").getByText(`We sent a link to ${newEmail}.`)).toBeVisible();
 
     const { link } = await emailLink(newEmail);
     const phone = await browser.newPage();
@@ -97,7 +102,9 @@ test.describe("FR-ACC-007 change my e-mail and password", () => {
     await page.getByLabel("Repeat the password").fill(newPassword);
     await page.getByRole("button", { name: "Save password" }).click();
     await expect(page.getByLabel("Current password")).toBeFocused({ timeout: 15_000 });
-    await expect(page.getByText("Your current password is incorrect.")).toBeVisible();
+    await expect(
+      page.getByRole("main").getByText("Your current password is incorrect."),
+    ).toBeVisible();
     expect(await laptop.signedIn()).toBe(true);
 
     await page.getByLabel("Current password").fill(password);
@@ -106,9 +113,9 @@ test.describe("FR-ACC-007 change my e-mail and password", () => {
     await page.getByRole("button", { name: "Save password" }).click();
     // Checking the current password, saving the new one and signing out the other sessions: three
     // calls to Supabase, slower than the default wait while every browser project runs at once.
-    await expect(page.getByText("Password saved. Your other devices were signed out.")).toBeVisible(
-      { timeout: 15_000 },
-    );
+    await expect(
+      page.getByRole("main").getByText("Password saved. Your other devices were signed out."),
+    ).toBeVisible({ timeout: 15_000 });
     expect(await laptop.signedIn()).toBe(false);
     // Its token is still valid, but settings ask Supabase, which sends it to sign in again.
     await tablet.goto(new URL("/settings", page.url()).toString());
