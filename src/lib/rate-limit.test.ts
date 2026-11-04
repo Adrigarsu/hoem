@@ -51,6 +51,16 @@ describe("limitWrites", () => {
     await expect(limitWrites()).rejects.toBeInstanceOf(NotAuthenticatedError);
   });
 
+  it("NFR-SEC-001 refuses a Bearer token that is not a valid JWT as not authenticated", async () => {
+    rpc.mockResolvedValue({
+      data: null,
+      error: { code: "PGRST301", message: "No suitable key or wrong key type", hint: null },
+    });
+    await expect(limitWrites({ accessToken: "not-a-token" })).rejects.toBeInstanceOf(
+      NotAuthenticatedError,
+    );
+  });
+
   it("NFR-SEC-006 throws any other database error as a fault", async () => {
     rpc.mockResolvedValue({ data: null, error: { code: "08006", message: "connection lost" } });
     await expect(limitWrites()).rejects.toThrow("connection lost");

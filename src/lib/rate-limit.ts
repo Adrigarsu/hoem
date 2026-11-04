@@ -14,6 +14,10 @@ const apiWrites: RateLimit = { bucket: "api_write", maxRequests: 60, windowSecon
 // The function answers 0 when the request is allowed, or the seconds left in the window.
 const retryAfterSeconds = z.number().int().nonnegative();
 
+// PostgREST refuses a token that is not a valid JWT, has expired or lacks the claims it needs before
+// the function runs (https://docs.postgrest.org/en/stable/references/errors.html, group 3).
+const rejectedTokenCodes = new Set(["PGRST301", "PGRST302", "PGRST303"]);
+
 // Every /api/v1 write route calls it before the service (docs/architecture.md §5.5). Over the limit
 // it throws RateLimitedError, which problemResponse answers with 429 and Retry-After.
 export async function limitWrites(credentials: ApiCredentials = {}): Promise<void> {
@@ -31,7 +35,9 @@ async function consume(limit: RateLimit, { accessToken }: ApiCredentials): Promi
   });
   if (error) {
     // The stable code in the HINT (supabase/migrations/*_api-rate-limits.sql).
-    if (error.hint === "not_authenticated") throw new NotAuthenticatedError(error.message);
+    if (error.hint === "not_authenticated" || rejectedTokenCodes.has(error.code)) {
+      throw new NotAuthenticatedError(error.message);
+    }
     throw Object.assign(new Error(error.message), { code: error.code });
   }
   const seconds = retryAfterSeconds.parse(data);
