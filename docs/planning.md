@@ -19,28 +19,29 @@ their milestone starts.
 
 ## Queue
 
-| #   | Issue                                                    | Milestone | Priority | Blocked by | Why here                                       |
-| --- | -------------------------------------------------------- | --------- | -------- | ---------- | ---------------------------------------------- |
-| 23  | FR-ACC-007: delete my account                            | M1a       | must     | —          | Entry point is the profile menu                |
-| 25  | FR-ACC-002: sign in with Google                          | M1a       | should   | —          | Should; independent                            |
-| 79  | FR-ACC-007: remove my profile photo                      | M1a       | should   | —          | Follows #22; privacy control, smaller than #80 |
-| 80  | FR-ACC-007: change my e-mail and password                | M1a       | should   | —          | Follows #22; touches auth                      |
-| 55  | ci: cache Playwright system libraries, time out installs | M1a       | should   | —          | Move up if CI installs keep stalling           |
-| 50  | chore: run end-to-end tests in Firefox and Edge          | M1a       | should   | —          | Widens browser coverage; no feature depends    |
-| 26  | FR-ACC-006: see household members and manage roles       | M1b       | must     | —          | Unblocks #27, #30                              |
-| 32  | FR-ONB-001: guided household setup, step 1 and progress  | M1b       | must     | —          | Starts the setup chain #33 → #34               |
-| 27  | FR-ACC-005: invite people to a household by e-mail       | M1b       | must     | #26        | Unblocks #28, #34                              |
-| 30  | FR-HH-009: parents decide who can split expenses         | M1b       | must     | #26        | Needs member roles                             |
-| 33  | FR-ONB-003: setup steps for meals and money              | M1b       | must     | #32        | Next step of the setup chain                   |
-| 28  | FR-ACC-005: accept an invitation, or see that it expired | M1b       | must     | #27        | Unblocks #29                                   |
-| 29  | NFR-LEG-001: children under 14 join only through family  | M1b       | must     | #28        | Builds on accepting invitations                |
-| 34  | FR-ONB-005: setup step for people, skipping steps        | M1b       | must     | #33, #27   | Closes the setup chain                         |
-| 31  | FR-HH-010: configure the rules of an "other" household   | M1b       | should   | —          | Should                                         |
-| 71  | docs: M1 documentation review                            | M1b       | must     | M1 issues  | Closes M1; needs every M1 feature shipped      |
-| 35  | chore: plan and track M2 Shopping                        | M2        | must     | —          | Split into issues when M1b ends                |
-| 36  | chore: plan and track M3 Meals & recipes                 | M3        | must     | —          | Milestone order                                |
-| 37  | chore: plan and track M4 Expenses & budgets              | M4        | must     | —          | Milestone order                                |
-| 38  | chore: plan and track M5 Planner & notifications         | M5        | must     | —          | Milestone order                                |
-| 39  | chore: plan and track M6 Dashboard & demo                | M6        | must     | —          | Milestone order                                |
-| 54  | chore: get Auth e-mails into the Outlook inbox           | M7        | must     | —          | Needed for release, not for development        |
-| 40  | chore: plan and track M7 MVP release v1.0.0              | M7        | must     | —          | Milestone order                                |
+| #   | Issue                                                    | Milestone | Priority | Blocked by | Why here                                                   |
+| --- | -------------------------------------------------------- | --------- | -------- | ---------- | ---------------------------------------------------------- |
+| 23  | FR-ACC-007: delete my account                            | M1a       | must     | —          | Entry point is the profile menu                            |
+| 25  | FR-ACC-002: sign in with Google                          | M1a       | should   | —          | Should; independent                                        |
+| 79  | FR-ACC-007: remove my profile photo                      | M1a       | should   | —          | Follows #22; privacy control, smaller than #80             |
+| 92  | NFR-UX-002: send a waiting delete reliably on tab close  | M1a       | should   | #79        | Closes a privacy gap in ADR-009 before more deletes use it |
+| 80  | FR-ACC-007: change my e-mail and password                | M1a       | should   | —          | Follows #22; touches auth                                  |
+| 55  | ci: cache Playwright system libraries, time out installs | M1a       | should   | —          | Move up if CI installs keep stalling                       |
+| 50  | chore: run end-to-end tests in Firefox and Edge          | M1a       | should   | —          | Widens browser coverage; no feature depends                |
+| 26  | FR-ACC-006: see household members and manage roles       | M1b       | must     | —          | Unblocks #27, #30                                          |
+| 32  | FR-ONB-001: guided household setup, step 1 and progress  | M1b       | must     | —          | Starts the setup chain #33 → #34                           |
+| 27  | FR-ACC-005: invite people to a household by e-mail       | M1b       | must     | #26        | Unblocks #28, #34                                          |
+| 30  | FR-HH-009: parents decide who can split expenses         | M1b       | must     | #26        | Needs member roles                                         |
+| 33  | FR-ONB-003: setup steps for meals and money              | M1b       | must     | #32        | Next step of the setup chain                               |
+| 28  | FR-ACC-005: accept an invitation, or see that it expired | M1b       | must     | #27        | Unblocks #29                                               |
+| 29  | NFR-LEG-001: children under 14 join only through family  | M1b       | must     | #28        | Builds on accepting invitations                            |
+| 34  | FR-ONB-005: setup step for people, skipping steps        | M1b       | must     | #33, #27   | Closes the setup chain                                     |
+| 31  | FR-HH-010: configure the rules of an "other" household   | M1b       | should   | —          | Should                                                     |
+| 71  | docs: M1 documentation review                            | M1b       | must     | M1 issues  | Closes M1; needs every M1 feature shipped                  |
+| 35  | chore: plan and track M2 Shopping                        | M2        | must     | —          | Split into issues when M1b ends                            |
+| 36  | chore: plan and track M3 Meals & recipes                 | M3        | must     | —          | Milestone order                                            |
+| 37  | chore: plan and track M4 Expenses & budgets              | M4        | must     | —          | Milestone order                                            |
+| 38  | chore: plan and track M5 Planner & notifications         | M5        | must     | —          | Milestone order                                            |
+| 39  | chore: plan and track M6 Dashboard & demo                | M6        | must     | —          | Milestone order                                            |
+| 54  | chore: get Auth e-mails into the Outlook inbox           | M7        | must     | —          | Needed for release, not for development                    |
+| 40  | chore: plan and track M7 MVP release v1.0.0              | M7        | must     | —          | Milestone order                                            |
