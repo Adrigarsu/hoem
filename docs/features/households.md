@@ -32,9 +32,11 @@ shopping lists and splitting (SRS §3.7).
   database function comes first, and the screen with the rest of #23.
 - **Members and roles** (FR-ACC-006, FR-HH-006, FR-HH-008): the database side is in place (#26,
   part 1). Every member reads the member list with names and photos. Owners manage members outside a
-  family; in a family, parents set parent, child or relative, and only owners make someone an owner.
-  A family always keeps a parent: the last one cannot stop being a parent, leave, be removed or
-  delete their account while others belong (`last_parent`). The screen comes in part 2 of #26.
+  family; in a family, parents set parent, child or relative and remove members. In every type, an
+  owner makes someone an owner or stops being one (`set_member_role`), whether or not they are a
+  parent, so an owner who is a relative can always hand over ownership. A family always keeps a
+  parent: the last one cannot stop being a parent, leave, be removed or delete their account while
+  others belong (`last_parent`). The screen comes in part 2 of #26.
 
 ## Privacy rules
 
@@ -60,7 +62,7 @@ shopping lists and splitting (SRS §3.7).
   with `currentHousehold()`.
 - Database: `households`, `memberships` and the functions `create_household` and
   `change_household_type` (`supabase/migrations/20261028190949_household-type.sql`),
-  `household_members` and the last-parent trigger
+  `household_members`, `set_member_role` and the last-parent trigger
   (`supabase/migrations/20261104165902_household-members.sql`); policies in
   `docs/architecture.md` §7.
 - Tests: `supabase/tests/database/household-type.test.sql`,
