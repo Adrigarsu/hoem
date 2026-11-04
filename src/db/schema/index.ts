@@ -2,3 +2,4 @@
 // expand/contract rule every schema change follows.
 export * from "./profiles";
 export * from "./households";
+export * from "./invitations";
