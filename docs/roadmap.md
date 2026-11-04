@@ -5,7 +5,7 @@ How HØEM gets from today to the release and beyond. GitHub holds the milestones
 gates, milestones and the work that still has to become issues.
 
 > **Draft.** The phases and gates are a proposal, and the sections marked _To define_ are being
-> worked out with the developer. Nothing in "Work to turn into issues" exists on GitHub yet.
+> worked out with the developer.
 
 ## How the work is organised
 
@@ -105,16 +105,14 @@ proves, and a rough size, so a milestone fits the 6–8 weeks per phase of SRS �
 
 ## Work to turn into issues
 
-Found while reviewing the repository organisation (November 2026). Each line becomes an issue once
-we agree on its milestone and priority; then it is placed in `docs/planning.md`.
+Every issue still to create, milestone by milestone, is written out in [`docs/milestones/`](milestones/README.md)
+as ready-to-paste `gh` commands. The work found in the repository organisation review (November 2026) went there too:
 
-| Work                                                                                               | Source                        | Proposed milestone | Notes                                       |
-| -------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------ | ------------------------------------------- |
-| Close the M0 milestone on GitHub                                                                   | GitHub                        | M0                 | A click, not an issue                       |
-| Observability: Sentry, structured logs, Vercel Analytics                                           | architecture §9.3             | M7                 | Before real users                           |
-| OpenAPI document generated from the Zod schemas, served at `/api/v1/openapi.json`, with a CI check | architecture §5.4, §9.2 row 4 | _To define_        | Cheaper while the API is small              |
-| Lighthouse CI on the preview URL                                                                   | architecture §9.2 row 6       | M7                 | NFR-PERF-002                                |
-| Secret scanning and dependency audit in CI                                                         | architecture §9.2 row 7       | _To define_        | GitHub secret scanning may cover half of it |
-| Feature pages for `auth`, `home` and `shell`                                                       | `docs/features/`              | M1 docs review #71 | Could join #71 instead of a new issue       |
-| Release process: changelog and tags                                                                | Organisation review, point 8  | M7                 | Pending decision                            |
-| Documentation review issue for each of M2–M7                                                       | `AGENTS.md`, Planning         | M2–M7              | Created when each tracking issue is split   |
+| Work                                                      | Where                                  |
+| --------------------------------------------------------- | -------------------------------------- |
+| Close the M0 milestone; update #71 for the new guides     | `m1-follow-ups.md`                     |
+| OpenAPI document generated from the Zod schemas           | `m2-shopping.md`                       |
+| Lighthouse CI, secret scanning and dependency audit       | `m7-release.md`                        |
+| Observability: error tracking, structured logs, analytics | `m7-release.md`                        |
+| Release process: changelog and tags                       | `m7-release.md` (tool still to decide) |
+| Documentation review for each of M2–M7                    | The last issue of each file            |

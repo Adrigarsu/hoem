@@ -14,6 +14,7 @@ Sources of truth. Read the relevant parts before designing anything non-trivial:
 - `docs/srs.md`: requirements with IDs (`FR-EXP-007`, `NFR-A11Y-001`…)
 - `docs/architecture.md`: architecture, data model, row-level security, decisions (ADRs)
 - `docs/roadmap.md`: phases, gates, milestones and planned work not yet in issues
+- `docs/milestones/`: the issues of each milestone, as `gh` commands to create them
 - `docs/adr/`: architecture decisions, one file each (index in `docs/adr/README.md`)
 - `docs/guides/`: how to set up, deploy, migrate, test and take screenshots
 - `docs/design-system/`: design tokens (`tokens.json`), approved colour pairs, typography,
@@ -180,6 +181,9 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   trade-offs and let the developer choose.
 - Every milestone ends with a `docs: <milestone> documentation review` issue, blocked by the
   rest of the milestone. When a milestone is split into issues, create it too.
+- `docs/milestones/<milestone>.md` holds the issues of each milestone still to split, as `gh`
+  commands the developer runs. When the SRS, a screen or a decision changes a later milestone,
+  update its file in the same pull request.
 
 ## Definition of done
 

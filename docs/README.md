@@ -6,6 +6,7 @@ Where to find what. Documentation lives here, never in the GitHub wiki.
 | ------------------------------------------- | ------------------------------------------------------------------------- |
 | [`srs.md`](srs.md)                          | What the product must do: every requirement with its ID (`FR-…`, `NFR-…`) |
 | [`roadmap.md`](roadmap.md)                  | When: phases, gates, milestones and work still to plan                    |
+| [`milestones/`](milestones/README.md)       | Which issues each milestone needs, as commands to create them             |
 | [`planning.md`](planning.md)                | What next: the ordered queue of open issues                               |
 | [`architecture.md`](architecture.md)        | How the system is built: layers, data model, row-level security, pipeline |
 | [`adr/`](adr/README.md)                     | Why: one record per significant technical decision                        |
