@@ -23,7 +23,6 @@ their milestone starts.
 | --- | -------------------------------------------------------- | --------- | -------- | ---------- | ----------------------------------------------------------- |
 | 23  | FR-ACC-007: delete my account                            | M1a       | must     | —          | Entry point is the profile menu                             |
 | 25  | FR-ACC-002: sign in with Google                          | M1a       | should   | —          | Should; independent                                         |
-| 92  | NFR-UX-002: send a waiting delete reliably on tab close  | M1a       | should   | #79        | Closes a privacy gap in ADR-009 before more deletes use it  |
 | 80  | FR-ACC-007: change my e-mail and password                | M1a       | should   | —          | Follows #22; touches auth                                   |
 | 55  | ci: cache Playwright system libraries, time out installs | M1a       | should   | —          | Move up if CI installs keep stalling                        |
 | 50  | chore: run end-to-end tests in Firefox and Edge          | M1a       | should   | —          | Widens browser coverage; no feature depends                 |
