@@ -59,27 +59,28 @@ PostgreSQL, highlighted, is where privacy is decided: the app and the browser re
 
 Nineteen decisions shape the system. Each lives as its own file in `docs/adr/`, written in Michael Nygard's format, so it can be reviewed in a pull request and superseded later without rewriting history. The index with dates is `docs/adr/README.md`.
 
-| ADR                                                                | Decision                                                                              | Status   |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | -------- |
-| [001](adr/0001-modular-monolith.md)                                | One Next.js application in one GitHub repository (modular monolith)                   | Accepted |
-| [002](adr/0002-supabase-backend.md)                                | Supabase as the backend platform, hosted in the EU                                    | Accepted |
-| [003](adr/0003-drizzle-and-sql-migrations.md)                      | Drizzle ORM for queries and schema; plain SQL migrations for policies                 | Accepted |
-| [004](adr/0004-two-layer-authorization.md)                         | Authorization in two layers: application services and PostgreSQL RLS                  | Accepted |
-| [005](adr/0005-server-actions-and-rest-api.md)                     | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                | Accepted |
-| [006](adr/0006-visibility-at-write-time.md)                        | Visibility of private records is decided when they are written                        | Accepted |
-| [007](adr/0007-money-as-integer-cents.md)                          | Money stored as integer cents, one currency per household                             | Accepted |
-| [008](adr/0008-reminders-icalendar-web-push.md)                    | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push  | Accepted |
-| [009](adr/0009-delete-with-undo.md)                                | Deletes are immediate after a 5-second undo window; no soft delete                    | Accepted |
-| [010](adr/0010-testing-strategy.md)                                | Test pyramid: test-first for domain and services, end-to-end per story                | Accepted |
-| [011](adr/0011-demo-with-anonymous-sessions.md)                    | Demo mode with anonymous sessions and per-visitor copies                              | Accepted |
-| [012](adr/0012-internationalisation.md)                            | Internationalisation with next-intl; locale from the profile, not the URL             | Accepted |
-| [013](adr/0013-production-supabase-in-ireland.md)                  | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt      | Proposed |
-| [014](adr/0014-migration-pipeline.md)                              | Migrations tested in CI, applied on merge to staging then production; expand/contract | Proposed |
-| [015](adr/0015-locale-through-an-internal-rewrite.md)              | Locale chosen in the proxy and rewritten to a hidden `[locale]` segment               | Proposed |
-| [016](adr/0016-session-only-in-httponly-cookies.md)                | Session only in HttpOnly cookies; no Supabase browser client                          | Proposed |
-| [017](adr/0017-active-household-in-a-cookie.md)                    | Active household in an HttpOnly cookie, checked against memberships on every request  | Proposed |
-| [018](adr/0018-theme-in-a-cookie-with-an-inline-script.md)         | Theme in a readable cookie, applied by an inline script before the first paint        | Proposed |
-| [019](adr/0019-delete-account-with-a-security-definer-function.md) | Delete an account through a security definer function, without the service-role key   | Proposed |
+| ADR                                                                   | Decision                                                                                | Status   |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------- |
+| [001](adr/0001-modular-monolith.md)                                   | One Next.js application in one GitHub repository (modular monolith)                     | Accepted |
+| [002](adr/0002-supabase-backend.md)                                   | Supabase as the backend platform, hosted in the EU                                      | Accepted |
+| [003](adr/0003-drizzle-and-sql-migrations.md)                         | Drizzle ORM for queries and schema; plain SQL migrations for policies                   | Accepted |
+| [004](adr/0004-two-layer-authorization.md)                            | Authorization in two layers: application services and PostgreSQL RLS                    | Accepted |
+| [005](adr/0005-server-actions-and-rest-api.md)                        | Server Actions for the web app; REST API v1 described with OpenAPI 3.1                  | Accepted |
+| [006](adr/0006-visibility-at-write-time.md)                           | Visibility of private records is decided when they are written                          | Accepted |
+| [007](adr/0007-money-as-integer-cents.md)                             | Money stored as integer cents, one currency per household                               | Accepted |
+| [008](adr/0008-reminders-icalendar-web-push.md)                       | Reminders as iCalendar rules, dispatched by a database scheduler, sent with Web Push    | Accepted |
+| [009](adr/0009-delete-with-undo.md)                                   | Deletes are immediate after a 5-second undo window; no soft delete                      | Accepted |
+| [010](adr/0010-testing-strategy.md)                                   | Test pyramid: test-first for domain and services, end-to-end per story                  | Accepted |
+| [011](adr/0011-demo-with-anonymous-sessions.md)                       | Demo mode with anonymous sessions and per-visitor copies                                | Accepted |
+| [012](adr/0012-internationalisation.md)                               | Internationalisation with next-intl; locale from the profile, not the URL               | Accepted |
+| [013](adr/0013-production-supabase-in-ireland.md)                     | Production Supabase project stays in Ireland (`eu-west-1`); staging in Frankfurt        | Proposed |
+| [014](adr/0014-migration-pipeline.md)                                 | Migrations tested in CI, applied on merge to staging then production; expand/contract   | Proposed |
+| [015](adr/0015-locale-through-an-internal-rewrite.md)                 | Locale chosen in the proxy and rewritten to a hidden `[locale]` segment                 | Proposed |
+| [016](adr/0016-session-only-in-httponly-cookies.md)                   | Session only in HttpOnly cookies; no Supabase browser client                            | Proposed |
+| [017](adr/0017-active-household-in-a-cookie.md)                       | Active household in an HttpOnly cookie, checked against memberships on every request    | Proposed |
+| [018](adr/0018-theme-in-a-cookie-with-an-inline-script.md)            | Theme in a readable cookie, applied by an inline script before the first paint          | Proposed |
+| [019](adr/0019-delete-account-with-a-security-definer-function.md)    | Delete an account through a security definer function, without the service-role key     | Proposed |
+| [020](adr/0020-commit-undoable-deletes-on-pagehide-with-keepalive.md) | A delete waiting for its undo is sent on pagehide with a keepalive request to `/api/v1` | Proposed |
 
 ## 4. Code organisation and conventions
 
@@ -186,7 +187,7 @@ The web app talks to the server through Server Actions; everything else uses the
 
 ### 5.2 Authentication
 
-Requests send the Supabase access token as `Authorization: Bearer <jwt>`. The route handler creates a Supabase client with that token, so every query runs as the user and RLS applies (ADR-004). The web app uses the same token through HTTP-only cookies managed by `@supabase/ssr` (ADR-016): `src/proxy.ts` refreshes the session on every page request, sends signed-out visitors to `/sign-in?next=…` (only `/sign-in`, `/sign-up` and `/auth/*` are public) and applies the no-cache headers that `@supabase/ssr` asks for, so a CDN never stores a response that sets auth cookies. Sign-up sends a verification e-mail whose link goes to `/auth/confirm`, which verifies the one-time token and starts the session; passwords go only to Supabase Auth (NFR-SEC-003), with at least 10 characters and at most 72 bytes.
+Requests send the Supabase access token as `Authorization: Bearer <jwt>`. The route handler creates a Supabase client with that token (`createTokenClient`), so every query runs as the user and RLS applies (ADR-004). A request without that header uses the session cookie, accepted only when its `Origin` is the app's own, which guards against cross-site request forgery; `apiCredentials` (`src/lib/api-credentials.ts`) decides, and a malformed header is refused. The web app calls the API only to send a delete when the page unloads (ADR-020). The web app uses the same token through HTTP-only cookies managed by `@supabase/ssr` (ADR-016): `src/proxy.ts` refreshes the session on every page request, sends signed-out visitors to `/sign-in?next=…` (only `/sign-in`, `/sign-up` and `/auth/*` are public) and applies the no-cache headers that `@supabase/ssr` asks for, so a CDN never stores a response that sets auth cookies. Sign-up sends a verification e-mail whose link goes to `/auth/confirm`, which verifies the one-time token and starts the session; passwords go only to Supabase Auth (NFR-SEC-003), with at least 10 characters and at most 72 bytes.
 
 ### 5.3 Errors
 
@@ -212,6 +213,7 @@ The OpenAPI 3.1 document is generated at build time from the Zod schemas (`@aste
 | Resource      | Endpoints                                                                                                                                     | Requirements                          |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
 | Households    | `GET/POST /households`, `GET/PATCH/DELETE /households/{id}`                                                                                   | FR-ACC-004, FR-ACC-009, FR-HH-001     |
+| Profile       | `DELETE /profile/avatar` (204; the web app sends it with keepalive on unload, ADR-020)                                                        | FR-ACC-007                            |
 | Members       | `GET /households/{id}/members`, `PATCH/DELETE …/members/{userId}`                                                                             | FR-ACC-006, FR-HH-006                 |
 | Invitations   | `POST /households/{id}/invitations`, `POST /invitations/{token}/accept`                                                                       | FR-ACC-005                            |
 | Recipes       | `GET/POST /households/{id}/recipes`, `GET/PATCH/DELETE …/recipes/{recipeId}`                                                                  | FR-MEAL-001, FR-MEAL-002              |

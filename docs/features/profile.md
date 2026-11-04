@@ -44,8 +44,8 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 - Signing out within the 5 seconds sends the removal first: once the session ends, it would be
   refused.
 - During the 5-second undo the file still exists and members can still load it, as ADR-009 intends.
-  Closing the tab sends the removal on `pagehide`, best effort: a browser may cut that request off,
-  and then the photo is still there on the next visit.
+  Closing the tab sends the removal on `pagehide` as a keepalive `DELETE /api/v1/profile/avatar`,
+  which outlives the page (ADR-020); only a killed browser sends nothing.
 - Whether an account has a password comes from `own_account_has_password()` (#80): Supabase Auth
   gives no sign of it once a Google account sets one. It answers only about the caller, only yes or
   no, and refuses without a session or for a deleted account, so the app never offers "Set a
