@@ -1,7 +1,8 @@
-import type { Page } from "@playwright/test";
+import { request as playwrightRequest, type Page } from "@playwright/test";
 import sharp from "sharp";
 import { expectNoA11yViolations, expectNoHorizontalScroll } from "./support/accessibility";
 import { verifiedAccount } from "./support/accounts";
+import { accessTokenOf, avatarPathOf } from "./support/database";
 import { expect, test } from "./support/fixtures";
 
 const password = "correct horse battery";
@@ -252,5 +253,70 @@ test.describe("FR-ACC-007 edit my profile", () => {
     await visit(accountPage(page));
     await expect(shownPhotos(page)).toHaveCount(0);
     await expect(removeButton(page)).toHaveCount(0);
+  });
+
+  test("NFR-UX-002 a removed photo is deleted even when the page is left within the 5 seconds", async ({
+    page,
+    visit,
+  }) => {
+    await visit(accountPage(page));
+    await uploadPhoto(page);
+    const photoUrl = (await avatarPhoto(page).getAttribute("src")) ?? "";
+
+    await removeButton(page).click();
+    await expect(page.getByText("Photo removed")).toBeVisible();
+    // A full navigation unloads the page (pagehide); only a keepalive request survives it.
+    await page.goto("about:blank");
+
+    await expect.poll(() => avatarPathOf(email, password)).toBeNull();
+    await expect.poll(async () => (await page.request.get(photoUrl)).ok()).toBe(false);
+  });
+
+  test("FR-ACC-007 an API client removes its photo with a Bearer token", async ({
+    page,
+    visit,
+  }) => {
+    await visit(accountPage(page));
+    await uploadPhoto(page);
+
+    const token = await accessTokenOf(email, password);
+    // A fresh request context: no session cookie, only the token.
+    const api = await playwrightRequest.newContext();
+    const response = await api.delete(new URL("/api/v1/profile/avatar", page.url()).href, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    expect(response.status()).toBe(204);
+    await api.dispose();
+    expect(await avatarPathOf(email, password)).toBeNull();
+  });
+
+  test("NFR-SEC-001 the API refuses a Bearer token that is not a user's", async ({
+    page,
+    visit,
+  }) => {
+    await visit(accountPage(page));
+    await uploadPhoto(page);
+    const api = await playwrightRequest.newContext();
+    const response = await api.delete(new URL("/api/v1/profile/avatar", page.url()).href, {
+      headers: { authorization: "Bearer not-a-token" },
+    });
+    expect(response.status()).toBe(401);
+    expect(response.headers()["www-authenticate"]).toBe("Bearer");
+    await api.dispose();
+    expect(await avatarPathOf(email, password)).not.toBeNull();
+  });
+
+  test("NFR-SEC-006 the API refuses a cookie request from another origin", async ({
+    page,
+    visit,
+  }) => {
+    await visit(accountPage(page));
+    await uploadPhoto(page);
+    const response = await page.request.delete("/api/v1/profile/avatar", {
+      headers: { origin: "https://evil.example" },
+    });
+    expect(response.status()).toBe(403);
+    expect(response.headers()["content-type"]).toBe("application/problem+json");
+    expect(await avatarPathOf(email, password)).not.toBeNull();
   });
 });

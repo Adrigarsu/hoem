@@ -90,7 +90,11 @@ Use pnpm only. Never edit `pnpm-lock.yaml` by hand.
   values in `src/lib/env.ts`, secrets in `src/lib/server-env.ts` (guarded by `server-only`).
   Never commit secrets and never read `.env` files.
 - Deleting hides the item at once with a 5-second undo, then deletes for real. No soft delete.
-  Use `useUndoTimer` and `Toast` from `@/design-system` (see its README, "Toast and undo").
+  Use `useUndoTimer` and `Toast` from `@/design-system` (see its README, "Toast and undo"), with
+  an `onUnload` keepalive `fetch` to the REST `DELETE` route of the same use case (ADR-020).
+- A REST route gets its credentials from `apiCredentials(request.headers)` (Bearer, or the cookie
+  from the app's own origin) and answers errors with `problemResponse`; see
+  `src/app/api/v1/profile/avatar/route.ts`.
 - The signed-in user's own avatar is `OwnAvatar` (`@/features/profile`), never `Avatar` with
   `avatarUrl`: it hides the photo during its undo window. A lint rule enforces it.
 - **Migrations are backward compatible (expand/contract, ADR-014):** a migration that adds a
