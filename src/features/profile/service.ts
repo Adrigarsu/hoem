@@ -115,10 +115,21 @@ export async function changeAvatar(
   await removeOtherAvatars(gateway, user.id, path);
 }
 
-// Everything else in the folder, not only the last photo: household members can read these files,
-// so one that a failed delete left behind goes with the next change. The new photo is already in
-// place, so a failure here is logged rather than reported to the user.
-async function removeOtherAvatars(gateway: ProfileGateway, userId: string, keep: string) {
+// The profile is cleared first, so a failure never leaves it pointing at a missing file. The
+// interface already waited out the 5-second undo (ADR-009), so this deletes for good. Without a
+// photo it does nothing: the delete is also sent on pagehide, and may arrive twice.
+export async function removePhoto(gateway: ProfileGateway) {
+  const user = await requireUser(gateway);
+  const profile = await gateway.profileById(user.id);
+  if (!profile?.avatarPath) return;
+  await gateway.updateProfile(user.id, { avatarPath: null });
+  await removeOtherAvatars(gateway, user.id);
+}
+
+// Everything in the folder but `keep`, not only the last photo: household members can read these
+// files, so one that a failed delete left behind goes with the next change. The profile no longer
+// points at them, so a failure here is logged rather than reported to the user.
+async function removeOtherAvatars(gateway: ProfileGateway, userId: string, keep?: string) {
   try {
     const files = await gateway.avatarFiles(userId);
     await Promise.all(
