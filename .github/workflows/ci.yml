@@ -115,16 +115,21 @@ jobs:
           path: ~/.cache/apt-archives
           key: apt-${{ steps.versions.outputs.image }}-playwright-${{ steps.versions.outputs.playwright }}
 
-      # With every package cached only `apt-get update` reaches the mirror. Four minutes is several
-      # times a cold install; a stalled one is killed (timeout signals the whole process group,
-      # sudo and apt included) and tried once more instead of eating the job's 25 minutes.
+      # With every package cached only `apt-get update` reaches the mirror. Four minutes is about
+      # twice a cold install (~110 MB); a stalled one is stopped and tried once more instead of
+      # eating the job's 25 minutes. The packages it finished downloading stay for the retry.
+      # sudo runs apt-get in its own session (use_pty), out of reach of timeout's signal, so it is
+      # stopped by name; then dpkg finishes anything left half done. Bash runs with -e here: the
+      # cleanup must not end the step before the retry.
       - name: Install browser system libraries
-        timeout-minutes: 9
+        timeout-minutes: 10
         run: |
           for attempt in 1 2; do
             timeout --kill-after=15s 4m pnpm exec playwright install-deps chromium webkit && exit 0
             echo "::warning::Installing the browser system libraries timed out or failed (attempt $attempt)"
-            sudo dpkg --configure -a
+            sudo pkill -x apt-get || true
+            while pgrep -x apt-get > /dev/null || pgrep -x dpkg > /dev/null; do sleep 1; done
+            sudo dpkg --configure -a || true
           done
           exit 1
 
