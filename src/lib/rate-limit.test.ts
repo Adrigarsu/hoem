@@ -5,16 +5,19 @@ import { limitWrites } from "./rate-limit";
 import { createClient, createTokenClient } from "./supabase/server";
 
 const rpc = vi.fn();
+const getClaims = vi.fn();
+const supabase = { rpc, auth: { getClaims } };
 
 vi.mock("next/server", () => ({ connection: vi.fn(async () => undefined) }));
 vi.mock("./supabase/server", () => ({
-  createClient: vi.fn(async () => ({ rpc })),
-  createTokenClient: vi.fn(() => ({ rpc })),
+  createClient: vi.fn(async () => supabase),
+  createTokenClient: vi.fn(() => supabase),
 }));
 
 beforeEach(() => {
   vi.clearAllMocks();
   rpc.mockResolvedValue({ data: 0, error: null });
+  getClaims.mockResolvedValue({ data: { claims: { sub: "user" } }, error: null });
 });
 
 describe("limitWrites", () => {
@@ -51,14 +54,19 @@ describe("limitWrites", () => {
     await expect(limitWrites()).rejects.toBeInstanceOf(NotAuthenticatedError);
   });
 
-  it("NFR-SEC-001 refuses a Bearer token that is not a valid JWT as not authenticated", async () => {
-    rpc.mockResolvedValue({
-      data: null,
-      error: { code: "PGRST301", message: "No suitable key or wrong key type", hint: null },
-    });
+  it("NFR-SEC-001 refuses a request without a session before counting it", async () => {
+    getClaims.mockResolvedValue({ data: null, error: null });
+    await expect(limitWrites()).rejects.toBeInstanceOf(NotAuthenticatedError);
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("NFR-SEC-001 refuses an invalid or expired Bearer token before counting it", async () => {
+    getClaims.mockResolvedValue({ data: null, error: new Error("invalid JWT") });
     await expect(limitWrites({ accessToken: "not-a-token" })).rejects.toBeInstanceOf(
       NotAuthenticatedError,
     );
+    expect(getClaims).toHaveBeenCalledWith("not-a-token");
+    expect(rpc).not.toHaveBeenCalled();
   });
 
   it("NFR-SEC-006 throws any other database error as a fault", async () => {
