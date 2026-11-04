@@ -7,6 +7,7 @@ import {
   ForbiddenError,
   NotAuthenticatedError,
   NotFoundError,
+  RateLimitedError,
   ValidationError,
 } from "./errors";
 
@@ -20,8 +21,15 @@ describe("AppError", () => {
     [new DemoRestrictedError(), "demo_restricted", 403],
     [new AuthFailedError("invalidCredentials"), "auth_failed", 401],
     [new AuthFailedError("rateLimited"), "rate_limited", 429],
+    [new RateLimitedError(30), "rate_limited", 429],
   ])("NFR-SEC-001 %o has the stable code %s and status %i", (error, code, status) => {
     expect(error).toMatchObject({ code, status });
+  });
+});
+
+describe("RateLimitedError", () => {
+  it("NFR-SEC-006 keeps the seconds the client must wait", () => {
+    expect(new RateLimitedError(30).retryAfterSeconds).toBe(30);
   });
 });
 

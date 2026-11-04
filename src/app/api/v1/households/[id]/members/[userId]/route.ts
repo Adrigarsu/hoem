@@ -1,6 +1,7 @@
 import { removeHouseholdMember } from "@/features/households";
 import { apiCredentials } from "@/lib/api-credentials";
 import { problemResponse } from "@/lib/problem-details";
+import { limitWrites } from "@/lib/rate-limit";
 import { uuidV7 } from "@/lib/uuid-v7";
 
 type Context = RouteContext<"/api/v1/households/[id]/members/[userId]">;
@@ -11,7 +12,9 @@ type Context = RouteContext<"/api/v1/households/[id]/members/[userId]">;
 export async function DELETE(request: Request, { params }: Context): Promise<Response> {
   const { id, userId } = await params;
   try {
-    await removeHouseholdMember({ householdId: id, userId }, apiCredentials(request.headers));
+    const credentials = apiCredentials(request.headers);
+    await limitWrites(credentials);
+    await removeHouseholdMember({ householdId: id, userId }, credentials);
     return new Response(null, { status: 204 });
   } catch (error) {
     return problemResponse(error, {

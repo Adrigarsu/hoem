@@ -43,6 +43,8 @@ shopping lists and splitting (SRS §3.7).
   - Removing hides the member at once with a 5-second undo (ADR-009); closing the tab sends it as a
     keepalive `DELETE /api/v1/households/{id}/members/{userId}` (ADR-020). Removing yourself is
     leaving, a separate issue.
+  - That route counts against the 60 write requests per minute per user and answers 429 with
+    `Retry-After` over it (NFR-SEC-006, ADR-021).
 
 ## Privacy rules
 
