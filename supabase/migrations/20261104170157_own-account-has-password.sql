@@ -3,21 +3,29 @@
 -- app needs it to ask for the current password before changing it, and to offer "Set a password"
 -- to accounts that have none. Only auth.users knows, so this reads it as its owner, about the
 -- caller only, and returns nothing but yes or no.
+--
+-- Without a session, or with the token of a deleted account (valid until it expires), it refuses
+-- instead of answering "no": "no" would let the app offer "Set a password" without asking for one.
 create function private.own_account_has_password()
 returns boolean
-language sql
+language plpgsql
 stable
 security definer
 set search_path = ''
 as $$
-  select coalesce(
-    (
-      select encrypted_password is not null and encrypted_password <> ''
-      from auth.users
-      where id = (select auth.uid())
-    ),
-    false
-  );
+declare
+  has_password boolean;
+begin
+  -- NULL <> '' is not true, so a missing password and Google's empty one both answer no.
+  select coalesce(encrypted_password <> '', false) into has_password
+  from auth.users
+  where id = (select auth.uid());
+  if not found then
+    raise exception 'not authenticated'
+      using errcode = 'insufficient_privilege', hint = 'not_authenticated';
+  end if;
+  return has_password;
+end;
 $$;
 
 revoke execute on function private.own_account_has_password() from public, anon;

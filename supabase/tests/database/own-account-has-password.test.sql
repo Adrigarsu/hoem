@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(10);
+select plan(11);
 
 -- Lucía signed up with e-mail and password. Marcos signed up with Google, so Auth stores an empty
 -- password for him. Ana's account has no password at all.
@@ -13,6 +13,22 @@ values
   ),
   ('00000000-0000-7000-8000-000000000702', 'marcos@example.com', ''),
   ('00000000-0000-7000-8000-000000000703', 'ana@example.com', null);
+
+-- The stable code a statement fails with, read from the HINT the app matches.
+create function pg_temp.hint_of(statement text)
+returns text
+language plpgsql
+as $$
+declare
+  code text;
+begin
+  execute statement;
+  return null;
+exception when others then
+  get stacked diagnostics code = pg_exception_hint;
+  return code;
+end;
+$$;
 
 -- Structure and privileges.
 
@@ -51,7 +67,19 @@ select is(
 set local role authenticated;
 
 set local request.jwt.claims = '{"role": "authenticated"}';
-select is(public.own_account_has_password(), false, 'FR-ACC-007 without a session it says no');
+select is(
+  pg_temp.hint_of($$ select public.own_account_has_password() $$),
+  'not_authenticated',
+  'FR-ACC-007 without a session it refuses instead of saying no'
+);
+
+-- A token stays valid until it expires, even after its account is deleted.
+set local request.jwt.claims = '{"sub": "00000000-0000-7000-8000-000000000799", "role": "authenticated"}';
+select is(
+  pg_temp.hint_of($$ select public.own_account_has_password() $$),
+  'not_authenticated',
+  'FR-ACC-007 the token of a deleted account is refused'
+);
 
 set local request.jwt.claims = '{"sub": "00000000-0000-7000-8000-000000000701", "role": "authenticated"}';
 select is(
