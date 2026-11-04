@@ -211,8 +211,11 @@ function TypeForm({ household }: { household: HouseholdSettingsView }) {
     );
   }
 
-  const memberLabel = (index: number, isYou: boolean) =>
-    isYou ? t("typeChange.you") : t("typeChange.member", { n: index + 1 });
+  // A member without a profile has no name; their place in the joining order tells them apart.
+  const memberLabel = (index: number, member: HouseholdSettingsView["members"][number]) =>
+    member.isYou
+      ? t("typeChange.you")
+      : (member.displayName ?? t("typeChange.member", { n: index + 1 }));
   const chosenLabel = chosen ? t(`types.${chosen}`) : "";
 
   return (
@@ -290,7 +293,7 @@ function TypeForm({ household }: { household: HouseholdSettingsView }) {
               <FormMessage tone="danger">{t("validation.noParent")}</FormMessage>
             )}
             {household.members.map((member, index) => {
-              const label = memberLabel(index, member.isYou);
+              const label = memberLabel(index, member);
               const field = roleField(member.userId);
               return (
                 <SelectField

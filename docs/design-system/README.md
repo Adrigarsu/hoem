@@ -69,7 +69,7 @@ Intermediate corners: `radius-md` (10px) for controls, `radius-lg` (14px) for ca
 
 ## Iconography
 
-[Lucide](https://lucide.dev) outline icons at 1.5px stroke, `icon-md` (20px) by default, `icon-sm` in badges, `icon-lg` in navigation. Icons inherit `currentColor`. An icon-only button always has an `aria-label` and a tooltip (NFR-A11Y-004).
+[Lucide](https://lucide.dev) outline icons at 1.5px stroke, `icon-md` (20px) by default, `icon-sm` in badges, `icon-lg` in navigation. Icons inherit `currentColor`. An icon-only button always has an `aria-label` and a tooltip (NFR-A11Y-004). `IconButton` is outlined by default; `variant="ghost"` drops the border and fill for a button inside a row, such as a member's options.
 
 | Module                        | Icon            |
 | ----------------------------- | --------------- |
@@ -118,7 +118,8 @@ What automation cannot prove is reviewed by hand per component and written in it
 
 `Toast` (`src/design-system/components/toast.tsx`) follows `.h-toast`: a message, an optional action
 such as "Undo", at most `column-narrow` wide. The shell sticks it to the bottom together with the
-tab bar, right above it. Its `status` and `alert` regions stay in the page while empty, so screen
+tab bar, right above it: the shell holds a `ToastSlot`, and a page renders its toast inside
+`<ToastPortal>` from wherever it is (see `household-members.tsx`). Its `status` and `alert` regions stay in the page while empty, so screen
 readers announce each message; confirmations use `status`, errors `alert`.
 
 A delete with undo (ADR-009) pairs it with `useUndoTimer`: hide the item, `start(commit)`, and

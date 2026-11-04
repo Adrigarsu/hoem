@@ -5,6 +5,8 @@ export const settingsPaths = {
   account: "/settings/account",
   appearance: "/settings/appearance",
   language: "/settings/language",
+  // Its own page on every width: the screen only draws the link (decided in #80).
+  password: "/settings/password",
   // Coming soon until their issue builds them: Notifications (M5) and Download my data
   // (NFR-LEG-003).
   notifications: "/settings/notifications",

@@ -1,7 +1,15 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useActionState, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useActionState,
+  useId,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { Button, buttonClassName, FormMessage, TextField, useFormFocus } from "@/design-system";
 import {
   changePhotoAction,
@@ -15,22 +23,18 @@ import { fieldErrors, nameSchema, type ValidationKey } from "../schemas";
 import { OwnAvatar, useOwnPhoto } from "./own-photo";
 
 type AccountFormProps = {
-  profile: { displayName: string; email: string; avatarUrl: string | null };
+  profile: { displayName: string; avatarUrl: string | null };
+  // The e-mail and password belong to the auth feature, which owns the account (#80).
+  email: ReactNode;
 };
 
-// The Account card and page (FR-ACC-007, profile.md). The email is read-only: changing it is #80.
-export function AccountForm({ profile }: AccountFormProps) {
-  const t = useTranslations("Profile");
+// The Account card and page (FR-ACC-007, profile.md).
+export function AccountForm({ profile, email }: AccountFormProps) {
   return (
     <div className="flex flex-col gap-4">
       <PhotoForm name={profile.displayName} photo={profile.avatarUrl} />
       <NameForm name={profile.displayName} />
-      {profile.email && (
-        <div className="flex flex-col gap-1">
-          <p className="text-label text-text">{t("email")}</p>
-          <p className="text-body break-words text-text-secondary">{profile.email}</p>
-        </div>
-      )}
+      {email}
     </div>
   );
 }

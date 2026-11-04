@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { AuthFailedError } from "@/lib/errors";
+import { AuthFailedError, NotAuthenticatedError } from "@/lib/errors";
 import type { AuthGateway } from "./service";
 import {
+  changeEmail,
+  changePassword,
+  currentAccount,
+  endSession,
   requestPasswordReset,
   resendVerification,
   resetPassword,
@@ -35,9 +39,16 @@ function gateway(overrides: Partial<AuthGateway> = {}): AuthGateway {
     updatePassword: vi.fn(async () => ({ error: null })),
     signOutOthers: vi.fn(async () => ({ error: null })),
     profilePreferences: vi.fn(async () => preferences),
+    account: vi.fn(async () => account),
+    updateEmail: vi.fn(async () => ({ error: null })),
+    signOutHere: vi.fn(async () => ({ error: null })),
     ...overrides,
   };
 }
+
+const account = { email: "ana@example.com", pendingEmail: null, hasPassword: true };
+const withoutPassword = async () => ({ ...account, hasPassword: false });
+const signedOut = async () => null;
 
 const refused = (code: string) => async () => ({ error: { code } });
 
@@ -241,5 +252,154 @@ describe("resetPassword", () => {
     const auth = gateway();
     await resetPassword(auth, "token-hash", "a new passphrase");
     expect(auth.signOutOthers).toHaveBeenCalled();
+  });
+});
+
+describe("currentAccount", () => {
+  it("FR-ACC-007 reads the e-mail, the one waiting for confirmation and whether there is a password", async () => {
+    const pending = { ...account, pendingEmail: "ana.new@example.com" };
+    await expect(currentAccount(gateway({ account: async () => pending }))).resolves.toEqual(
+      pending,
+    );
+  });
+
+  it("FR-ACC-007 needs a session", async () => {
+    await expect(currentAccount(gateway({ account: signedOut }))).rejects.toBeInstanceOf(
+      NotAuthenticatedError,
+    );
+  });
+});
+
+describe("changeEmail", () => {
+  const confirmUrl = "https://hoemapp.com/auth/confirm";
+
+  it("FR-ACC-007 asks Supabase to e-mail a link to the new address", async () => {
+    const auth = gateway();
+    await changeEmail(auth, "ana.new@example.com", confirmUrl);
+    expect(auth.updateEmail).toHaveBeenCalledWith("ana.new@example.com", {
+      emailRedirectTo: confirmUrl,
+    });
+  });
+
+  it("FR-ACC-007 refuses the address the account already has", async () => {
+    const auth = gateway();
+    await expect(changeEmail(auth, "ana@example.com", confirmUrl)).rejects.toMatchObject({
+      reason: "sameEmail",
+    });
+    expect(auth.updateEmail).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-007 answers as if it sent the link when another account has the address", async () => {
+    const auth = gateway({ updateEmail: refused("email_exists") });
+    await expect(changeEmail(auth, "marcos@example.com", confirmUrl)).resolves.toBeUndefined();
+  });
+
+  it("FR-ACC-007 reports the rate limit", async () => {
+    const auth = gateway({ updateEmail: refused("over_email_send_rate_limit") });
+    await expect(changeEmail(auth, "ana.new@example.com", confirmUrl)).rejects.toMatchObject({
+      reason: "rateLimited",
+    });
+  });
+
+  it("FR-ACC-007 needs a session", async () => {
+    const auth = gateway({ account: signedOut });
+    await expect(changeEmail(auth, "ana.new@example.com", confirmUrl)).rejects.toBeInstanceOf(
+      NotAuthenticatedError,
+    );
+    expect(auth.updateEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe("changePassword", () => {
+  const input = {
+    currentPassword: "the old passphrase",
+    password: "a new passphrase",
+    confirmPassword: "a new passphrase",
+  };
+
+  it("FR-ACC-007 checks the current password before setting the new one", async () => {
+    const auth = gateway();
+    await changePassword(auth, input);
+    expect(auth.signInWithPassword).toHaveBeenCalledWith({
+      email: "ana@example.com",
+      password: "the old passphrase",
+    });
+    expect(auth.updatePassword).toHaveBeenCalledWith("a new passphrase");
+    expect(vi.mocked(auth.signInWithPassword).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(auth.updatePassword).mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it("FR-ACC-007 signs out the other sessions once the password changed", async () => {
+    const auth = gateway();
+    await changePassword(auth, input);
+    expect(auth.signOutOthers).toHaveBeenCalledOnce();
+    expect(vi.mocked(auth.updatePassword).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(auth.signOutOthers).mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it("FR-ACC-007 refuses a wrong current password and changes nothing", async () => {
+    const auth = gateway({ signInWithPassword: refused("invalid_credentials") });
+    await expect(changePassword(auth, input)).rejects.toMatchObject({ reason: "wrongPassword" });
+    expect(auth.updatePassword).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-007 refuses an empty current password when the account has one", async () => {
+    const auth = gateway();
+    await expect(changePassword(auth, { ...input, currentPassword: "" })).rejects.toMatchObject({
+      reason: "wrongPassword",
+    });
+    expect(auth.signInWithPassword).not.toHaveBeenCalled();
+    expect(auth.updatePassword).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-007 reports the rate limit while checking the current password", async () => {
+    const auth = gateway({ signInWithPassword: refused("over_request_rate_limit") });
+    await expect(changePassword(auth, input)).rejects.toMatchObject({ reason: "rateLimited" });
+  });
+
+  it("FR-ACC-007 lets an account without a password set one without a current password", async () => {
+    const auth = gateway({ account: withoutPassword });
+    await changePassword(auth, { ...input, currentPassword: "" });
+    expect(auth.signInWithPassword).not.toHaveBeenCalled();
+    expect(auth.updatePassword).toHaveBeenCalledWith("a new passphrase");
+    expect(auth.signOutOthers).toHaveBeenCalledOnce();
+  });
+
+  it("FR-ACC-007 maps a new password the provider rejects to a message key", async () => {
+    const auth = gateway({ updatePassword: refused("weak_password") });
+    await expect(changePassword(auth, input)).rejects.toMatchObject({ reason: "weakPassword" });
+    expect(auth.signOutOthers).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-007 accepts the same password as before", async () => {
+    const auth = gateway({ updatePassword: refused("same_password") });
+    await expect(changePassword(auth, input)).resolves.toBeUndefined();
+  });
+
+  it("FR-ACC-007 keeps the change when signing out the other sessions fails", async () => {
+    const auth = gateway({ signOutOthers: refused("unexpected_failure") });
+    await expect(changePassword(auth, input)).resolves.toBeUndefined();
+  });
+
+  it("FR-ACC-007 needs a session", async () => {
+    const auth = gateway({ account: signedOut });
+    await expect(changePassword(auth, input)).rejects.toBeInstanceOf(NotAuthenticatedError);
+    expect(auth.updatePassword).not.toHaveBeenCalled();
+  });
+});
+
+describe("endSession", () => {
+  it("FR-ACC-007 clears this browser's session once Supabase no longer knows it", async () => {
+    const auth = gateway({ account: signedOut });
+    await expect(endSession(auth)).resolves.toBe("/sign-in");
+    expect(auth.signOutHere).toHaveBeenCalledOnce();
+  });
+
+  it("FR-ACC-007 keeps a session that is still valid, so a crafted link cannot sign anyone out", async () => {
+    const auth = gateway();
+    await expect(endSession(auth)).resolves.toBe("/");
+    expect(auth.signOutHere).not.toHaveBeenCalled();
   });
 });

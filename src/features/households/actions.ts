@@ -2,14 +2,18 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { NotFoundError, ValidationError } from "@/lib/errors";
-import { householdSettingsPath } from "./paths";
+import { ForbiddenError, NotFoundError, ValidationError } from "@/lib/errors";
+import type { FamilyRole } from "./domain/household-rules";
+import { householdSettingsPath, householdSettingsRoute as settingsRoute } from "./paths";
+import { removeHouseholdMember } from "./remove-household-member";
 import { householdGateway } from "./repository";
 import {
+  changeFamilyRoleSchema,
   changeHouseholdTypeSchema,
   createHouseholdSchema,
   fieldErrors,
   renameHouseholdSchema,
+  setMemberRoleSchema,
   switchHouseholdSchema,
   type ValidationKey,
 } from "./schemas";
@@ -39,9 +43,6 @@ function familyRolesOf(formData: FormData): Record<string, string> {
   }
   return roles;
 }
-
-// The route as the file system names it, with its locale segment and route group, not one URL.
-const settingsRoute = "/[locale]/(app)/settings/household/[id]";
 
 export async function createHouseholdAction(
   _: HouseholdFormState,
@@ -131,6 +132,82 @@ export async function switchHouseholdAction(householdId: string): Promise<boolea
     return true;
   } catch (error) {
     if (error instanceof NotFoundError) return false;
+    throw error;
+  }
+}
+
+// Member management (FR-ACC-006, FR-HH-006). "refused" carries why, so the dialog says what to do
+// first; "stale" means the members changed since the page loaded, and the refreshed page shows them.
+export type MemberFormState = {
+  status: "idle" | "saved" | "refused" | "stale";
+  refusal?: households.MemberChangeRefusal;
+  // The family role that was saved, for the confirmation.
+  familyRole?: FamilyRole;
+};
+
+async function memberChange(change: () => Promise<void>): Promise<MemberFormState> {
+  try {
+    await change();
+    return { status: "saved" };
+  } catch (error) {
+    if (error instanceof households.MemberChangeRefusedError) {
+      return { status: "refused", refusal: error.reason };
+    }
+    // Someone else changed the household meanwhile: the refresh below shows it as it is now.
+    if (error instanceof ForbiddenError || error instanceof NotFoundError)
+      return { status: "stale" };
+    throw error;
+  } finally {
+    revalidatePath(settingsRoute, "page");
+  }
+}
+
+export async function setMemberRoleAction(
+  _: MemberFormState,
+  formData: FormData,
+): Promise<MemberFormState> {
+  const parsed = setMemberRoleSchema.safeParse({
+    householdId: text(formData, "householdId"),
+    userId: text(formData, "userId"),
+    role: text(formData, "role"),
+  });
+  // Only a tampered request sends something else: the form offers no free input.
+  if (!parsed.success) return { status: "stale" };
+  return memberChange(async () => households.setMemberRole(await householdGateway(), parsed.data));
+}
+
+export async function changeFamilyRoleAction(
+  _: MemberFormState,
+  formData: FormData,
+): Promise<MemberFormState> {
+  const parsed = changeFamilyRoleSchema.safeParse({
+    householdId: text(formData, "householdId"),
+    userId: text(formData, "userId"),
+    familyRole: text(formData, "familyRole"),
+  });
+  if (!parsed.success) return { status: "stale" };
+  const result = await memberChange(async () =>
+    households.changeFamilyRole(await householdGateway(), parsed.data),
+  );
+  return { ...result, familyRole: parsed.data.familyRole };
+}
+
+// Called by the undo timer once the 5 seconds are over (ADR-009). False when nothing was removed,
+// so the member comes back with a message.
+export async function removeMemberAction(householdId: string, userId: string): Promise<boolean> {
+  try {
+    await removeHouseholdMember({ householdId, userId });
+    return true;
+  } catch (error) {
+    // A tampered request, a member the user may no longer remove, or a household they have left.
+    if (
+      error instanceof ValidationError ||
+      error instanceof ForbiddenError ||
+      error instanceof NotFoundError
+    ) {
+      revalidatePath(settingsRoute, "page");
+      return false;
+    }
     throw error;
   }
 }

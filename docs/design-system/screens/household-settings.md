@@ -5,7 +5,7 @@
 ## Layout — mobile (360 px), owner of a shared flat (drawn)
 
 1. Back link "Profile"; `h1` "Calle Mayor flat"; subtitle "Household settings · you're the owner".
-2. Section "Members" with a small secondary button "Invite": member rows — avatar, name ("Lucía (you)", "Marcos"), role Badge (Owner / Member), IconButton "Options for {name}" (menu: make owner, remove; family: change family role).
+2. Section "Members" with a small secondary button "Invite": member rows — avatar, name ("Lucía (you)", "Marcos"), role as secondary text (Owner / Member, plus the family role in a family), ghost IconButton "Options for {name}" that opens a dialog (make owner, make member or stop being an owner, family role, remove). Built in #26: see the decisions in `README.md`.
 3. Section "Details": field "Name"; select "Type" (Shared flat, Just me, Family, Something else) with helper "Changing the type never reveals existing private data."
 4. Section "How the household works": rows with value — "Split shared expenses" → "Equally between members"; "Meals to plan" → "4 of 5"; "Monthly shared budget" → "€600".
 5. Ghost button "Run the setup guide again".

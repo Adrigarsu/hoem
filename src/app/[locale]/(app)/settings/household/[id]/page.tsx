@@ -8,9 +8,11 @@ import { FormMessage } from "@/design-system";
 import {
   HouseholdDetails,
   householdGateway,
+  HouseholdMembers,
   householdSettings,
   type HouseholdSettingsView,
 } from "@/features/households";
+import { OwnAvatar } from "@/features/profile";
 import { settingsPaths } from "@/features/settings";
 import { LaunchScreen, Page } from "@/features/shell";
 import { NotFoundError } from "@/lib/errors";
@@ -35,8 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: t("title") };
 }
 
-// Household settings (household-settings.md): #19 builds Details; Members (#26) and the rules
-// (#30, #31) come later. The data loads inside <Suspense>, like Settings: opening it from Settings
+// Household settings (household-settings.md): Members (#26) and Details (#19); the rules (#30, #31)
+// come later. The data loads inside <Suspense>, like Settings: opening it from Settings
 // keeps the settings segment mounted, so the (app) loading screen does not cover that navigation.
 export default async function HouseholdSettingsPage({ params, searchParams }: Props) {
   const locale = await setLocaleFromParams(params);
@@ -56,6 +58,7 @@ async function HouseholdSettings({
   const { created } = await searchParams;
   const t = await getTranslations({ locale, namespace: "Households.settings" });
   const household = await load(id);
+  const you = household.members.find((member) => member.isYou);
 
   return (
     <Page
@@ -79,6 +82,10 @@ async function HouseholdSettings({
         {created === "1" && (
           <FormMessage tone="success">{t("created", { name: household.name })}</FormMessage>
         )}
+        <HouseholdMembers
+          household={household}
+          ownAvatar={<OwnAvatar name={you?.displayName ?? ""} src={you?.avatarUrl ?? null} />}
+        />
         <HouseholdDetails household={household} />
       </div>
     </Page>

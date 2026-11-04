@@ -1,6 +1,6 @@
 # Profile
 
-Each user's name, photo, theme and language (FR-ACC-007). On phones they are edited on their own
+Each user's name, photo, e-mail, password, theme and language (FR-ACC-007). On phones they are edited on their own
 pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 
 ## What it does
@@ -13,7 +13,16 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
   every avatar of the user, with "Undo" for 5 seconds (paused while the pointer or focus is on the
   message); then the profile's `avatar_path` is cleared and every file in the user's folder is
   deleted (ADR-009). If that fails, the photo comes back and the message says so.
-- **Email**: read-only until #80, which adds changing the email and the password.
+- **Email**: an editable field with "Change email". Supabase e-mails a link to the new address only
+  (`double_confirm_changes = false`, decided in #80); the account keeps the current address, and the
+  card says which one is waiting, until the link is opened. The link (`email_change.html`) goes to
+  `/auth/confirm`, which signs the user in and opens Account settings with the new address; an
+  expired or used link opens Account settings with the reason (`?error=`), not sign-in. The card
+  reads the account from Supabase Auth (`getUser`), not from the session token, so an address
+  confirmed on another device shows without signing in again.
+- **Password**: "Change password", or "Set a password" for an account created with Google, opens
+  `/settings/password` on every width. An account with a password types the current one first; then
+  the new one twice (the sign-up policy), and every other session is signed out.
 - **Theme**: System (the default), Light or Dark. It applies at once and follows the user to every
   device; if saving fails, the previous theme comes back (ADR-018).
 - **Language**: English is selected and is the only option until Spanish in phase 2 (ADR-012), so
@@ -46,6 +55,17 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 - During the 5-second undo the file still exists and members can still load it, as ADR-009 intends.
   Closing the tab sends the removal on `pagehide` as a keepalive `DELETE /api/v1/profile/avatar`,
   which outlives the page (ADR-020); only a killed browser sends nothing.
+- Typing an address that belongs to another account gets the same "We sent a link" answer and
+  e-mails nobody, so the form never reveals who has signed up.
+- A wrong current password changes nothing. Supabase checks a password only by signing in, so the
+  check renews this session; the other sessions are deleted after the change. A device that is
+  signed out keeps a valid token until it expires (at most 1 hour): Supabase refuses its next
+  refresh and every `getUser`. The settings pages ask Supabase, so on that device they go to
+  `/auth/session-ended`, which clears its cookies and opens sign-in. That route signs out only a
+  session Supabase no longer knows, so a link to it cannot sign anyone out.
+- One confirmation only: someone using a session left open could move the account to an address of
+  theirs. Accepted in #80; "Set a password" carries the same risk for a Google account, and the
+  Supabase "password changed" notification e-mail is left for a later issue.
 - Whether an account has a password comes from `own_account_has_password()` (#80): Supabase Auth
   gives no sign of it once a Google account sets one. It answers only about the caller, only yes or
   no, and refuses without a session or for a deleted account, so the app never offers "Set a
@@ -55,11 +75,14 @@ pages, opened from the settings menu; from 768 px, in the cards of `/settings`.
 
 ## Where it lives
 
-- Code: `src/features/profile/` (`own-photo.tsx` holds the removal for the whole app), the Toast and
+- Code: `src/features/profile/` (`own-photo.tsx` holds the removal for the whole app), the e-mail and
+  password in `src/features/auth/` (`email-form.tsx`, `change-password-form.tsx`, `own-account.ts`),
+  the template `supabase/templates/email_change.html`, the Toast and
   `useUndoTimer` in `src/design-system/`, the theme in `src/lib/theme/`, the migrations
   `supabase/migrations/*_avatars-storage.sql` and `*_profiles-avatar-path.sql`.
 - Tests: `src/features/profile/**/*.test.ts(x)`, `src/lib/theme/theme.test.ts`,
-  `supabase/tests/database/avatars.test.sql`, `tests/e2e/profile.spec.ts`.
+  `supabase/tests/database/avatars.test.sql`, `tests/e2e/profile.spec.ts`,
+  `tests/e2e/account-credentials.spec.ts`.
 
 ## Requirements
 
