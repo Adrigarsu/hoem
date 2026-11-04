@@ -29,6 +29,11 @@ async function consume(limit: RateLimit, { accessToken }: ApiCredentials): Promi
   // Per request only: Supabase reads the clock to check the session, which a prerender refuses.
   await connection();
   const supabase = accessToken ? createTokenClient(accessToken) : await createClient();
+  // The caller is checked first, as the gateways do: without a valid session PostgREST would refuse
+  // the call itself (an invalid token, or the anon role, which may not execute the function), with
+  // errors that are not the function's own refusal.
+  const { data: session } = await supabase.auth.getClaims(accessToken);
+  if (!session?.claims) throw new NotAuthenticatedError("No valid session");
   const { data, error } = await supabase.rpc("consume_rate_limit", {
     bucket: limit.bucket,
     max_requests: limit.maxRequests,

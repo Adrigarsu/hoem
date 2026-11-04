@@ -5,16 +5,19 @@ import { limitWrites } from "./rate-limit";
 import { createClient, createTokenClient } from "./supabase/server";
 
 const rpc = vi.fn();
+const getClaims = vi.fn();
+const supabase = { rpc, auth: { getClaims } };
 
 vi.mock("next/server", () => ({ connection: vi.fn(async () => undefined) }));
 vi.mock("./supabase/server", () => ({
-  createClient: vi.fn(async () => ({ rpc })),
-  createTokenClient: vi.fn(() => ({ rpc })),
+  createClient: vi.fn(async () => supabase),
+  createTokenClient: vi.fn(() => supabase),
 }));
 
 beforeEach(() => {
   vi.clearAllMocks();
   rpc.mockResolvedValue({ data: 0, error: null });
+  getClaims.mockResolvedValue({ data: { claims: { sub: "user" } }, error: null });
 });
 
 describe("limitWrites", () => {

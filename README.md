@@ -41,10 +41,10 @@ Sign-up e-mails from the local Supabase never leave your machine: open Mailpit a
 http://127.0.0.1:54324 to read them and click the verification link.
 
 The end-to-end tests run against the local Supabase (`pnpm db:start`), and need the Playwright
-browsers once (Chrome itself must be installed):
+browsers once (Google Chrome and Microsoft Edge themselves must be installed):
 
 ```bash
-pnpm exec playwright install chromium webkit
+pnpm exec playwright install chromium firefox webkit
 ```
 
 ```bash

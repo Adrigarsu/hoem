@@ -53,18 +53,32 @@ jobs:
       - name: Unit tests with coverage
         run: pnpm test:coverage
 
-  # NFR-UX-001, NFR-A11Y-001: the production build in Chromium, Chrome and Safari (WebKit) at three
-  # widths, with axe-core in both themes. Firefox and Edge are not wired up yet. A throw-away local
-  # Supabase (database, Auth, REST and the Mailpit mail catcher) serves the auth stories.
-  # Split in two runners: the whole suite took close to the time limit on one.
+  # NFR-UX-001, NFR-A11Y-001: the production build at three widths, with axe-core in both themes,
+  # in every browser SRS 2.3 targets. One job per browser, so they run in parallel, each with its
+  # own check and re-run; fail-fast is off so one browser's failure does not cancel the others. A
+  # throw-away local Supabase (database, Auth, REST and the Mailpit mail catcher) serves the auth
+  # stories in each job.
   e2e:
-    name: e2e (${{ matrix.shard }}/2)
+    name: e2e (${{ matrix.browser }})
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        browser: [chromium, chrome, firefox, edge, safari]
+        # The Playwright browser each project needs. Google Chrome and Microsoft Edge are
+        # preinstalled on GitHub's Ubuntu runners, so they install nothing.
+        include:
+          - browser: chromium
+            playwright-browser: chromium
+          - browser: chrome
+            playwright-browser: ""
+          - browser: firefox
+            playwright-browser: firefox
+          - browser: edge
+            playwright-browser: ""
+          - browser: safari
+            playwright-browser: webkit
     # The Supabase URL and key come from the local stack, set in a step below. Placeholder, not a
     # secret: nothing in the E2E tests sends real e-mail.
     env:
@@ -85,27 +99,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Google Chrome is preinstalled on GitHub's Ubuntu runners; Chromium and WebKit come from
-      # Playwright. The browsers are cached per Playwright version; their system libraries are not
+      # The browsers are cached per Playwright version and browser; their system libraries are not
       # cacheable, so they are installed on every run.
       - name: Read the Playwright version
+        if: matrix.playwright-browser != ''
         id: playwright
         run: echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
+        if: matrix.playwright-browser != ''
         id: playwright-cache
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ matrix.playwright-browser }}
 
       - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium webkit
+        if: matrix.playwright-browser != '' && steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps ${{ matrix.playwright-browser }}
 
       - name: Install browser system libraries
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium webkit
+        if: matrix.playwright-browser != '' && steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps ${{ matrix.playwright-browser }}
 
       - name: Start a local Supabase
         run: pnpm exec supabase start -x realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
@@ -122,13 +137,13 @@ jobs:
         run: pnpm build
 
       - name: End-to-end tests
-        run: pnpm test:e2e --shard=${{ matrix.shard }}/2
+        run: pnpm test:e2e --project="${{ matrix.browser }}-*"
 
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report-${{ matrix.shard }}
+          name: playwright-report-${{ matrix.browser }}
           path: playwright-report/
           retention-days: 7
 
