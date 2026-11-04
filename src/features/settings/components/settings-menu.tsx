@@ -1,7 +1,8 @@
 import { Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { Avatar, IconButton } from "@/design-system";
+import { IconButton } from "@/design-system";
+import { OwnAvatar } from "@/features/profile";
 import type { Locale } from "@/lib/i18n/locales";
 import type { Theme } from "@/lib/theme/theme";
 import { settingsPaths } from "../domain/sections";
@@ -30,7 +31,7 @@ export function SettingsMenu({ profile, households, locale, signOut }: SettingsM
     <div className="flex w-full flex-col gap-4 md:hidden">
       <Section id="settings-account" title={t("account")}>
         <div className="flex items-center gap-3">
-          <Avatar name={profile.displayName} src={profile.avatarUrl} size="lg" />
+          <OwnAvatar name={profile.displayName} src={profile.avatarUrl} size="lg" />
           <div className="flex min-w-0 flex-1 flex-col">
             <span className="truncate text-body-strong text-text">{profile.displayName}</span>
             {profile.email && (

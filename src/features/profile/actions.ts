@@ -5,7 +5,7 @@ import { ValidationError } from "@/lib/errors";
 import type { AvatarRejection } from "./domain/avatar-rules";
 import { profileGateway } from "./repository";
 import { fieldErrors, nameSchema, themeSchema, type ValidationKey } from "./schemas";
-import { changeAvatar, updateName, updateTheme } from "./service";
+import { changeAvatar, removePhoto, updateName, updateTheme } from "./service";
 
 // The route as the file system names it: this layout holds the header and the sidebar, which show
 // the name and the photo.
@@ -77,4 +77,18 @@ export async function changePhotoAction(
   }
   revalidatePath(appLayout, "layout");
   return { status: "saved" };
+}
+
+// Sent once the 5-second undo has passed, or on pagehide (ADR-009). It takes no input: whose photo
+// goes comes from the session.
+export async function removePhotoAction(): Promise<{ removed: boolean }> {
+  try {
+    await removePhoto(await profileGateway());
+  } catch (error) {
+    console.error("Could not remove the photo", error);
+    // The interface puts the photo back and says so.
+    return { removed: false };
+  }
+  revalidatePath(appLayout, "layout");
+  return { removed: true };
 }

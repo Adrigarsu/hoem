@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test";
 import sharp from "sharp";
+import { expectNoA11yViolations, expectNoHorizontalScroll } from "./support/accessibility";
 import { verifiedAccount } from "./support/accounts";
 import { expect, test } from "./support/fixtures";
 
@@ -33,6 +34,11 @@ const avatarPhoto = (page: Page) => avatarPhotos(page).first();
 const pageAlert = (page: Page) => page.getByRole("main").getByRole("alert");
 
 const dataTheme = (page: Page) => page.evaluate(() => document.documentElement.dataset.theme);
+
+// Every avatar on screen, not only the card's: the header button on phones, the sidebar from 768 px.
+const shownPhotos = (page: Page) => page.locator("img:visible");
+const removeButton = (page: Page) =>
+  page.getByRole("button", { name: "Remove photo" }).locator("visible=true");
 
 async function uploadPhoto(page: Page) {
   await photoInput(page).setInputFiles({
@@ -203,5 +209,48 @@ test.describe("FR-ACC-007 edit my profile", () => {
     const language = page.getByRole("combobox", { name: "Language" });
     await expect(language).toHaveValue("en");
     await expect(language.getByRole("option")).toHaveText(["English"]);
+  });
+
+  test("FR-ACC-007 removing my photo shows my initials everywhere at once, and Undo brings it back", async ({
+    page,
+    visit,
+  }) => {
+    await visit(accountPage(page));
+    await uploadPhoto(page);
+    const photoUrl = (await avatarPhoto(page).getAttribute("src")) ?? "";
+
+    await removeButton(page).click();
+    await expect(shownPhotos(page)).toHaveCount(0);
+    await expect(page.getByText("Photo removed")).toBeVisible();
+    await expect(page.getByLabel("Change photo")).toBeFocused();
+
+    // Pointer on the toast pauses the countdown, so the checks below cannot outlast it.
+    await page.getByText("Photo removed").hover();
+    await expectNoHorizontalScroll(page);
+    await expectNoA11yViolations(page);
+
+    await page.getByRole("button", { name: "Undo" }).click();
+    await expect(avatarPhoto(page)).toBeVisible();
+    await expect(page.getByText("Photo removed")).toHaveCount(0);
+    expect((await page.request.get(photoUrl)).ok()).toBe(true);
+  });
+
+  test("FR-ACC-007 a removed photo is deleted for real once the 5 seconds have passed", async ({
+    page,
+    visit,
+  }) => {
+    await visit(accountPage(page));
+    await uploadPhoto(page);
+    const photoUrl = (await avatarPhoto(page).getAttribute("src")) ?? "";
+
+    await removeButton(page).click();
+    await page.mouse.move(0, 0);
+    await expect(page.getByText("Photo removed")).toHaveCount(0, { timeout: 10_000 });
+
+    // Its signed URL is still within its 15 minutes, so only a deleted file can make it fail.
+    await expect.poll(async () => (await page.request.get(photoUrl)).ok()).toBe(false);
+    await visit(accountPage(page));
+    await expect(shownPhotos(page)).toHaveCount(0);
+    await expect(removeButton(page)).toHaveCount(0);
   });
 });

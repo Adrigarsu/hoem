@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Avatar, Tooltip } from "@/design-system";
-import { ownProfile, ThemeSync } from "@/features/profile";
+import { Tooltip } from "@/design-system";
+import { OwnAvatar, ownProfile, ThemeSync } from "@/features/profile";
 import { settingsPaths } from "@/features/settings";
 import { NavLink } from "./nav-link";
 
@@ -24,7 +24,7 @@ function AvatarFabLink({ name, photo }: { name: string; photo: string | null }) 
         >
           <span className="sr-only">{t("profileAndSettings")}</span>
           <span className="rounded-full ring-2 ring-bg outline-1 outline-offset-2 outline-border-control">
-            <Avatar name={name} src={photo} />
+            <OwnAvatar name={name} src={photo} />
           </span>
         </NavLink>
       </Tooltip>
@@ -45,7 +45,7 @@ function SidebarProfileLink({ name, photo }: { name: string; photo: string | nul
       href={settings}
       className="flex items-center gap-3 rounded-md border border-border px-3 py-2 text-text hover:bg-surface-subtle aria-[current=page]:border-brand aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand-ink"
     >
-      <Avatar name={name} src={photo} />
+      <OwnAvatar name={name} src={photo} />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-label">{name}</span>
         <span className="text-caption">{t("profileAndSettings")}</span>

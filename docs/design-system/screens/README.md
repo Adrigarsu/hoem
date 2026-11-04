@@ -141,6 +141,17 @@ decision wins and the screen's spec says so.
 | Households         | The rows of #21, without the role or the "Switch" button of the desktop frame: the switcher is in the header.                                                                                                                                                                                                     |
 | Saved              | A message next to the form, as in household settings; the app has no Toast yet.                                                                                                                                                                                                                                   |
 
+### Decisions taken removing the profile photo (#79)
+
+| Topic         | Decision                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button        | "Remove photo", a ghost button next to "Change photo" (wrapping below it on narrow cards), only while there is a photo. The screen did not define it.    |
+| At once       | The initials replace the photo in every avatar of the user (card, settings menu, header button, sidebar) as soon as it is pressed, not only in the card. |
+| Toast         | The app's first toast: "Photo removed" with "Undo", right above the tab bar on phones and at the bottom of the content from 768 px.                      |
+| Time to react | The 5-second countdown pauses while the pointer or the focus is on the toast (WCAG 2.2.1).                                                               |
+| Focus         | After removing, focus moves to "Change photo", since the pressed button disappears.                                                                      |
+| Failure       | The photo comes back and the toast says "We could not remove your photo. Try again." as an alert.                                                        |
+
 ### Decisions taken building the household switcher (#20)
 
 | Topic           | Decision                                                                                                                                                                                                                  |

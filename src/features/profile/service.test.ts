@@ -3,6 +3,7 @@ import { NotAuthenticatedError, NotFoundError, ValidationError } from "@/lib/err
 import {
   changeAvatar,
   currentProfile,
+  removePhoto,
   updateName,
   updateTheme,
   UnreadableImageError,
@@ -240,6 +241,88 @@ describe("changeAvatar", () => {
   it("NFR-SEC-001 refuses without a session", async () => {
     await expect(
       changeAvatar(gateway({ signedInUser: vi.fn(async () => null) }), encoder, png),
+    ).rejects.toBeInstanceOf(NotAuthenticatedError);
+  });
+});
+
+describe("removePhoto", () => {
+  const leftover = `${userId}/leftover.webp`;
+  // The profile as removePhoto reads it before and after clearing it.
+  const clearedPhoto = () =>
+    vi
+      .fn()
+      .mockResolvedValueOnce({ ...stored, avatarPath: oldPath })
+      .mockResolvedValue(stored);
+
+  it("FR-ACC-007 clears the photo from the signed-in user's own profile", async () => {
+    const profiles = gateway({ profileById: withPhoto() });
+    await removePhoto(profiles);
+    expect(profiles.updateProfile).toHaveBeenCalledWith(userId, { avatarPath: null });
+  });
+
+  it("FR-ACC-007 deletes every file in the user's folder, after clearing the profile", async () => {
+    const profiles = gateway({
+      profileById: clearedPhoto(),
+      avatarFiles: vi.fn(async () => [oldPath, leftover]),
+    });
+    await removePhoto(profiles);
+    expect(profiles.removeAvatar).toHaveBeenCalledWith(oldPath);
+    expect(profiles.removeAvatar).toHaveBeenCalledWith(leftover);
+    expect(vi.mocked(profiles.updateProfile).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(profiles.removeAvatar).mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it("FR-ACC-007 never deletes a photo uploaded while the removal was running", async () => {
+    const newPath = `${userId}/new.webp`;
+    const profiles = gateway({
+      profileById: vi
+        .fn()
+        .mockResolvedValueOnce({ ...stored, avatarPath: oldPath })
+        .mockResolvedValueOnce({ ...stored, avatarPath: newPath }),
+      avatarFiles: vi.fn(async () => [oldPath, newPath]),
+    });
+    await removePhoto(profiles);
+    expect(profiles.removeAvatar).toHaveBeenCalledWith(oldPath);
+    expect(profiles.removeAvatar).not.toHaveBeenCalledWith(newPath);
+  });
+
+  it("FR-ACC-007 does nothing when there is no photo, so a repeated request is harmless", async () => {
+    const profiles = gateway();
+    await removePhoto(profiles);
+    expect(profiles.updateProfile).not.toHaveBeenCalled();
+    expect(profiles.removeAvatar).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-007 keeps the photo and its file when the profile cannot be cleared", async () => {
+    const profiles = gateway({
+      profileById: withPhoto(),
+      avatarFiles: vi.fn(async () => [oldPath]),
+      updateProfile: vi.fn(async () => {
+        throw new Error("db down");
+      }),
+    });
+    await expect(removePhoto(profiles)).rejects.toThrow("db down");
+    expect(profiles.removeAvatar).not.toHaveBeenCalled();
+  });
+
+  it("FR-ACC-007 succeeds even if a file cannot be deleted, and logs it", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const profiles = gateway({
+      profileById: clearedPhoto(),
+      avatarFiles: vi.fn(async () => [oldPath]),
+      removeAvatar: vi.fn(async () => {
+        throw new Error("storage down");
+      }),
+    });
+    await expect(removePhoto(profiles)).resolves.toBeUndefined();
+    expect(logged).toHaveBeenCalledTimes(1);
+    logged.mockRestore();
+  });
+
+  it("NFR-SEC-001 refuses without a session", async () => {
+    await expect(
+      removePhoto(gateway({ signedInUser: vi.fn(async () => null) })),
     ).rejects.toBeInstanceOf(NotAuthenticatedError);
   });
 });
