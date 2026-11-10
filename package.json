@@ -74,7 +74,7 @@
     "postcss": "^8.5.32",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "stylelint": "^17.16.0",
+    "stylelint": "^18.0.0",
     "supabase": "^2.122.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
